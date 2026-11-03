@@ -1,4 +1,4 @@
-// Rodapé: ano do ©, relógio de Ilhabela, nome gigante do tamanho da largura e a entrada.
+// Rodapé: ano do ©, relógio de Ilhabela e a entrada.
 (() => {
   const ft = document.querySelector('.site-footer');
   if (!ft) return;
@@ -23,22 +23,6 @@
     setInterval(tick, 15000);
   }
 
-  // nome gigante: mede no tamanho base e ajusta para ocupar a largura disponível
-  const word = ft.querySelector('.ft-word');
-  const inner = ft.querySelector('.ft-word-in');
-  const fit = () => {
-    if (!word || !inner) return;
-    const pad = parseFloat(getComputedStyle(word).paddingLeft) * 2;
-    const avail = word.clientWidth - pad;
-    word.style.fontSize = '100px';
-    const w = inner.getBoundingClientRect().width;
-    if (w) word.style.fontSize = `${(100 * avail) / w}px`;
-  };
-  fit();
-  if (document.fonts) document.fonts.ready.then(fit);
-  let raf;
-  addEventListener('resize', () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(fit); });
-
   // entrada quando o rodapé aparece (sem animação para quem prefere menos movimento)
   if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
   ft.classList.add('ft-anim');
@@ -46,7 +30,6 @@
     if (!entries.some((e) => e.isIntersecting)) return;
     ft.classList.add('is-in');
     io.disconnect();
-    setTimeout(() => ft.classList.add('is-done'), 1900);
   }, { threshold: 0.12 });
   io.observe(ft);
 })();
