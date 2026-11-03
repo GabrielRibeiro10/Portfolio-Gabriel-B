@@ -1083,3 +1083,44 @@ html, body { overflow-x: clip; }
 .about-cta p span { color: var(--peach); }
 .about-cta .cta-bonus { color: rgba(255, 246, 239, .88); }
 .cta-bonus i { background: #fff; box-shadow: 0 0 10px 2px rgba(255, 210, 168, .9); }
+
+/* ---------- Rodapé ----------
+   Café escuro igual ao fundo dos Projetos (--ember-*), texto em creme/pêssego, detalhes em laranja.
+   Três colunas no computador (marca | Navegar | Contato), empilha no celular. */
+.site-footer {
+  position: relative; overflow: hidden; isolation: isolate;
+  padding: clamp(56px, 6vw, 96px) max(24px, calc((100vw - 1320px) / 2)) 28px;
+  color: var(--peach-50);
+  background:
+    radial-gradient(60% 90% at 100% 0%, rgba(242, 107, 29, .28), rgba(242, 107, 29, 0) 65%),
+    radial-gradient(50% 80% at 0% 100%, rgba(122, 42, 10, .5), rgba(122, 42, 10, 0) 70%),
+    linear-gradient(180deg, var(--ember-800), var(--ember-950));
+  border-radius: clamp(18px, 2vw, 32px) clamp(18px, 2vw, 32px) 0 0;
+  font-family: var(--font);
+  box-shadow: 0 0 0 clamp(18px, 2vw, 32px) var(--panel);   /* os cantos arredondados mostram o creme da seção de cima */
+  clip-path: inset(calc(-1 * clamp(18px, 2vw, 32px)) 0 0 0);
+}
+.ft-in { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr); gap: clamp(32px, 4vw, 64px); }
+.ft-logo { display: inline-flex; align-items: center; gap: 14px; }
+.ft-mark { height: 30px; width: auto; overflow: visible; }
+.ft-mark path { fill: none; stroke: #fff; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+.ft-mark rect { fill: var(--orange-2); filter: drop-shadow(0 0 3px rgba(255, 149, 54, .9)); }
+.ft-name { font-size: clamp(20px, 1.7vw, 26px); font-weight: 500; letter-spacing: -.02em; color: #fff; }
+.ft-tagline { margin: 18px 0 0; max-width: 30ch; text-wrap: balance; font-size: clamp(16px, 1.3vw, 20px); line-height: 1.45; letter-spacing: -.01em; color: rgba(255, 233, 216, .74); }
+.ft-title { margin: 0 0 16px; font-size: 12px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--orange-2); }
+.ft-col ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.ft-col a { font-size: clamp(15px, 1.1vw, 17px); color: var(--peach-50); transition: color .2s ease; }
+.ft-col a:hover { color: var(--peach); }
+.site-footer a:focus-visible { outline: 2px solid var(--orange-2); outline-offset: 3px; border-radius: 4px; }
+.ft-base {
+  display: flex; justify-content: space-between; gap: 8px 24px; flex-wrap: wrap;
+  margin-top: clamp(40px, 5vw, 72px); padding-top: 22px; border-top: 1px solid rgba(255, 210, 168, .16);
+  font-size: 13px; color: rgba(255, 233, 216, .58);
+}
+.ft-base p { margin: 0; }
+
+@media (max-width: 860px) {
+  .site-footer { padding: 44px 20px 24px; }
+  .ft-in { grid-template-columns: 1fr; gap: 32px; }
+  .ft-base { flex-direction: column; margin-top: 36px; }
+}

@@ -400,5 +400,44 @@
   </div>
 </section>
 
+<!-- Rodapé: fundo café escuro igual ao dos Projetos (--ember-*), marca, navegação, contato e base -->
+<footer class="site-footer">
+  <div class="ft-in">
+    <div class="ft-brand">
+      <a class="ft-logo" href="#" aria-label="Gabriel Ribeiro, voltar ao início">
+        <svg class="ft-mark" viewBox="1 5 48 30" aria-hidden="true">
+          <path d="M21.9 10.2A12 12 0 1 0 27 20"/><path d="M27 32V8h5.5a6 6 0 0 1 0 12H17"/><path d="M31 20l7 12"/>
+          <rect x="42" y="27" width="6" height="5" rx="1"/>
+        </svg>
+        <span class="ft-name">Gabriel Ribeiro</span>
+      </a>
+      <p class="ft-tagline">Sites, lojas virtuais e sistemas feitos para vender.</p>
+    </div>
+
+    <nav class="ft-col" aria-labelledby="ft-nav-title">
+      <h2 class="ft-title" id="ft-nav-title">Navegar</h2>
+      <ul>
+        <li><a href="#sobre">Sobre</a></li>
+        <li><a href="#projetos">Projetos</a></li>
+        <li><a href="#servicos">Serviços</a></li>
+      </ul>
+    </nav>
+
+    <div class="ft-col">
+      <h2 class="ft-title">Contato</h2>
+      <ul>
+        <li><a href="https://wa.me/5512991145851" target="_blank" rel="noopener">WhatsApp</a></li>
+        <li><a href="https://github.com/Gabrielrinkawetsky" target="_blank" rel="noopener">GitHub</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="ft-base">
+    <p>© <span class="ft-year">2026</span> Gabriel Ribeiro. Todos os direitos reservados.</p>
+    <p>Caraguatatuba · Litoral Norte de SP</p>
+  </div>
+  <script>document.querySelector('.ft-year').textContent = new Date().getFullYear();</script>
+</footer>
+
 </body>
 </html>
