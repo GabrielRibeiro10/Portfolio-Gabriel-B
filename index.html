@@ -250,11 +250,13 @@
         <li data-ab><span class="n">03</span><h3>IA e automações</h3><p>Automações com IA que poupam horas: conectam ferramentas e eliminam tarefas repetitivas.</p></li>
         <li data-ab><span class="n">04</span><h3>Performance e qualidade</h3><p>Responsividade, acessibilidade, código organizado e carregamento rápido.</p></li>
         <li data-ab><span class="n">05</span><h3>Pagamentos online</h3><p>Venda direto pelo site. Checkout com cartão de crédito integrado, pagamento seguro e pedido confirmado na hora.</p></li>
-        <!-- 06: os bônus que vão junto com todo site. Mesmo formato dos outros itens; quando o fio chega,
-             um alfinete 3D desce e prende a etiqueta "Grátis" (css/style.css) -->
+        <!-- 06: os bônus que vão junto com todo site, no visual do design aprovado (faixa pêssego de ponta a
+             ponta, selo "Bônus", título e os dois bônus com ícone) e no layout da lista: número na coluna dos
+             números, título na dos títulos e os dois bônus alinhados às colunas de título e descrição de cima.
+             Quando o fio chega, o alfinete prende o selo (css/style.css) -->
         <li class="bonus" data-ab>
           <span class="n">06</span>
-          <h3>Bônus em todo site
+          <div class="bonus-head">
             <span class="bonus-badge" aria-hidden="true">
               <svg class="bonus-pin" viewBox="0 0 32 40">
                 <defs>
@@ -268,10 +270,20 @@
                 <ellipse cx="16" cy="8" rx="9.5" ry="6.4" fill="url(#bonus-pin-head)"/>
                 <ellipse cx="12.6" cy="5.6" rx="3.2" ry="1.7" fill="#fff" opacity=".75"/>
               </svg>
-              <span class="bonus-tag">Grátis</span>
+              <span class="bonus-tag">Bônus</span>
             </span>
-          </h3>
-          <p>Google Meu Negócio configurado, para sua empresa aparecer no Maps e nas buscas da região, e 2 ajustes grátis depois da entrega.</p>
+            <h3>Todo site sai com <em>dois bônus</em></h3>
+          </div>
+          <ul class="bonus-list">
+            <li>
+              <span class="bonus-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.3 7-12a7 7 0 10-14 0c0 5.7 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg></span>
+              <p><strong>Google Meu Negócio configurado</strong>Endereço, horários, fotos, link para o site e WhatsApp. Sua empresa aparece no Google Maps e nas buscas da sua região.</p>
+            </li>
+            <li>
+              <span class="bonus-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 11-2.3-5.6M20 4v4.5h-4.5"/></svg></span>
+              <p><strong>2 ajustes grátis</strong>Precisou mudar alguma coisa depois da entrega? Os dois primeiros ajustes são por minha conta.</p>
+            </li>
+          </ul>
         </li>
       </ol>
     </div>
