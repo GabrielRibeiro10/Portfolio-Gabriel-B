@@ -1018,3 +1018,68 @@ html, body { overflow-x: clip; }
   .about-cta .cta-bonus { font-size: 13px; }
   .cta-bonus i { align-self: flex-start; margin-top: .45em; }
 }
+
+/* ---------- Paleta quente: Projetos, Bônus e chamada final ----------
+   As três partes usavam grafite neutro (#0e0d0c, #141110, #111) e destoavam do hero. Agora tiram as
+   cores do próprio hero: o café escuro do canto (#240a03), o laranja-tijolo do gradiente e o pêssego
+   da marca (#ffd2a8). Projetos = café com holofote laranja; Bônus = faixa clara pêssego (liga com o
+   claro em volta e com o FAQ); chamada final = o gradiente do hero, fechando como o site abre. */
+:root {
+  --ember-950: #1a0803;
+  --ember-900: #240a03;
+  --ember-800: #3a1406;
+  --ember-700: #5c210a;
+  --peach: #ffd2a8;
+  --peach-50: #fff6ef;
+  --peach-100: #ffe9d8;
+  --rust: #c4520f;    /* laranja mais fechado: texto laranja sobre fundo claro */
+}
+
+/* Projetos: café quente no lugar do grafite */
+.pj { --pj-end: var(--ember-950); }
+.pj-bg {
+  background:
+    radial-gradient(720px circle at var(--mx, 68%) var(--my, 45%), rgba(242, 107, 29, .46), rgba(242, 107, 29, 0) 62%),
+    radial-gradient(70% 60% at 0% 0%, rgba(122, 42, 10, .55), rgba(122, 42, 10, 0) 70%),
+    radial-gradient(60% 50% at 100% 0%, rgba(255, 149, 54, .12), rgba(255, 149, 54, 0) 70%),
+    linear-gradient(180deg, var(--ember-800), var(--ember-950));
+}
+.pj-bg::before { background-image: radial-gradient(rgba(255, 210, 168, .2) 1px, transparent 1.5px); }
+.pj::after { background: linear-gradient(180deg, rgba(26, 8, 3, 0), var(--pj-end)); }
+.pj-curve svg { fill: var(--ember-950); }
+.pj-slide::before { -webkit-text-stroke-color: rgba(255, 210, 168, .12); }
+.pj-desc { color: rgba(255, 233, 216, .74); }
+.pj-tech li { background: rgba(255, 210, 168, .06); border-color: rgba(255, 210, 168, .2); color: #ffe9d8; }
+.pj-count { color: rgba(255, 233, 216, .55); }
+.pj-dots i { background: rgba(255, 210, 168, .22); }
+.pj-arrow { border-color: rgba(255, 210, 168, .3); }
+.lp-face { box-shadow: inset 0 0 0 1.5px #3b3b3f, inset 0 0 0 3px #111, 0 30px 60px -28px rgba(26, 8, 3, .9); }
+
+/* Bônus: faixa clara pêssego, texto escuro e detalhes em laranja */
+.bonus {
+  color: var(--ink);
+  background:
+    radial-gradient(55% 140% at 100% 50%, rgba(255, 149, 54, .32), rgba(255, 149, 54, 0) 70%),
+    radial-gradient(40% 120% at 0% 0%, rgba(255, 210, 168, .5), rgba(255, 210, 168, 0) 70%),
+    linear-gradient(180deg, var(--peach-50), var(--peach-100));
+  border-top: 1px solid rgba(242, 107, 29, .14); border-bottom: 1px solid rgba(242, 107, 29, .14);
+}
+.bonus-tag { background: linear-gradient(180deg, var(--orange-2), var(--orange)); box-shadow: 0 8px 18px -10px rgba(242, 107, 29, .9); }
+.bonus h3 em { color: var(--rust); }
+.about-areas .bonus-list li { border-top-color: rgba(122, 42, 10, .16); }
+.bonus-list span:not(.bonus-ico) { color: var(--muted); }
+.bonus-ico { border-color: rgba(242, 107, 29, .35); background: #fff; box-shadow: 0 6px 16px -10px rgba(122, 42, 10, .5); }
+.bonus-ico svg { stroke: var(--orange); }
+
+/* Chamada final: o gradiente do hero, com o brilho laranja e o canto café */
+.about-cta {
+  position: relative; overflow: hidden; isolation: isolate;
+  background:
+    radial-gradient(60% 120% at 78% 40%, rgba(255, 160, 70, .85), rgba(246, 122, 36, 0) 70%),
+    radial-gradient(55% 130% at 0% 0%, rgba(36, 10, 3, .9), rgba(60, 18, 5, 0) 70%),
+    linear-gradient(160deg, #7a2a0a 0%, #d8611a 48%, #e9721f 70%, #b9480f 100%);
+  box-shadow: 0 30px 60px -34px rgba(122, 42, 10, .8);
+}
+.about-cta p span { color: var(--peach); }
+.about-cta .cta-bonus { color: rgba(255, 246, 239, .88); }
+.cta-bonus i { background: #fff; box-shadow: 0 0 10px 2px rgba(255, 210, 168, .9); }
