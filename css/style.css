@@ -1044,40 +1044,46 @@ html, body { overflow-x: clip; }
 }
 
 /* ---------- Bônus: item 06 de "O que eu entrego" ----------
-   Google Meu Negócio + 2 ajustes grátis, no mesmo fundo claro da lista, com o selo "Bônus" em preto.
+   Mesmo formato e tamanho dos outros itens, texto em preto. Ao lado do título, uma etiqueta branca
+   "Grátis" presa por um alfinete laranja em 3D: quando o fio chega no item (.is-on, js/main.js) a
+   etiqueta aparece, o alfinete desce de cima girando no espaço, finca e a etiqueta balança de leve.
    Encosta na Stack embaixo. A linha pequena na chamada final também fala dos bônus. */
-.about-areas li.bonus {
-  align-items: center; border-bottom: 0; color: var(--ink);
-  padding-top: clamp(30px, 3.4vw, 52px); padding-bottom: clamp(30px, 3.4vw, 52px);
-}
-.bonus-copy { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+.about-areas li.bonus { border-bottom: 0; }
+.about-areas li.bonus h3 { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 26px; color: var(--ink); }
+.bonus-badge { position: relative; display: inline-block; perspective: 500px; margin-top: 10px; }
 .bonus-tag {
-  padding: 6px 14px; border-radius: 999px; border: 1.5px solid var(--ink); color: var(--ink);
-  font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+  display: block; padding: 10px 16px 9px; border-radius: 5px; background: #fff; color: var(--ink);
+  font-size: 14px; font-weight: 700; letter-spacing: .16em; line-height: 1; text-transform: uppercase;
+  box-shadow: 0 12px 22px -12px rgba(36, 10, 3, .5), 0 0 0 1px rgba(17, 17, 17, .06);
+  transform: rotate(-5deg); transform-origin: 50% 0;
 }
-.bonus-list { display: grid; gap: 16px; margin: 0; padding: 0; list-style: none; }
-.about-areas .bonus-list li {   /* não herda o estilo da lista de cima */
-  display: grid; grid-template-columns: 44px 1fr; gap: 14px; align-items: start;
-  padding: 0; border: 0; transition: none;
+.bonus-pin {
+  position: absolute; z-index: 1; left: 50%; top: -30px; width: 30px; height: 37px; margin-left: -15px;
+  transform: rotateZ(-12deg); transform-origin: 50% 100%;
+  filter: drop-shadow(2px 3px 1.5px rgba(36, 10, 3, .38));
 }
-.about-areas .bonus-list li + li { padding-top: 16px; border-top: 1px solid rgba(17, 17, 17, .16); }
-.bonus-list strong { display: block; font-size: clamp(16px, 1.3vw, 20px); font-weight: 600; letter-spacing: -.01em; }
-.bonus-list span:not(.bonus-ico) { display: block; margin-top: 4px; font-size: clamp(14px, 1vw, 16px); line-height: 1.5; color: rgba(17, 17, 17, .78); }
-.bonus-ico { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: #fff; box-shadow: 0 8px 18px -10px rgba(122, 42, 10, .6); }
-.bonus-ico svg { width: 20px; height: 20px; fill: none; stroke: var(--orange); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 @media (prefers-reduced-motion: no-preference) {
-  .bonus-ico--pin svg { animation: bonus-pin 2.8s cubic-bezier(.45, 0, .2, 1) infinite; }
+  .about-areas ol.is-live > li.bonus:not(.is-on) :is(.bonus-pin, .bonus-tag) { opacity: 0; }
+  .about-areas li.bonus.is-on .bonus-tag {
+    animation: bonus-tag-in .45s cubic-bezier(.2, .8, .3, 1.2) both, bonus-tag-jolt .6s ease-out .66s, bonus-tag-swing 4s ease-in-out 1.3s infinite;
+  }
+  .about-areas li.bonus.is-on .bonus-pin { animation: bonus-pin-drop .75s cubic-bezier(.3, .7, .3, 1) .2s both; }
 }
-@keyframes bonus-pin { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+@keyframes bonus-tag-in { from { opacity: 0; transform: translateY(-10px) rotate(-16deg) scale(.85); } }
+@keyframes bonus-tag-jolt { 0%, 100% { transform: rotate(-5deg); } 25% { transform: translateY(3px) rotate(-1deg); } 60% { transform: rotate(-7deg); } }
+@keyframes bonus-tag-swing { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(-2.5deg); } }
+@keyframes bonus-pin-drop {   /* vem de cima, girando no espaço, com a sombra longe e borrada; finca e quica */
+  0% { opacity: 0; transform: translate3d(46px, -110px, 0) rotateX(60deg) rotateZ(40deg) scale(1.9); filter: drop-shadow(26px 40px 10px rgba(36, 10, 3, .12)); }
+  55% { opacity: 1; transform: translate3d(0, 5px, 0) rotateX(0) rotateZ(-16deg) scale(.94); filter: drop-shadow(2px 3px 1.5px rgba(36, 10, 3, .38)); }
+  78% { transform: translate3d(0, -3px, 0) rotateZ(-10deg) scale(1.04); }
+  100% { opacity: 1; transform: rotateZ(-12deg); filter: drop-shadow(2px 3px 1.5px rgba(36, 10, 3, .38)); }
+}
 
 .cta-copy { display: flex; flex-direction: column; gap: 14px; }
 .about-cta .cta-bonus { display: inline-flex; align-items: baseline; gap: 10px; max-width: none; font-size: clamp(13px, 1vw, 15px); letter-spacing: 0; color: rgba(255, 255, 255, .7); }
 .cta-bonus i { flex: none; align-self: center; width: 8px; height: 8px; border-radius: 50%; background: var(--orange); box-shadow: 0 0 10px 1px var(--orange); }
 
 @media (max-width: 860px) {
-  .about-areas .bonus .bonus-list { grid-column: 2; margin-top: 6px; }
-  .about-areas .bonus-list li { grid-template-columns: 38px 1fr; gap: 12px; }
-  .bonus-ico { width: 38px; height: 38px; }
   .about-cta .cta-bonus { font-size: 13px; }
   .cta-bonus i { align-self: flex-start; margin-top: .45em; }
 }
