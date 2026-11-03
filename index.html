@@ -269,14 +269,79 @@
       </div>
     </div>
 
-    <div class="about-stack">
+    <!-- Stack: só o que está no código dos projetos no ar (PH Sports, Maria Festinha, este portfólio e o
+         dashboard). Cartão café como os Projetos; o fio laranja desce com a rolagem e acende cada grupo
+         (js/main.js). Ícones em img/stack.svg -->
+    <div class="about-stack" id="stack">
       <p class="about-label" data-ab>Stack</p>
-      <dl>
-        <div data-ab><dt>Frontend</dt><dd><b>React</b><b>TypeScript</b><b>TanStack Start</b><b>Tailwind CSS</b></dd></div>
-        <div data-ab><dt>Animação</dt><dd><b>GSAP</b><b>ScrollTrigger</b></dd></div>
-        <div data-ab><dt>Backend e dados</dt><dd><b>Node.js</b><b>Supabase</b><b>PostgreSQL</b></dd></div>
-        <div data-ab><dt>IA e automação</dt><dd><b>Claude Code</b><b>Codex</b><b>Antigravity</b><b>Maestri</b><b>Lovable</b></dd></div>
-      </dl>
+      <div class="stack">
+        <div class="stack-head">
+          <p class="stack-kicker"><i aria-hidden="true"></i>Stack em produção</p>
+          <p class="stack-note">Tecnologias que estão no código da PH Sports, da Maria Festinha, deste portfólio e do dashboard de gestão.</p>
+        </div>
+        <ol class="stack-list">
+          <li>
+            <div class="stack-group"><span class="n">01</span><h3>Linguagens</h3><p>A base de tudo</p></div>
+            <ul class="stack-chips">
+              <li><svg aria-hidden="true"><use href="img/stack.svg#typescript"/></svg>TypeScript</li>
+              <li><svg aria-hidden="true"><use href="img/stack.svg#javascript"/></svg>JavaScript</li>
+              <li><svg aria-hidden="true"><use href="img/stack.svg#html5"/></svg>HTML</li>
+              <li><svg aria-hidden="true"><use href="img/stack.svg#css"/></svg>CSS</li>
+              <li><svg aria-hidden="true"><use href="img/stack.svg#sql"/></svg>SQL</li>
+            </ul>
+          </li>
+          <li>
+            <div class="stack-group"><span class="n">02</span><h3>Frontend</h3><p>Interfaces e lojas virtuais</p></div>
+            <ul class="stack-chips">
+              <li><svg aria-hidden="true"><use href="img/stack.svg#react"/></svg>React</li>
+              <li><svg aria-hidden="true"><use href="img/stack.svg#tanstack"/></svg>TanStack</li>
+              <li><svg aria-hidden="true"><use href="img/stack.svg#tailwindcss"/></svg>Tailwind CSS</li>
+              <li><svg aria-hidden="true"><use href="img/stack.svg#shadcnui"/></svg>shadcn/ui</li>
+              <li><svg aria-hidden="true"><use href="img/stack.svg#vite"/></svg>Vite</li>
+              <li><svg aria-hidden="true"><use href="img/stack.svg#recharts"/></svg>Recharts</li>
+            </ul>
+          </li>
+          <li>
+            <div class="stack-group"><span class="n">03</span><h3>Animação e 3D</h3><p>Movimento e profundidade</p></div>
+            <ul class="stack-chips">
+              <li><svg aria-hidden="true"><use href="img/stack.svg#gsap"/></svg>GSAP</li>
+              <li><svg aria-hidden="true"><use href="img/stack.svg#threedotjs"/></svg>Three.js</li>
+              <li><svg aria-hidden="true"><use href="img/stack.svg#lenis"/></svg>Lenis</li>
+            </ul>
+          </li>
+          <li>
+            <div class="stack-group"><span class="n">04</span><h3>Backend e dados</h3><p>APIs, login e banco de dados</p></div>
+            <ul class="stack-chips">
+              <li><svg aria-hidden="true"><use href="img/stack.svg#nodedotjs"/></svg>Node.js</li>
+              <li><svg aria-hidden="true"><use href="img/stack.svg#express"/></svg>Express</li>
+              <li><svg aria-hidden="true"><use href="img/stack.svg#supabase"/></svg>Supabase</li>
+              <li><svg aria-hidden="true"><use href="img/stack.svg#postgresql"/></svg>PostgreSQL</li>
+              <li><svg aria-hidden="true"><use href="img/stack.svg#turso"/></svg>libSQL</li>
+            </ul>
+          </li>
+          <li>
+            <div class="stack-group"><span class="n">05</span><h3>Qualidade e testes</h3><p>Código que não quebra</p></div>
+            <ul class="stack-chips">
+              <li><svg aria-hidden="true"><use href="img/stack.svg#vitest"/></svg>Vitest</li>
+              <li><svg aria-hidden="true"><use href="img/stack.svg#testinglibrary"/></svg>Testing Library</li>
+              <li><svg aria-hidden="true"><use href="img/stack.svg#zod"/></svg>Zod</li>
+              <li><svg aria-hidden="true"><use href="img/stack.svg#eslint"/></svg>ESLint</li>
+              <li><svg aria-hidden="true"><use href="img/stack.svg#prettier"/></svg>Prettier</li>
+            </ul>
+          </li>
+          <li>
+            <div class="stack-group"><span class="n">06</span><h3>Deploy e ferramentas</h3><p>Do commit ao site no ar</p></div>
+            <ul class="stack-chips">
+              <li><svg aria-hidden="true"><use href="img/stack.svg#vercel"/></svg>Vercel</li>
+              <li><svg aria-hidden="true"><use href="img/stack.svg#cloudflare"/></svg>Cloudflare</li>
+              <li><svg aria-hidden="true"><use href="img/stack.svg#git"/></svg>Git</li>
+              <li><svg aria-hidden="true"><use href="img/stack.svg#github"/></svg>GitHub</li>
+              <li><svg aria-hidden="true"><use href="img/stack.svg#bun"/></svg>Bun</li>
+              <li><svg aria-hidden="true"><use href="img/stack.svg#npm"/></svg>npm</li>
+            </ul>
+          </li>
+        </ol>
+      </div>
     </div>
 
     <!-- Perguntas frequentes: acordeão (js/main.js abre/fecha; a altura anima por grid-template-rows) -->
