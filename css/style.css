@@ -442,8 +442,9 @@ a { color: inherit; text-decoration: none; }
 }
 @keyframes stack-glow { to { transform: translate(30vw, -12vw) scale(1.25); } }
 @media (prefers-reduced-motion: reduce) { .stack::before { animation: none; } }
-/* sem sobra de fundo entre as faixas: o Bônus encosta em cima da Stack e o FAQ embaixo */
-.about-areas .bonus { margin-bottom: 0; }
+/* o Bônus fica colado na lista de "O que eu entrego" (faz parte dela); a Stack vem depois de um respiro
+   e o FAQ encosta embaixo dela */
+.about-areas .bonus { margin-top: 0; }
 .stack + .faq { margin-top: 0; }
 
 .stack .about-kicker { color: #fff; }
