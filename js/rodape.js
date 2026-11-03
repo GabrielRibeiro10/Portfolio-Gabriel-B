@@ -1,4 +1,4 @@
-// Rodapé: ano do ©, relógio de Caraguatatuba, nome gigante do tamanho da largura e a entrada.
+// Rodapé: ano do ©, relógio de Ilhabela, nome gigante do tamanho da largura e a entrada.
 (() => {
   const ft = document.querySelector('.site-footer');
   if (!ft) return;
@@ -7,7 +7,7 @@
   const year = ft.querySelector('.ft-year');
   if (year) year.textContent = new Date().getFullYear();
 
-  // relógio local (fuso de São Paulo, o mesmo de Caraguatatuba)
+  // relógio local (fuso de São Paulo, o mesmo de Ilhabela)
   const time = ft.querySelector('.ft-time');
   const tz = ft.querySelector('.ft-tz');
   if (time) {
