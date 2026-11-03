@@ -32,7 +32,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="preload" as="image" href="img/gabriel-recorte.webp" fetchpriority="high">
+  <!-- foto da hero em 3 tamanhos (ampliada com IA, Real-ESRGAN): cada tela baixa só o que precisa; telas retina pegam a de 2048 px -->
+  <link rel="preload" as="image" href="img/gabriel-recorte.webp" imagesrcset="img/gabriel-recorte.webp 1024w, img/gabriel-recorte-1536.webp 1536w, img/gabriel-recorte-2048.webp 2048w" imagesizes="(max-width: 860px) 100vw, 79vh" fetchpriority="high">
   <link rel="stylesheet" href="css/style.css">
   <script>
     // esconde a foto até o GSAP preparar a entrada (o js/main.js tira a classe)
@@ -121,7 +122,7 @@
 
   <!-- Foto recortada: fica na frente do painel, como na referência -->
   <div class="person">
-    <img src="img/gabriel-recorte.webp" alt="Gabriel Ribeiro, sorrindo e olhando para cima" width="1024" height="1536" fetchpriority="high">
+    <img src="img/gabriel-recorte.webp" srcset="img/gabriel-recorte.webp 1024w, img/gabriel-recorte-1536.webp 1536w, img/gabriel-recorte-2048.webp 2048w" sizes="(max-width: 860px) 100vw, 79vh" alt="Gabriel Ribeiro, sorrindo e olhando para cima" width="1024" height="1536" fetchpriority="high">
     <span class="person-light" aria-hidden="true"></span>
   </div>
 

@@ -178,7 +178,8 @@ a { color: inherit; text-decoration: none; }
   background:
     linear-gradient(105deg, rgba(255, 150, 60, .75) 0%, rgba(255, 130, 45, .45) 38%, rgba(120, 40, 10, .1) 60%, rgba(30, 8, 2, .55) 100%);
   mix-blend-mode: soft-light;
-  -webkit-mask-image: url("../img/gabriel-recorte.webp"); mask-image: url("../img/gabriel-recorte.webp");
+  /* molde só com a transparência da foto (leve): não baixa a foto de novo em telas retina, que usam outro tamanho */
+  -webkit-mask-image: url("../img/gabriel-recorte-mascara.webp"); mask-image: url("../img/gabriel-recorte-mascara.webp");
   -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
 }
 
