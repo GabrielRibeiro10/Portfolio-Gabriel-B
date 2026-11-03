@@ -421,8 +421,7 @@ a { color: inherit; text-decoration: none; }
    Faixa de ponta a ponta com o fundo da hero (canto café em cima à esquerda, brilho laranja à direita e
    a luz que flutua devagar), sem cantos nem sobra nas laterais, como o Bônus e o FAQ. Selo (04), título
    grande e um grupo por linha com as tecnologias em pílulas creme (o claro do painel da hero) e o ícone
-   em laranja (img/stack.svg). O fio branco à esquerda desce com a rolagem, como em "O que eu entrego"
-   (js/main.js põe --p de 0 a 1) */
+   em laranja (img/stack.svg). */
 .stack {
   position: relative; overflow: hidden; isolation: isolate;
   width: 100vw; margin-left: calc(50% - 50vw);
@@ -460,14 +459,14 @@ a { color: inherit; text-decoration: none; }
 .stack-facts strong { font-size: clamp(28px, 2.6vw, 40px); font-weight: 500; letter-spacing: -.03em; line-height: 1; }
 .stack-facts span { font-size: 13px; color: rgba(255, 233, 216, .82); }
 
-.stack-list { position: relative; --p: 0; margin: 0; padding: 0; list-style: none; border-top: 1px solid rgba(255, 255, 255, .26); }
+.stack-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid rgba(255, 255, 255, .26); }
 .stack-list > li {
   display: grid; grid-template-columns: minmax(220px, 290px) 1fr; align-items: center; gap: 14px 32px;
-  padding: clamp(18px, 1.8vw, 26px) 0 clamp(18px, 1.8vw, 26px) clamp(26px, 2.6vw, 42px);
+  padding: clamp(18px, 1.8vw, 26px) 0;
   border-bottom: 1px solid rgba(255, 255, 255, .18);
 }
 .stack-group { display: grid; grid-template-columns: 34px 1fr; align-items: baseline; }
-.stack-group .n { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; color: rgba(255, 233, 216, .62); transition: color .4s; }
+.stack-group .n { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--peach); }
 .stack-group h3 { margin: 0; font-size: clamp(19px, 1.7vw, 26px); font-weight: 500; letter-spacing: -.02em; line-height: 1.15; }
 .stack-group p { grid-column: 2; margin: 4px 0 0; font-size: 13px; color: rgba(255, 246, 239, .76); }
 .stack-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
@@ -483,20 +482,6 @@ a { color: inherit; text-decoration: none; }
   .stack-chips li:hover svg { color: var(--orange-2); }
 }
 
-/* fio branco à esquerda dos grupos (trilho translúcido + branco cortado em --p, ponta brilhante) */
-.stack-list::before, .stack-list::after { content: ''; position: absolute; left: 0; pointer-events: none; }
-.stack-list::before {
-  top: 0; bottom: 0; width: 2px; margin-left: -.5px;
-  background: linear-gradient(#fff, var(--peach)) 0 0 / 100% calc(var(--p) * 100%) no-repeat, rgba(255, 255, 255, .24);
-}
-.stack-list::after {
-  top: calc(var(--p) * 100%); width: 9px; height: 9px; margin: -4.5px 0 0 -4px; border-radius: 50%;
-  background: #fff; box-shadow: 0 0 0 4px rgba(255, 255, 255, .22), 0 0 18px 3px rgba(255, 210, 168, .9);
-  opacity: calc(min(var(--p) * 40, 1) * min((1 - var(--p)) * 40, 1));
-}
-.stack-list.is-live > li > * { transition: opacity .6s cubic-bezier(.2, .7, .2, 1); }
-.stack-list.is-live > li:not(.is-on) > * { opacity: .4; }
-.stack-list > li.is-on .n { color: #fff; }
 
 .about-cta {
   display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;
@@ -540,7 +525,7 @@ a { color: inherit; text-decoration: none; }
   .stack-facts { margin-top: 16px; padding-top: 16px; gap: 22px; }
   .stack-facts strong { font-size: 24px; }
   .stack-facts span { font-size: 12px; }
-  .stack-list > li { padding: 16px 0 16px 22px; gap: 10px; }
+  .stack-list > li { padding: 16px 0; gap: 10px; }
   .stack-chips { gap: 6px; }
   .stack-chips li { gap: 7px; padding: 7px 12px 7px 10px; font-size: 13px; }
   .stack-chips svg { width: 15px; height: 15px; }

@@ -214,9 +214,9 @@ if (window.Lenis && !reduceMotion && matchMedia('(hover: hover) and (pointer: fi
   }
 }
 
-// "O que eu entrego" e Stack: o fio laranja desce junto com a rolagem (a ponta fica a 60% da altura
-// da tela), com um leve atraso para ficar macio; o item acende quando o fio passa do começo dele
-document.querySelectorAll('.about-areas ol, .stack-list').forEach((list) => {
+// "O que eu entrego": o fio laranja desce junto com a rolagem (a ponta fica a 60% da altura da tela),
+// com um leve atraso para ficar macio; o item acende quando o fio passa do começo dele
+document.querySelectorAll('.about-areas ol').forEach((list) => {
   const items = [...list.children];
   if (reduceMotion) { list.style.setProperty('--p', 1); items.forEach((li) => li.classList.add('is-on')); }
   else {
