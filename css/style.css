@@ -442,9 +442,9 @@ a { color: inherit; text-decoration: none; }
 }
 @keyframes stack-glow { to { transform: translate(30vw, -12vw) scale(1.25); } }
 @media (prefers-reduced-motion: reduce) { .stack::before { animation: none; } }
-/* o Bônus fica colado na lista de "O que eu entrego" (faz parte dela); a Stack vem depois de um respiro
-   e o FAQ encosta embaixo dela */
-.about-areas .bonus { margin-top: 0; }
+/* sem sobra de fundo: o Bônus fica colado na lista de "O que eu entrego" em cima e na Stack embaixo,
+   e o FAQ encosta embaixo da Stack */
+.about-areas .bonus { margin-top: 0; margin-bottom: 0; }
 .stack + .faq { margin-top: 0; }
 
 .stack .about-kicker { color: #fff; }
