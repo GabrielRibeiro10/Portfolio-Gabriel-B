@@ -215,27 +215,36 @@ if (window.Lenis && !reduceMotion && matchMedia('(hover: hover) and (pointer: fi
 }
 
 // "O que eu entrego": o fio laranja desce junto com a rolagem (a ponta fica a 60% da altura da tela),
-// com um leve atraso para ficar macio; o item acende quando o fio passa do começo dele
+// com um leve atraso para ficar macio; o item acende quando o fio passa do começo dele. No mesmo quadro
+// em que desenha o fio, chama a gota dos Projetos (dropFrame, mais abaixo) com o mesmo valor, para ela
+// pousar exatamente onde a bolinha da ponta está.
+let dropFrame = null, lineGo = () => {};
 document.querySelectorAll('.about-areas ol').forEach((list) => {
   const items = [...list.children];
   if (reduceMotion) { list.style.setProperty('--p', 1); items.forEach((li) => li.classList.add('is-on')); }
   else {
     list.classList.add('is-live');
-    let cur = 0, raf = 0;
-    const target = () => { const r = list.getBoundingClientRect(); return Math.min(1, Math.max(0, (innerHeight * 0.6 - r.top) / r.height)); };
+    let cur = 0, raf = 0, hgt = 0, tops = [];
+    // medidas dos itens guardadas (mudam só quando a lista muda de tamanho): o quadro só lê a posição na tela
+    const measure = () => { hgt = list.offsetHeight; tops = items.map((li) => li.offsetTop + li.offsetHeight * 0.3); };
+    measure();
+    if ('ResizeObserver' in window) new ResizeObserver(measure).observe(list);
     const tick = () => {
-      const t = target();
+      const r = list.getBoundingClientRect();
+      const t = Math.min(1, Math.max(0, (innerHeight * 0.6 - r.top) / r.height));
       cur += (t - cur) * 0.12;
       if (Math.abs(t - cur) < 0.0005) cur = t;
-      list.style.setProperty('--p', cur.toFixed(4));
-      const tip = cur * list.offsetHeight;
-      for (const li of items) li.classList.toggle('is-on', tip >= li.offsetTop + li.offsetHeight * 0.3);
+      const p = Number(cur.toFixed(4));
+      if (dropFrame) dropFrame(p, r);   // antes de mexer no fio: a gota lê a tela sem forçar outro layout
+      list.style.setProperty('--p', p);
+      const tip = p * hgt;
+      items.forEach((li, i) => li.classList.toggle('is-on', tip >= tops[i]));
       raf = cur === t ? 0 : requestAnimationFrame(tick);
     };
-    const go = () => { if (!raf) raf = requestAnimationFrame(tick); };
-    addEventListener('scroll', go, { passive: true });
-    addEventListener('resize', go);
-    go();
+    lineGo = () => { if (!raf) raf = requestAnimationFrame(tick); };
+    addEventListener('scroll', lineGo, { passive: true });
+    addEventListener('resize', lineGo);
+    lineGo();
   }
 });
 
@@ -350,49 +359,77 @@ document.querySelectorAll('.about-areas ol').forEach((list) => {
 }
 
 // Saída dos Projetos (escuro → claro): a borda de baixo do painel pende como uma gota e se recolhe
-// com a rolagem (curva SVG); a gota laranja acompanha a ponta e se estica, se solta, desce num arco
-// até o fio de "O que eu entrego" e se junta à bolinha da ponta dele (que fica a 60% da altura da tela).
-// st.p vai de 0 (topo da curva no pé da tela) a 1 (no topo da tela); tudo sai dele para a gota
-// nunca descolar da curva, que usa o mesmo valor suavizado.
-if (animate && ScrollTrigger) {
+// com a rolagem (curva SVG); a gota laranja fica pendurada no ponto mais fundo, se estica, se solta, cai
+// num arco e pousa na bolinha da ponta do fio de "O que eu entrego", que dá um pulso.
+// p vai de 0 (topo da curva no pé da tela) a 1 (no topo da tela) e sai da posição REAL da curva a cada
+// quadro, junto com o fio. Antes ele vinha de um scrub atrasado: durante a rolagem a gota descolava da
+// curva (até 100 px abaixo da ponta) e pousava longe da bolinha (que tem o próprio atraso).
+if (animate) {
   const curve = document.querySelector('.pj-curve');
+  const svg = curve && curve.querySelector('svg');
   const path = curve && curve.querySelector('path');
   const drop = curve && curve.querySelector('.pj-drop');
   const line = document.querySelector('.about-areas ol');
   if (path && drop) {
-    const st = { p: 0 };
-    const ease = gsap.parseEase('power2.inOut');
-    const REL = 0.6, ARR = 0.85;                               // solta com a curva a 40% da tela; chega com ela a 15%
-    let merged = false;
-    const render = () => {
-      const v = innerHeight, H = curve.querySelector('svg').getBoundingClientRect().height;
-      const pc = Math.min(1, st.p / 0.8);                      // a curva termina de se recolher com o topo a 20% da tela
-      const d = 1 - ease(pc);                                  // 1 = gota funda, 0 = borda reta
-      path.setAttribute('d', `M0 0H1440Q720 ${(400 * d).toFixed(1)} 0 0Z`);
-      const cr = curve.getBoundingClientRect(), cx = cr.left + cr.width / 2;
-      const cs = v * (1 - st.p);                               // topo da curva na tela (suavizado)
-      if (st.p < REL || !line) {                               // presa na ponta, esticando
-        const s = Math.min(1, st.p / REL);
-        gsap.set(drop, { x: 0, y: d * H + (cs - cr.top), scaleX: 1 - 0.12 * s, scaleY: 1 + 0.35 * s, opacity: Math.min(1, st.p * 8) * (line || st.p < REL ? 1 : 1 - (st.p - REL) / (1 - REL)) });
+    const inOut = (x) => (x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2);   // power2.inOut
+    const outQ = (x) => 1 - (1 - x) * (1 - x);
+    const REL = 0.6, ARR = 0.85;   // solta com a curva a 40% da tela; pousa com ela a 15%
+    const R = 7;                    // raio da gota (14 px no css)
+    const SX = 0.88, SY = 1.35;     // esticada, no instante em que se solta
+    let merged = null, lastD = '', hidden = false, H = 0, lt = 0, lh = 0;
+    // medidas que só mudam com o tamanho da tela: altura da curva e a borda/altura interna da lista
+    const measure = () => { H = svg.getBoundingClientRect().height; if (line) { lt = line.clientTop; lh = line.clientHeight; } };
+    measure();
+    if ('ResizeObserver' in window) { const ro = new ResizeObserver(measure); ro.observe(svg); if (line) ro.observe(line); }
+    const depth = (p) => 1 - inOut(Math.min(1, p / 0.8));   // 1 = gota funda, 0 = borda reta
+    // lê tudo primeiro (curva e lista na tela), escreve no fim: nenhum layout forçado no meio do quadro
+    dropFrame = (lineP, lr) => {
+      const v = innerHeight, cr = curve.getBoundingClientRect();
+      const p = Math.min(1, Math.max(0, (v - cr.top) / v));
+      if (merged === null) merged = p >= ARR;   // página aberta já mais abaixo: sem pulso na chegada
+      const d = depth(p);
+      const dAttr = `M0 0H1440Q720 ${(400 * d).toFixed(1)} 0 0Z`;
+      if (dAttr !== lastD) { path.setAttribute('d', dAttr); lastD = dAttr; }
+      // longe da tela (antes de a curva aparecer ou depois do pouso): só garante a gota apagada
+      if (p <= 0 || (p >= ARR && merged)) {
+        if (!hidden) { drop.style.opacity = '0'; hidden = true; }
+        if (p >= ARR) return;
         merged = false;
         return;
       }
-      const q = Math.min(1, (st.p - REL) / (ARR - REL));
-      const sy = v * (1 - REL) + (1 - ease(Math.min(1, REL / 0.8))) * H;   // onde ela se soltou
-      const lr = line.getBoundingClientRect(), ex = lr.left + 0.5, ey = v * 0.6;   // ponta do fio
-      const x = cx + (ex - cx) * (1 - (1 - q) * (1 - q));      // sai de lado depressa e assenta
-      const y = sy + (ey - sy) * q * q;                        // e cai acelerando
-      const k = 1 - 0.36 * q;                                  // encolhe até o tamanho da bolinha do fio
-      gsap.set(drop, { x: x - cx, y: y - cr.top, scaleX: k * (1 + 0.2 * Math.sin(q * Math.PI)), scaleY: k * (1 - 0.12 * Math.sin(q * Math.PI)),
-        opacity: q < 0.94 ? 1 : (1 - q) / 0.06 });
-      if (q >= 1 && !merged) {                                 // encontrou: a bolinha do fio dá um pulso
-        merged = true;
-        line.classList.remove('is-merge'); void line.offsetWidth; line.classList.add('is-merge');
-      } else if (q < 1) merged = false;
+      hidden = false;
+      // posições em relação à curva (que anda junto com a página): a queda acontece "no mundo" da página,
+      // como uma gota de verdade, e não oscila com a rolagem
+      let x = 0, y, sx, sy, op;
+      if (p < REL || !line) {
+        // pendurada na ponta da curva (o topo da gota encosta na borda), esticando aos poucos
+        const s = Math.min(1, p / REL);
+        sx = 1 - (1 - SX) * s; sy = 1 + (SY - 1) * s;
+        y = d * H + R * sy - 3;
+        op = Math.min(1, p * 8) * (line || p < REL ? 1 : 1 - (p - REL) / (1 - REL));
+        merged = false;
+      } else {
+        const q = Math.min(1, (p - REL) / (ARR - REL));
+        const yr = depth(REL) * H + R * SY - 3;                   // onde ela se soltou
+        const xb = lr.left + 0.5 - (cr.left + cr.width / 2);      // bolinha do fio, onde ela está agora
+        const yb = lr.top + lt + lineP * lh - cr.top;
+        x = xb * outQ(q);                                         // sai de lado depressa e assenta
+        y = yr + (yb - yr) * q * q;                               // e cai acelerando
+        const k = 1 - 0.36 * q, w = Math.sin(q * Math.PI);        // encolhe até o tamanho da bolinha (9 px)
+        const r = outQ(Math.min(1, q / 0.18));                    // desfaz o esticado logo depois de soltar
+        sx = SX + (k * (1 + 0.16 * w) - SX) * r;
+        sy = SY + (k * (1 - 0.1 * w) - SY) * r;
+        op = q < 0.94 ? 1 : (1 - q) / 0.06;
+        if (q >= 1 && !merged) {                                 // encontrou: a bolinha do fio dá um pulso
+          merged = true;
+          line.classList.remove('is-merge'); void line.offsetWidth; line.classList.add('is-merge');
+        } else if (q < 1) merged = false;
+      }
+      drop.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) scale(${sx.toFixed(3)}, ${sy.toFixed(3)})`;
+      drop.style.opacity = op.toFixed(3);
     };
-    gsap.to(st, { p: 1, ease: 'none', onUpdate: render,
-      scrollTrigger: { trigger: curve, start: 'top bottom', end: 'top top', scrub: 0.8, invalidateOnRefresh: true, onRefresh: render } });
-    render();
+    if (line) lineGo();
+    else { const f = () => dropFrame(0, null); addEventListener('scroll', f, { passive: true }); f(); }
   }
 }
 
