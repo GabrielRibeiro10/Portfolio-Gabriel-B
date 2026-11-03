@@ -439,6 +439,10 @@ a { color: inherit; text-decoration: none; }
   background: radial-gradient(circle, rgba(255, 170, 80, .26) 0%, rgba(255, 170, 80, 0) 62%);
   animation: stack-glow 14s ease-in-out infinite alternate;
 }
+.stack::after {   /* o pé da Stack vai a um tom único (#b9480f, o fim do gradiente da hero): a onda do FAQ começa nele, sem emenda */
+  content: ''; position: absolute; z-index: -1; left: 0; right: 0; bottom: 0; height: min(34%, 420px); pointer-events: none;
+  background: linear-gradient(180deg, rgba(185, 72, 15, 0), rgba(185, 72, 15, .55) 55%, #b9480f);
+}
 @keyframes stack-glow { to { transform: translate(30vw, -12vw) scale(1.25); } }
 @media (prefers-reduced-motion: reduce) { .stack::before { animation: none; } }
 /* sem sobra de fundo: a Stack encosta no Bônus (fim de "O que eu entrego") em cima e no FAQ embaixo */
@@ -902,42 +906,48 @@ html, body { overflow-x: clip; }
   padding: calc(var(--u) * 57) var(--cl) 0;
   color: var(--ink); background: #f9f7f5;
 }
-.faq-bg { position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; background: #f9f7f5; }
+/* a onda se dissolve no creme (--wf-a/--wf-b medidos no js/main.js; sem JS, valores aproximados). A máscara fica
+   no fundo inteiro, e não no SVG: em telas largas a onda passa do SVG até a borda esquerda e seria cortada */
+.faq-bg {
+  position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; background: #f9f7f5;
+  -webkit-mask-image: linear-gradient(180deg, #000 var(--wf-a, calc(100% - 330px)), transparent var(--wf-b, calc(100% - 170px)));
+          mask-image: linear-gradient(180deg, #000 var(--wf-a, calc(100% - 330px)), transparent var(--wf-b, calc(100% - 170px)));
+}
 .faq-wave { position: absolute; top: 0; left: calc(var(--cl) - 42 * var(--u)); width: calc(420 * var(--u)); height: 100%; overflow: visible; }   /* em telas largas o laranja passa da moldura até a borda esquerda */
 
 .faq .about-kicker { display: flex; align-items: center; gap: 0; font-size: max(13px, calc(14 * var(--u))); line-height: 1; }
 .faq .about-kicker .k-line, .faq .about-kicker .k-sub { display: none; }
-.faq .about-kicker .k-dash { flex: none; width: 1.07em; height: max(1.5px, .11em); border-radius: 2px; background: #fd5a0a; margin-right: .36em; }
-.faq .about-kicker .k-num { font-size: .86em; font-weight: 400; color: #fd6712; margin-right: .58em; }
-.faq .about-kicker .k-name { font-size: 1.02em; font-weight: 400; letter-spacing: 0; color: #1a1d1c; }
+.faq .about-kicker .k-dash { flex: none; width: 1.07em; height: max(1.5px, .11em); border-radius: 2px; background: var(--peach); margin-right: .36em; }
+.faq .about-kicker .k-num { font-size: .86em; font-weight: 400; color: var(--peach); margin-right: .58em; }
+.faq .about-kicker .k-name { font-size: 1.02em; font-weight: 400; letter-spacing: 0; color: #fff; }
 .faq-grid { display: grid; grid-template-columns: 5fr 7fr; gap: clamp(32px, 6vw, 110px); margin-top: calc(var(--u) * 35); align-items: start; }
 .faq-side { position: sticky; top: clamp(24px, 12vh, 120px); }
-.faq-title { margin: 0; font-size: var(--t); font-weight: 700; line-height: .915; letter-spacing: -.02em; color: #0a0a0a; }
-.faq-title em { font-style: normal; color: #fe5700; }
-.faq-lead { margin: calc(var(--u) * 15) 0 0; max-width: 19.4em; font-size: max(12px, calc(11.9 * var(--u))); line-height: 1.325; color: #4f4a42; }
+.faq-title { margin: 0; font-size: var(--t); font-weight: 700; line-height: .915; letter-spacing: -.02em; color: #fff; text-shadow: 0 2px 30px rgba(90, 28, 6, .18); }
+.faq-title em { font-style: normal; color: var(--peach); }
+.faq-lead { margin: calc(var(--u) * 15) 0 0; max-width: 19.4em; font-size: max(12px, calc(11.9 * var(--u))); line-height: 1.325; color: rgba(255, 246, 239, .92); }
 .faq-wa {
   display: inline-flex; align-items: center; height: 3.4em; margin-top: calc(var(--u) * 17);
-  padding: 0 1.1em 0 1.45em; border-radius: 999px; background: #0b0b0a; color: #fff;
+  padding: 0 1.1em 0 1.45em; border-radius: 999px; background: var(--ink); color: #fff;
   font-size: max(10.5px, calc(10.2 * var(--u))); font-weight: 500; white-space: nowrap;
-  box-shadow: 0 .5em 1.5em -.05em rgba(225, 85, 5, .85); transition: background .35s, box-shadow .5s;
+  box-shadow: 0 .7em 1.6em -.3em rgba(36, 10, 3, .75); transition: background .35s, color .35s, box-shadow .5s;
 }
 .faq-wa svg { flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: transform .5s cubic-bezier(.2, .7, .2, 1); }
 .faq-wa .faq-wa-ico { width: 1.9em; height: 1.9em; margin-right: .55em; stroke-width: 1.5; }
 .faq-wa .faq-wa-ico .fill { fill: currentColor; stroke: none; }
 .faq-wa .faq-wa-arrow { width: 1.6em; height: 1.6em; margin-left: 1.1em; stroke-width: 1.4; }
 @media (hover: hover) {
-  .faq-wa:hover { background: var(--orange); box-shadow: 0 .55em 1.6em -.1em rgba(240, 85, 0, .7); }
+  .faq-wa:hover { background: #fff; color: var(--ink); box-shadow: 0 .8em 1.8em -.3em rgba(36, 10, 3, .6); }
   .faq-wa:hover .faq-wa-arrow { transform: translateX(4px); }
 }
 /* selo de segurança embaixo do botão */
-.faq-trust { display: flex; align-items: center; margin: calc(var(--u) * 44) 0 0; font-size: max(7.5px, calc(7 * var(--u))); font-weight: 600; letter-spacing: .1em; line-height: 1.29; text-transform: uppercase; color: #524a3f; }
-.faq-trust-dash { flex: none; width: 2.14em; height: max(1.5px, .21em); border-radius: 2px; background: #fb6f20; margin-right: .43em; }
-.faq-trust svg { flex: none; width: 3.4em; height: 3.4em; margin-right: 1em; fill: rgba(251, 111, 32, .07); stroke: #fb6f20; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.faq-trust { display: flex; align-items: center; margin: calc(var(--u) * 44) 0 0; font-size: max(7.5px, calc(7 * var(--u))); font-weight: 600; letter-spacing: .1em; line-height: 1.29; text-transform: uppercase; color: rgba(255, 233, 216, .9); }
+.faq-trust-dash { flex: none; width: 2.14em; height: max(1.5px, .21em); border-radius: 2px; background: var(--peach); margin-right: .43em; }
+.faq-trust svg { flex: none; width: 3.4em; height: 3.4em; margin-right: 1em; fill: rgba(255, 210, 168, .12); stroke: var(--peach); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 
-/* os 3 degradês que se alternam entre as perguntas */
+/* os 3 degradês que se alternam entre as perguntas: todos da paleta do site (laranja, queimado e pêssego) */
 .faq-item { --g1: #f26b1d; --g2: #ffb36b; --gs: rgba(242, 107, 29, .35); }
-.faq-item:nth-of-type(3n + 2) { --g1: #ff5f6d; --g2: #ffb36b; --gs: rgba(255, 95, 109, .3); }
-.faq-item:nth-of-type(3n + 3) { --g1: #ff8a3d; --g2: #ff5e8a; --gs: rgba(255, 94, 138, .28); }
+.faq-item:nth-of-type(3n + 2) { --g1: #d8611a; --g2: #ffd2a8; --gs: rgba(216, 97, 26, .32); }
+.faq-item:nth-of-type(3n + 3) { --g1: #b9480f; --g2: #ff9536; --gs: rgba(185, 72, 15, .32); }
 
 .faq-list { position: relative; z-index: 0; border-top: 1px solid var(--faq-line); }
 .faq-item { position: relative; border-bottom: 1px solid var(--faq-line); transition: border-color .5s; }
