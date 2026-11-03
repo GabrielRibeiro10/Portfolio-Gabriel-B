@@ -400,44 +400,69 @@
   </div>
 </section>
 
-<!-- Rodapé: fundo café escuro igual ao dos Projetos (--ember-*), marca, navegação, contato e base -->
-<footer class="site-footer">
+<!-- Rodapé: claro, sem borda. Frase da marca + disponibilidade, colunas (Navegar, Serviços, Contato
+     com relógio local), o nome gigante em gradiente do hero e a base com © automático e "voltar ao topo".
+     js/rodape.js: ano, relógio, ajuste do nome à largura e a entrada quando o rodapé aparece. -->
+<footer class="site-footer" aria-labelledby="ft-heading">
   <div class="ft-in">
-    <div class="ft-brand">
-      <a class="ft-logo" href="#" aria-label="Gabriel Ribeiro, voltar ao início">
-        <svg class="ft-mark" viewBox="1 5 48 30" aria-hidden="true">
-          <path d="M21.9 10.2A12 12 0 1 0 27 20"/><path d="M27 32V8h5.5a6 6 0 0 1 0 12H17"/><path d="M31 20l7 12"/>
-          <rect x="42" y="27" width="6" height="5" rx="1"/>
-        </svg>
-        <span class="ft-name">Gabriel Ribeiro</span>
-      </a>
-      <p class="ft-tagline">Sites, lojas virtuais e sistemas feitos para vender.</p>
-    </div>
+    <div class="ft-top">
+      <div class="ft-brand" data-ft>
+        <a class="ft-logo" href="#" aria-label="Gabriel Ribeiro, voltar ao início">
+          <svg class="ft-mark" viewBox="1 5 48 30" aria-hidden="true">
+            <path d="M21.9 10.2A12 12 0 1 0 27 20"/><path d="M27 32V8h5.5a6 6 0 0 1 0 12H17"/><path d="M31 20l7 12"/>
+            <rect x="42" y="27" width="6" height="5" rx="1"/>
+          </svg>
+          <span class="ft-name">Gabriel Ribeiro</span>
+        </a>
+        <h2 class="ft-statement" id="ft-heading">Sites, lojas virtuais e sistemas feitos para <em>vender</em>.</h2>
+        <p class="ft-status"><i aria-hidden="true"></i>Disponível para novos projetos</p>
+      </div>
 
-    <nav class="ft-col" aria-labelledby="ft-nav-title">
-      <h2 class="ft-title" id="ft-nav-title">Navegar</h2>
-      <ul>
-        <li><a href="#sobre">Sobre</a></li>
-        <li><a href="#projetos">Projetos</a></li>
-        <li><a href="#servicos">Serviços</a></li>
-      </ul>
-    </nav>
+      <div class="ft-cols">
+        <nav class="ft-col" aria-labelledby="ft-nav" data-ft>
+          <h3 class="ft-title" id="ft-nav"><b>01</b>Navegar</h3>
+          <ul>
+            <li><a class="ft-link" href="#"><span data-t="Início">Início</span></a></li>
+            <li><a class="ft-link" href="#sobre"><span data-t="Sobre">Sobre</span></a></li>
+            <li><a class="ft-link" href="#projetos"><span data-t="Projetos">Projetos</span></a></li>
+            <li><a class="ft-link" href="#servicos"><span data-t="Serviços">Serviços</span></a></li>
+            <li><a class="ft-link" href="#faq"><span data-t="Perguntas frequentes">Perguntas frequentes</span></a></li>
+          </ul>
+        </nav>
 
-    <div class="ft-col">
-      <h2 class="ft-title">Contato</h2>
-      <ul>
-        <li><a href="https://wa.me/5512991145851" target="_blank" rel="noopener">WhatsApp</a></li>
-        <li><a href="https://github.com/Gabrielrinkawetsky" target="_blank" rel="noopener">GitHub</a></li>
-      </ul>
+        <div class="ft-col" data-ft>
+          <h3 class="ft-title"><b>02</b>Serviços</h3>
+          <ul class="ft-plain">
+            <li>Sites</li>
+            <li>Lojas virtuais</li>
+            <li>Sistemas sob medida</li>
+            <li>Automações com IA</li>
+            <li>Pagamentos online</li>
+          </ul>
+        </div>
+
+        <div class="ft-col" data-ft>
+          <h3 class="ft-title"><b>03</b>Contato</h3>
+          <ul>
+            <li><a class="ft-link" href="https://wa.me/5512991145851" target="_blank" rel="noopener"><span data-t="WhatsApp">WhatsApp</span><svg class="ft-ext" viewBox="0 0 12 12" aria-hidden="true"><path d="M3.5 8.5l5-5M4.5 3.5h4v4"/></svg></a><small>(12) 99114-5851</small></li>
+            <li><a class="ft-link" href="https://github.com/Gabrielrinkawetsky" target="_blank" rel="noopener"><span data-t="GitHub">GitHub</span><svg class="ft-ext" viewBox="0 0 12 12" aria-hidden="true"><path d="M3.5 8.5l5-5M4.5 3.5h4v4"/></svg></a></li>
+          </ul>
+          <p class="ft-place">Caraguatatuba, SP<br><span class="ft-clock"><time class="ft-time">--:--</time> <span class="ft-tz">horário local</span></span></p>
+        </div>
+      </div>
     </div>
   </div>
+
+  <p class="ft-word" aria-hidden="true"><span class="ft-word-in"><span style="--i:0">G</span><span style="--i:1">a</span><span style="--i:2">b</span><span style="--i:3">r</span><span style="--i:4">i</span><span style="--i:5">e</span><span style="--i:6">l</span><span class="sp" style="--i:7"> </span><span style="--i:8">R</span><span style="--i:9">i</span><span style="--i:10">b</span><span style="--i:11">e</span><span style="--i:12">i</span><span style="--i:13">r</span><span style="--i:14">o</span></span></p>
 
   <div class="ft-base">
     <p>© <span class="ft-year">2026</span> Gabriel Ribeiro. Todos os direitos reservados.</p>
     <p>Caraguatatuba · Litoral Norte de SP</p>
+    <p>Design e código por Gabriel Ribeiro</p>
+    <a class="ft-top-btn" href="#"><span>Voltar ao topo</span><i aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M10 15V5M6 9l4-4 4 4"/></svg></i></a>
   </div>
-  <script>document.querySelector('.ft-year').textContent = new Date().getFullYear();</script>
 </footer>
+<script src="js/rodape.js" defer></script>
 
 </body>
 </html>
