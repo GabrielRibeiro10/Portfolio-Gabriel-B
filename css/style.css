@@ -1079,36 +1079,26 @@ html, body { overflow-x: clip; }
 .about-areas .bonus-list p { max-width: 50ch; }
 .bonus-list p strong { display: block; margin-bottom: 6px; font-size: clamp(16px, 1.3vw, 20px); font-weight: 500; line-height: 1.3; letter-spacing: -.01em; color: var(--ink); }
 
-/* selo "Bônus" preso pelo alfinete */
-.bonus-badge { position: relative; display: inline-block; flex: none; perspective: 500px; }
+/* selo "Bônus" preso pelo alfinete 3D. Este é o estado final, parado (sem JS ou com "menos movimento"); o
+   js/alfinete.js anima por cima: queda com perspectiva e a sombra vindo de longe, a agulha entrando no selo,
+   o impacto e o balanço amortecido em volta do alfinete. O alfinete fica preso na margem de cima do selo, no
+   centro (10% da altura, acima das letras), e o selo gira em volta desse ponto. As camadas são desenhadas em
+   48×60 px e o ponto de contato da agulha fica em 24×46,8 px (img/alfinete-*.webp, renderizados em three.js
+   com a mesma câmera). */
+.bonus-badge { position: relative; display: inline-block; flex: none; margin-top: 6px; }
 .bonus-tag {
   display: block; padding: 9px 16px 8px; border-radius: 999px;
-  background: linear-gradient(180deg, var(--orange-2), var(--orange)); color: #fff;
+  background: linear-gradient(180deg, #ff9d45, var(--orange) 70%, #e85f14); color: #fff;
   font-size: 12px; font-weight: 700; letter-spacing: .14em; line-height: 1; text-transform: uppercase;
-  box-shadow: 0 8px 18px -10px rgba(242, 107, 29, .9);
-  transform: rotate(-4deg); transform-origin: 50% 0;
+  /* plástico fino: brilho na borda de cima, borda de baixo mais escura, sombra de contato + sombra difusa */
+  box-shadow: inset 0 1px 0 rgba(255, 235, 215, .55), inset 0 -1px 0 rgba(140, 45, 5, .35),
+    0 1px 1.5px rgba(122, 42, 10, .3), 0 7px 16px -7px rgba(122, 42, 10, .55);
+  transform: rotate(-4deg); transform-origin: 50% 10%;
 }
-.bonus-pin {
-  position: absolute; z-index: 1; left: 50%; top: -28px; width: 26px; height: 32px; margin-left: -13px;
-  transform: rotateZ(-12deg); transform-origin: 50% 100%;
-  filter: drop-shadow(2px 3px 1.5px rgba(36, 10, 3, .38));
-}
-@media (prefers-reduced-motion: no-preference) {
-  .about-areas ol.is-live > li.bonus:not(.is-on) :is(.bonus-pin, .bonus-tag) { opacity: 0; }
-  .about-areas li.bonus.is-on .bonus-tag {
-    animation: bonus-tag-in .45s cubic-bezier(.2, .8, .3, 1.2) both, bonus-tag-jolt .6s ease-out .66s, bonus-tag-swing 4s ease-in-out 1.3s infinite;
-  }
-  .about-areas li.bonus.is-on .bonus-pin { animation: bonus-pin-drop .75s cubic-bezier(.3, .7, .3, 1) .2s both; }
-}
-@keyframes bonus-tag-in { from { opacity: 0; transform: translateY(-10px) rotate(-16deg) scale(.85); } }
-@keyframes bonus-tag-jolt { 0%, 100% { transform: rotate(-4deg); } 25% { transform: translateY(3px) rotate(-1deg); } 60% { transform: rotate(-6deg); } }
-@keyframes bonus-tag-swing { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(-2deg); } }
-@keyframes bonus-pin-drop {   /* vem de cima, girando no espaço, com a sombra longe e borrada; finca e quica */
-  0% { opacity: 0; transform: translate3d(46px, -110px, 0) rotateX(60deg) rotateZ(40deg) scale(1.9); filter: drop-shadow(26px 40px 10px rgba(36, 10, 3, .12)); }
-  55% { opacity: 1; transform: translate3d(0, 5px, 0) rotateX(0) rotateZ(-16deg) scale(.94); filter: drop-shadow(2px 3px 1.5px rgba(36, 10, 3, .38)); }
-  78% { transform: translate3d(0, -3px, 0) rotateZ(-10deg) scale(1.04); }
-  100% { opacity: 1; transform: rotateZ(-12deg); filter: drop-shadow(2px 3px 1.5px rgba(36, 10, 3, .38)); }
-}
+.bonus-pin { position: absolute; z-index: 1; left: calc(50% - 24px); top: calc(10% - 46.8px); width: 48px; height: 60px; pointer-events: none; }
+.bonus-pin img { position: absolute; inset: 0; width: 100%; height: 100%; transform-origin: 24px 46.8px; }
+.pin-needle { visibility: hidden; }   /* preso: a agulha está dentro do selo */
+.bonus-badge.pin-live .bonus-tag, .bonus-badge.pin-live .bonus-pin img { will-change: transform, opacity; }
 
 @media (max-width: 860px) {
   .about-areas ol > li.bonus { padding-top: 48px; padding-bottom: 40px; row-gap: 24px; }
