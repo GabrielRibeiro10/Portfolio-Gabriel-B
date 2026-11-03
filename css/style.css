@@ -1040,21 +1040,56 @@ html, body { overflow-x: clip; }
 }
 
 /* ---------- Bônus: item 06 de "O que eu entrego" ----------
-   Mesmo formato e tamanho dos outros itens, texto em preto. Ao lado do título, uma etiqueta branca
-   "Grátis" presa por um alfinete laranja em 3D: quando o fio chega no item (.is-on, js/main.js) a
-   etiqueta aparece, o alfinete desce de cima girando no espaço, finca e a etiqueta balança de leve.
-   Encosta na Stack embaixo. A linha pequena na chamada final também fala dos bônus. */
-.about-areas li.bonus { border-bottom: 0; }
-.about-areas li.bonus h3 { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 26px; color: var(--ink); }
-.bonus-badge { position: relative; display: inline-block; perspective: 500px; margin-top: 10px; }
+   Visual do design aprovado, no layout da lista: faixa pêssego de ponta a ponta atrás do item (o fio laranja
+   passa por cima), o número 06 na coluna dos números, o selo "Bônus" laranja preso por um alfinete e o título
+   na coluna dos títulos, e os dois bônus (ícone em círculo branco, título e texto) alinhados às colunas de
+   título e descrição dos itens de cima (subgrid). Encosta na Stack embaixo. A linha pequena na chamada final
+   também fala dos bônus. */
+.about-areas ol::before { z-index: 1; }   /* o fio e a bolinha da ponta ficam por cima da faixa do bônus */
+.about-areas ol::after { z-index: 2; }
+.about-areas ol > li.bonus {
+  position: relative; isolation: isolate; border-bottom: 0; align-items: center;
+  row-gap: clamp(26px, 2.8vw, 40px);
+  padding-top: clamp(38px, 4vw, 60px); padding-bottom: clamp(42px, 4.6vw, 70px);
+}
+.about-areas ol > li.bonus::before {   /* faixa pêssego de ponta a ponta, com o brilho laranja à direita */
+  content: ""; position: absolute; z-index: -1; top: 0; bottom: 0; left: calc(50% - 50vw); width: 100vw; pointer-events: none;
+  background:
+    radial-gradient(55% 140% at 100% 62%, rgba(255, 149, 54, .34), rgba(255, 149, 54, 0) 70%),
+    radial-gradient(40% 120% at 0% 0%, rgba(255, 210, 168, .5), rgba(255, 210, 168, 0) 70%),
+    linear-gradient(180deg, var(--peach-50), var(--peach-100));
+}
+@media (hover: hover) { .about-areas ol > li.bonus:hover { padding-left: clamp(22px, 2.4vw, 40px); } }   /* o bloco grande não anda no hover */
+.about-areas li.bonus > .n { grid-column: 1; grid-row: 1; }
+.bonus-head { grid-column: 2 / -1; grid-row: 1; display: flex; flex-wrap: wrap; align-items: center; gap: 14px clamp(22px, 2.8vw, 40px); }
+.about-areas .bonus-head h3 { font-size: clamp(24px, 2.5vw, 40px); line-height: 1.1; }
+.bonus-head h3 em { color: var(--rust); }
+
+.bonus-list { grid-column: 2 / -1; grid-row: 2; display: grid; grid-template-columns: subgrid; row-gap: 22px; margin: 0; padding: 0; list-style: none; }
+.about-areas li.bonus .bonus-list > li {
+  display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 16px; align-items: start;
+  padding: 20px 0 0; border: 0; border-top: 1px solid rgba(122, 42, 10, .16); transition: none;
+}
+.about-areas li.bonus .bonus-list > li:hover { padding-left: 0; }
+.bonus-ico {
+  display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
+  border: 1px solid rgba(242, 107, 29, .35); background: #fff; box-shadow: 0 6px 16px -10px rgba(122, 42, 10, .5);
+}
+.bonus-ico svg { width: 20px; height: 20px; fill: none; stroke: var(--orange); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.about-areas .bonus-list p { max-width: 50ch; }
+.bonus-list p strong { display: block; margin-bottom: 6px; font-size: clamp(16px, 1.3vw, 20px); font-weight: 500; line-height: 1.3; letter-spacing: -.01em; color: var(--ink); }
+
+/* selo "Bônus" preso pelo alfinete */
+.bonus-badge { position: relative; display: inline-block; flex: none; perspective: 500px; }
 .bonus-tag {
-  display: block; padding: 10px 16px 9px; border-radius: 5px; background: #fff; color: var(--ink);
-  font-size: 14px; font-weight: 700; letter-spacing: .16em; line-height: 1; text-transform: uppercase;
-  box-shadow: 0 12px 22px -12px rgba(36, 10, 3, .5), 0 0 0 1px rgba(17, 17, 17, .06);
-  transform: rotate(-5deg); transform-origin: 50% 0;
+  display: block; padding: 9px 16px 8px; border-radius: 999px;
+  background: linear-gradient(180deg, var(--orange-2), var(--orange)); color: #fff;
+  font-size: 12px; font-weight: 700; letter-spacing: .14em; line-height: 1; text-transform: uppercase;
+  box-shadow: 0 8px 18px -10px rgba(242, 107, 29, .9);
+  transform: rotate(-4deg); transform-origin: 50% 0;
 }
 .bonus-pin {
-  position: absolute; z-index: 1; left: 50%; top: -30px; width: 30px; height: 37px; margin-left: -15px;
+  position: absolute; z-index: 1; left: 50%; top: -28px; width: 26px; height: 32px; margin-left: -13px;
   transform: rotateZ(-12deg); transform-origin: 50% 100%;
   filter: drop-shadow(2px 3px 1.5px rgba(36, 10, 3, .38));
 }
@@ -1066,13 +1101,24 @@ html, body { overflow-x: clip; }
   .about-areas li.bonus.is-on .bonus-pin { animation: bonus-pin-drop .75s cubic-bezier(.3, .7, .3, 1) .2s both; }
 }
 @keyframes bonus-tag-in { from { opacity: 0; transform: translateY(-10px) rotate(-16deg) scale(.85); } }
-@keyframes bonus-tag-jolt { 0%, 100% { transform: rotate(-5deg); } 25% { transform: translateY(3px) rotate(-1deg); } 60% { transform: rotate(-7deg); } }
-@keyframes bonus-tag-swing { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(-2.5deg); } }
+@keyframes bonus-tag-jolt { 0%, 100% { transform: rotate(-4deg); } 25% { transform: translateY(3px) rotate(-1deg); } 60% { transform: rotate(-6deg); } }
+@keyframes bonus-tag-swing { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(-2deg); } }
 @keyframes bonus-pin-drop {   /* vem de cima, girando no espaço, com a sombra longe e borrada; finca e quica */
   0% { opacity: 0; transform: translate3d(46px, -110px, 0) rotateX(60deg) rotateZ(40deg) scale(1.9); filter: drop-shadow(26px 40px 10px rgba(36, 10, 3, .12)); }
   55% { opacity: 1; transform: translate3d(0, 5px, 0) rotateX(0) rotateZ(-16deg) scale(.94); filter: drop-shadow(2px 3px 1.5px rgba(36, 10, 3, .38)); }
   78% { transform: translate3d(0, -3px, 0) rotateZ(-10deg) scale(1.04); }
   100% { opacity: 1; transform: rotateZ(-12deg); filter: drop-shadow(2px 3px 1.5px rgba(36, 10, 3, .38)); }
+}
+
+@media (max-width: 860px) {
+  .about-areas ol > li.bonus { padding-top: 48px; padding-bottom: 40px; row-gap: 24px; }
+  .about-areas li.bonus > .n { align-self: start; margin-top: 7px; }   /* na altura do selo (o título desce para a linha de baixo) */
+  .bonus-head { gap: 12px 16px; }
+  .about-areas .bonus-head h3 { font-size: clamp(22px, 6.2vw, 28px); }
+  .bonus-list { row-gap: 18px; }
+  .about-areas li.bonus .bonus-list > li { grid-template-columns: 38px minmax(0, 1fr); gap: 12px; padding-top: 16px; }
+  .bonus-ico { width: 38px; height: 38px; }
+  .bonus-ico svg { width: 18px; height: 18px; }
 }
 
 .cta-copy { display: flex; flex-direction: column; gap: 14px; }
