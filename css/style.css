@@ -1248,3 +1248,127 @@ html, body { overflow-x: clip; }
   .ft-legal ul { flex-direction: column; gap: 12px; }
   .ft-legal li { font-size: 16px; }
 }
+
+/* ---------- Aviso de cookies (js/cookies.js) ----------
+   Cartão no canto de baixo, no café escuro dos Projetos com o brilho laranja e a grade de pontos.
+   "Recusar" e "Aceitar todos" do mesmo tamanho; "Personalizar" abre as categorias (altura animada por
+   grid-template-rows). Entra subindo com uma mola leve depois da entrada da página e sai descendo. */
+.ck {
+  position: fixed; z-index: 90; left: clamp(12px, 2vw, 28px); bottom: clamp(12px, 2vw, 28px);
+  width: min(440px, calc(100vw - 24px)); color: #ffe9d8; font-family: var(--font);
+  opacity: 0; transform: translateY(calc(100% + 40px)); pointer-events: none;
+}
+.ck.is-in {
+  opacity: 1; transform: none; pointer-events: auto;
+  transition: transform .95s cubic-bezier(.2, .95, .25, 1.08), opacity .5s ease;
+}
+.ck.is-out { opacity: 0; transform: translateY(28px) scale(.98); transition: transform .5s cubic-bezier(.5, 0, .75, 0), opacity .4s ease; }
+.ck-card {
+  position: relative; overflow: hidden; isolation: isolate;
+  padding: 22px 22px 18px; border-radius: 22px;
+  background:
+    radial-gradient(120% 90% at 100% 0%, rgba(242, 107, 29, .4), rgba(242, 107, 29, 0) 60%),
+    radial-gradient(90% 70% at 0% 100%, rgba(122, 42, 10, .55), rgba(122, 42, 10, 0) 70%),
+    linear-gradient(160deg, var(--ember-800), var(--ember-950));
+  box-shadow: 0 0 0 1px rgba(255, 210, 168, .14), 0 34px 70px -24px rgba(26, 8, 3, .8), 0 12px 26px -14px rgba(26, 8, 3, .55);
+}
+.ck-card::before {   /* grade de pontos dos Projetos, apagando para baixo */
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background-image: radial-gradient(rgba(255, 210, 168, .16) 1px, transparent 1.5px); background-size: 18px 18px;
+  -webkit-mask-image: linear-gradient(170deg, #000, transparent 60%); mask-image: linear-gradient(170deg, #000, transparent 60%);
+}
+.ck-head { display: flex; align-items: center; gap: 14px; }
+.ck-ico {
+  flex: none; display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%;
+  background: rgba(255, 210, 168, .08); box-shadow: inset 0 0 0 1px rgba(255, 210, 168, .16);
+}
+.ck-ico svg { width: 32px; height: 32px; overflow: visible; filter: drop-shadow(0 4px 6px rgba(26, 8, 3, .45)); }
+.ck-t { margin: 0; font-size: 17px; font-weight: 500; letter-spacing: -.015em; line-height: 1.25; color: #fff; }
+.ck-d { margin: 14px 0 0; font-size: 14px; line-height: 1.55; color: rgba(255, 233, 216, .78); }
+.ck-d a { color: var(--peach); text-decoration: underline; text-decoration-color: rgba(255, 210, 168, .45); text-underline-offset: 3px; transition: color .2s, text-decoration-color .2s; }
+.ck-d a:hover { color: #fff; text-decoration-color: currentColor; }
+
+.ck-prefs { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .55s cubic-bezier(.2, .7, .2, 1); }
+.ck.is-prefs .ck-prefs { grid-template-rows: 1fr; }
+.ck-prefs-in { min-height: 0; overflow: hidden; }
+.ck-prefs-in > :first-child { margin-top: 16px; }
+.ck-opt {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 12px 0; border-top: 1px solid rgba(255, 210, 168, .12);
+  opacity: 0; transform: translateY(-6px); transition: opacity .3s, transform .5s cubic-bezier(.2, .7, .2, 1);
+}
+label.ck-opt { cursor: pointer; }
+.ck.is-prefs .ck-opt { opacity: 1; transform: none; transition-delay: .1s; }
+.ck.is-prefs .ck-opt:nth-child(2) { transition-delay: .16s; }
+.ck.is-prefs .ck-opt:nth-child(3) { transition-delay: .22s; }
+.ck-opt-t { display: flex; flex-direction: column; gap: 2px; }
+.ck-opt-t strong { font-size: 14px; font-weight: 600; color: #fff; }
+.ck-opt-t span { font-size: 12.5px; line-height: 1.45; color: rgba(255, 233, 216, .66); }
+.ck-always { flex: none; padding: 5px 10px; border-radius: 999px; background: rgba(255, 210, 168, .1); font-size: 11.5px; font-weight: 600; color: var(--peach); white-space: nowrap; }
+/* chave liga/desliga */
+.ck-switch {
+  flex: none; position: relative; width: 42px; height: 24px; margin: 0; border-radius: 999px; cursor: pointer;
+  -webkit-appearance: none; appearance: none; background: rgba(255, 210, 168, .18);
+  box-shadow: inset 0 0 0 1px rgba(255, 210, 168, .2); transition: background .3s, box-shadow .3s;
+}
+.ck-switch::before {
+  content: ""; position: absolute; left: 3px; top: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff;
+  box-shadow: 0 2px 6px rgba(26, 8, 3, .45); transition: transform .45s cubic-bezier(.3, 1.4, .5, 1);
+}
+.ck-switch:checked { background: linear-gradient(180deg, var(--orange-2), var(--orange)); box-shadow: inset 0 0 0 1px rgba(255, 149, 54, .6), 0 0 14px -2px rgba(242, 107, 29, .7); }
+.ck-switch:checked::before { transform: translateX(18px); }
+
+.ck-actions { display: flex; align-items: center; gap: 10px; margin-top: 18px; }
+.ck-btn {
+  display: inline-flex; align-items: center; justify-content: center; height: 44px; padding: 0 18px; border-radius: 999px;
+  font: 600 14px var(--font); white-space: nowrap; cursor: pointer;
+  transition: background .3s, border-color .3s, color .3s, transform .25s, box-shadow .3s;
+}
+.ck-btn[hidden] { display: none; }
+.ck-btn--line { border: 1px solid rgba(255, 210, 168, .38); background: rgba(255, 210, 168, .04); color: #fff; }
+.ck-btn--line:hover { background: rgba(255, 210, 168, .12); border-color: rgba(255, 210, 168, .6); }
+.ck-btn--main { border: 0; background: linear-gradient(180deg, var(--orange-2), var(--orange)); color: #fff; box-shadow: 0 12px 26px -12px rgba(242, 107, 29, .9); }
+.ck-btn--main:hover { transform: translateY(-1px); box-shadow: 0 16px 30px -12px rgba(242, 107, 29, 1); }
+.ck-btn:active { transform: scale(.97); }
+.ck-more {
+  display: inline-flex; align-items: center; gap: 6px; margin-right: auto; padding: 8px 2px; border: 0; background: none;
+  font: 500 14px var(--font); color: var(--peach); cursor: pointer;
+}
+.ck-more:hover { color: #fff; }
+.ck-more svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .45s cubic-bezier(.2, .7, .2, 1); }
+.ck.is-prefs .ck-more svg { transform: rotate(180deg); }
+.ck :focus-visible { outline: 2px solid var(--peach); outline-offset: 3px; }
+.ck .ck-switch:focus-visible { outline-offset: 2px; }
+
+/* biscoito: entra girando com uma mola e dá uma "mordida" leve de vez em quando */
+@media (prefers-reduced-motion: no-preference) {
+  .ck.is-in .ck-ico svg { animation: ck-roll .9s cubic-bezier(.3, 1.35, .5, 1) .25s both, ck-nibble 5s ease-in-out 2.4s infinite; }
+}
+@keyframes ck-roll { from { transform: translateX(-26px) rotate(-200deg) scale(.5); opacity: 0; } }
+@keyframes ck-nibble { 0%, 86%, 100% { transform: none; } 90% { transform: rotate(-9deg) scale(1.06); } 94% { transform: rotate(5deg); } }
+@media (prefers-reduced-motion: reduce) { .ck, .ck.is-in, .ck.is-out, .ck-prefs, .ck-opt { transition: none !important; } }
+
+@media (max-width: 600px) {
+  .ck { left: 10px; right: 10px; bottom: 10px; width: auto; }
+  .ck-card { padding: 18px 18px 14px; border-radius: 20px; }
+  .ck-ico { width: 42px; height: 42px; }
+  .ck-ico svg { width: 28px; height: 28px; }
+  .ck-t { font-size: 16px; }
+  .ck-d { margin-top: 10px; font-size: 13.5px; }
+  .ck-actions { flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .ck-btn { flex: 1; }
+  .ck-more { order: 3; flex: 1 0 100%; justify-content: center; margin: 0; padding: 6px 0 2px; }
+}
+
+/* botão "Preferências de cookies" na faixa legal do rodapé */
+.ft-cookies {
+  display: inline-flex; align-items: center; gap: 9px; height: 42px; padding: 0 18px 0 13px;
+  border: 1px solid rgba(17, 17, 17, .14); border-radius: 999px; background: rgba(255, 255, 255, .7);
+  font: 500 14px var(--font); color: var(--ink); cursor: pointer;
+  transition: border-color .3s, color .3s, background .3s, transform .3s cubic-bezier(.2, .7, .2, 1);
+}
+.ft-cookies svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; transition: transform .6s cubic-bezier(.3, 1.4, .5, 1); }
+.ft-cookies:hover { border-color: var(--orange); color: var(--rust); background: #fff; }
+.ft-cookies:hover svg { transform: rotate(-24deg); }
+.ft-cookies:focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; }
+.ft-cookies[hidden] { display: none; }
