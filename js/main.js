@@ -214,13 +214,12 @@ if (window.Lenis && !reduceMotion && matchMedia('(hover: hover) and (pointer: fi
   }
 }
 
-// "O que eu entrego": o fio laranja desce junto com a rolagem (a ponta fica a 60% da altura da tela),
-// com um leve atraso para ficar macio; o item acende quando o fio passa do começo dele
-{
-  const list = document.querySelector('.about-areas ol');
-  const items = list ? [...list.children] : [];
-  if (list && reduceMotion) { list.style.setProperty('--p', 1); items.forEach((li) => li.classList.add('is-on')); }
-  else if (list) {
+// "O que eu entrego" e Stack: o fio laranja desce junto com a rolagem (a ponta fica a 60% da altura
+// da tela), com um leve atraso para ficar macio; o item acende quando o fio passa do começo dele
+document.querySelectorAll('.about-areas ol, .stack-list').forEach((list) => {
+  const items = [...list.children];
+  if (reduceMotion) { list.style.setProperty('--p', 1); items.forEach((li) => li.classList.add('is-on')); }
+  else {
     list.classList.add('is-live');
     let cur = 0, raf = 0;
     const target = () => { const r = list.getBoundingClientRect(); return Math.min(1, Math.max(0, (innerHeight * 0.6 - r.top) / r.height)); };
@@ -238,7 +237,7 @@ if (window.Lenis && !reduceMotion && matchMedia('(hover: hover) and (pointer: fi
     addEventListener('resize', go);
     go();
   }
-}
+});
 
 // Projetos: carrossel de notebooks 3D (o desenho e as animações estão no css/style.css). O primeiro
 // notebook abre quando aparece na tela; setas, teclado (← →) e arrastar para o lado trocam de projeto:
