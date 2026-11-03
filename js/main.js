@@ -426,6 +426,22 @@ if (animate && ScrollTrigger) {
   });
   // a onda do fundo só balança com a seção à vista (e fica parada para quem prefere menos movimento)
   const wave = faq && faq.querySelector('.faq-wave');
+  // e se dissolve no creme: no PC entre o fim da lista (a coluna fixa nunca passa dali) e o texto em
+  // contorno; no celular logo depois da coluna da esquerda, para as perguntas ficarem no claro.
+  // --wf-a/--wf-b: começo e fim do esmaecido, em px do topo do FAQ (offsetTop ignora as animações de entrada)
+  if (wave && 'ResizeObserver' in window) {
+    const side = faq.querySelector('.faq-side'), grid = faq.querySelector('.faq-grid'), mq = faq.querySelector('.faq-marquee');
+    const phone = matchMedia('(max-width: 860px)');
+    const fit = () => {
+      let a, b;
+      if (phone.matches) { a = side.offsetTop + side.offsetHeight + 4; b = a + 190; }
+      else { a = grid.offsetTop + grid.offsetHeight - 10; b = Math.max(a + 90, mq.offsetTop + 30); }
+      faq.style.setProperty('--wf-a', a + 'px');
+      faq.style.setProperty('--wf-b', b + 'px');
+    };
+    new ResizeObserver(fit).observe(faq);
+    phone.addEventListener('change', fit);
+  }
   if (wave && (reduceMotion || !('IntersectionObserver' in window))) { if (reduceMotion) wave.pauseAnimations(); }
   else if (wave) {
     wave.pauseAnimations();
