@@ -1782,34 +1782,6 @@ html.leve .intro .btn-work, html.leve .intro .btn-work::before, html.leve .intro
   .stack .stack-chips svg { width: 12px; height: 12px; }
 }
 
-/* ---------- Ponte hero -> Projetos ----------
-   Curta e sem enfeite: o laranja do pé da hero (--seam, o mesmo que ela termina) escurece aos poucos até o café do
-   topo do painel dos Projetos, com paradas suavizadas (sem faixas). O espaço entre a hero e o painel diminui, e a
-   ponte vai 90 px por baixo do painel, que se dissolve nela nos primeiros 80 px. Altura (--bh) vem do js/main.js. */
-.about > .about-in { position: relative; z-index: 1; }
-.about:has(> .about-in > .projects:first-child) { padding-top: clamp(64px, 6.4vw, 104px); }
-.pj-bridge {
-  position: absolute; z-index: 0; left: 0; right: 0; top: 0; height: var(--bh, 320px); overflow: hidden; pointer-events: none;
-  background: linear-gradient(90deg, #8a3810 0%, #64260b 26%, #3f1607 52%, #441907 76%, #4c200b 100%);
-}
-.pj-bridge::before {   /* o laranja da hero em cima, escurecendo para baixo numa curva suave */
-  content: ''; position: absolute; inset: 0; background: var(--seam);
-  -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, .94) 14%, rgba(0, 0, 0, .78) 30%, rgba(0, 0, 0, .55) 46%, rgba(0, 0, 0, .32) 62%, rgba(0, 0, 0, .14) 78%, rgba(0, 0, 0, .04) 90%, transparent 100%);
-  mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, .94) 14%, rgba(0, 0, 0, .78) 30%, rgba(0, 0, 0, .55) 46%, rgba(0, 0, 0, .32) 62%, rgba(0, 0, 0, .14) 78%, rgba(0, 0, 0, .04) 90%, transparent 100%);
-}
-/* o selo dos Projetos fica sobre o degradê: em claro */
-.pj-kicker { color: #fff; }
-.pj-kicker .k-num { color: #ffd2a8; }
-.pj-kicker .k-sub { color: rgba(255, 233, 216, .82); }
-.pj-kicker .k-line { opacity: .35; }
-.about-in > .projects:first-child .pj {
-  -webkit-mask-image: linear-gradient(180deg, transparent 0, rgba(0, 0, 0, .5) 36px, #000 80px);
-  mask-image: linear-gradient(180deg, transparent 0, rgba(0, 0, 0, .5) 36px, #000 80px);
-}
-@media (max-width: 860px) {
-  .about:has(> .about-in > .projects:first-child) { padding-top: 56px; }
-}
-
 /* ---------- "E não para por aí": faixa de ponta a ponta ----------
    Sai do cartão branco e vira uma faixa que encosta nas bordas da tela, no laranja da hero: canto café em cima à
    esquerda, vermelho-alaranjado no meio e laranja vivo embaixo à direita, com um brilho amarelo, a grade de pontos
@@ -1851,22 +1823,6 @@ html.leve .intro .btn-work, html.leve .intro .btn-work::before, html.leve .intro
   .nc-more::after { right: -40vw; bottom: -18%; width: 110vw; }
   .nc-go-end { margin-top: 24px; }
   .nichos + .about-areas { margin-top: 44px; }
-}
-
-/* ---------- Emenda hero -> Projetos sem quebra ----------
-   O pé da hero muda de cor (foto, brilhos, modo leve), então em vez de tentar acertar a cor, as duas seções
-   usam a mesma: --seam. O pé da hero se dissolve nela (por cima do fundo e da foto, por baixo dos cartões e
-   textos) e a ponte começa exatamente nela. Mesma largura, mesma cor no mesmo pixel: a emenda não existe. */
-:root { --seam: linear-gradient(90deg, #c84a0c 0%, #d65c14 28%, #e06012 55%, #e25a02 76%, #ec6400 100%); }
-.hero::after {
-  content: ''; position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; height: calc(36px + 1.6cqw); pointer-events: none;   /* até a borda de baixo do painel claro, sem pintar ele */
-  background: var(--seam);
-  -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, .55) 50%, #000 100%);
-  mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, .55) 50%, #000 100%);
-}
-@media (max-width: 860px), (max-aspect-ratio: 4/5), (orientation: landscape) and (max-height: 500px) and (max-width: 1000px) {
-  :root { --seam: linear-gradient(90deg, #e45c00 0%, #e96000 30%, #ec6300 60%, #f06600 100%); }
-  .hero::after { height: 64px; }
 }
 
 /* ---------- "Design que emociona. Código que entrega.": entra da esquerda para a direita ----------

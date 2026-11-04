@@ -708,16 +708,3 @@ if (animate) {
     io.observe(ni);
   }
 }
-
-// Ponte hero -> Projetos: altura até 90 px abaixo do topo do painel (que se dissolve nela)
-{
-  const about = document.querySelector('.about'), bridge = about && about.querySelector('.pj-bridge');
-  const panel = about && about.querySelector('.projects .pj');
-  if (bridge && panel) {
-    const size = () => bridge.style.setProperty('--bh', Math.round(panel.getBoundingClientRect().top - about.getBoundingClientRect().top + 90) + 'px');
-    size();
-    addEventListener('resize', size);
-    addEventListener('load', size);
-    if ('ResizeObserver' in window) new ResizeObserver(size).observe(panel.parentElement);
-  }
-}
