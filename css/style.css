@@ -1352,62 +1352,73 @@ html.leve .faq-wave { animation: none; }   /* em telas largas o laranja passa da
 .cta-m { display: none; }
 @media (max-width: 860px) {
   .cta-m { display: revert; }
+  /* faixa de ponta a ponta (encosta nas bordas da tela), nas três cores do site: preto sombra no fundo, um sol
+     amarelo nascendo no canto de cima (o mesmo disco amarelo da hero, #e69924 → #fb9413 → #ca6710) com um anel
+     fino em volta, e um círculo laranja grande saindo por baixo à esquerda */
   .faq .about-cta {
-    margin: 44px 0 0; padding: 26px 20px 20px; gap: 0; border-radius: 26px; overflow: hidden; isolation: isolate;
+    margin: 48px -20px 0; padding: 150px 24px 40px; gap: 0; border-radius: 0; overflow: hidden; isolation: isolate;
     background:
-      radial-gradient(80% 55% at 100% 100%, rgba(242, 107, 29, .62), rgba(242, 107, 29, 0) 70%),
-      radial-gradient(60% 40% at 0% 0%, rgba(255, 160, 70, .14), rgba(255, 160, 70, 0) 70%),
-      linear-gradient(165deg, #1f0b04 0%, #130603 55%, #1d0904 100%);
-    box-shadow: 0 34px 60px -34px rgba(60, 18, 5, .75), inset 0 0 0 1px rgba(255, 233, 216, .07);
+      radial-gradient(260px 260px at calc(100% - 45px) 15px, rgba(251, 148, 19, .38), rgba(251, 148, 19, 0) 100%),
+      radial-gradient(120% 50% at 50% 100%, rgba(242, 107, 29, .22), rgba(242, 107, 29, 0) 70%),
+      linear-gradient(180deg, #0d0503 0%, #160704 60%, #1c0904 100%);
+    box-shadow: none;
   }
-  .faq .about-cta::before {   /* pontilhado fino, só no alto à direita */
-    content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
-    background: radial-gradient(circle, rgba(255, 233, 216, .16) 1px, transparent 1.4px) 0 0 / 14px 14px;
-    -webkit-mask-image: radial-gradient(70% 60% at 100% 0%, #000, transparent 75%); mask-image: radial-gradient(70% 60% at 100% 0%, #000, transparent 75%);
+  .faq .about-cta::before {   /* sol amarelo + anel, no canto de cima à direita */
+    content: ''; position: absolute; z-index: -1; pointer-events: none; top: -120px; right: -90px; width: 270px; height: 270px; border-radius: 50%;
+    background: radial-gradient(circle at 38% 62%, #ffd36b 0%, #fbb22e 30%, #fb9413 62%, #ca6710 100%);
+    box-shadow: 0 0 0 18px #110604, 0 0 0 19px rgba(255, 211, 107, .45);
+  }
+  .faq .about-cta::after {    /* círculo laranja grande saindo por baixo à esquerda */
+    content: ''; position: absolute; z-index: -2; pointer-events: none; left: -190px; bottom: -260px; width: 460px; height: 460px; border-radius: 50%;
+    background: radial-gradient(circle at 60% 30%, #ff8a3d 0%, #f26b1d 40%, #b9480f 75%, #7a2a0a 100%);
+    opacity: .55;
   }
   .faq .about-cta .cta-copy { gap: 0; }
   .faq .about-cta .cta-bonus { display: none; }
   .cta-status {
     display: inline-flex !important; align-self: flex-start; align-items: center; gap: 8px; margin: 0 0 20px !important; max-width: none !important; white-space: nowrap;
-    padding: 6px 12px 6px 10px; border-radius: 99px; border: 1px solid rgba(255, 233, 216, .14); background: rgba(255, 233, 216, .05);
+    padding: 6px 12px 6px 10px; border-radius: 99px; border: 1px solid rgba(255, 233, 216, .16); background: rgba(13, 5, 3, .6);
     font-size: 12px !important; font-weight: 500; letter-spacing: .01em; line-height: 1.2 !important; color: rgba(255, 240, 228, .88);
   }
-  .cta-status i { position: relative; width: 7px; height: 7px; border-radius: 50%; background: #ff8a3d; }
-  .cta-status i::after { content: ''; position: absolute; inset: -4px; border-radius: 50%; border: 1px solid #ff8a3d; opacity: 0; }
-  .faq .about-cta .cta-head { font-size: 27px; line-height: 1.1; letter-spacing: -.035em; color: #fff; max-width: 17ch; }
+  .cta-status i { position: relative; width: 7px; height: 7px; border-radius: 50%; background: #fbb22e; }
+  .cta-status i::after { content: ''; position: absolute; inset: -4px; border-radius: 50%; border: 1px solid #fbb22e; opacity: 0; }
+  .faq .about-cta .cta-head { font-size: clamp(30px, 8.6vw, 38px); line-height: 1.06; letter-spacing: -.04em; color: #fff; max-width: 15ch; }
   .faq .about-cta .cta-head span {
-    background: linear-gradient(100deg, #ffd2a8 0%, #ffa45c 55%, #ff7a2e 100%);
+    background: linear-gradient(100deg, #ffd36b 0%, #fbb22e 40%, #f26b1d 100%);
     -webkit-background-clip: text; background-clip: text; color: transparent;
   }
-  .cta-chips { display: flex !important; flex-wrap: wrap; gap: 8px; margin: 20px 0 0; padding: 0; list-style: none; }
+  .cta-chips { display: flex !important; flex-wrap: wrap; gap: 8px; margin: 24px 0 0; padding: 0; list-style: none; }
   .cta-chips li {
     display: inline-flex; align-items: center; gap: 7px; padding: 8px 12px 8px 10px; border-radius: 99px;
-    background: rgba(255, 210, 168, .07); border: 1px solid rgba(255, 210, 168, .16); color: #ffe9d8; font-size: 13px; line-height: 1;
+    background: rgba(255, 211, 107, .07); border: 1px solid rgba(255, 211, 107, .2); color: #fff1dc; font-size: 13px; line-height: 1;
   }
-  .cta-chips svg { width: 15px; height: 15px; fill: none; stroke: #ffb37a; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+  .cta-chips svg { width: 15px; height: 15px; fill: none; stroke: #fbb22e; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
   .faq .about-cta .btn-work {
-    display: flex; align-items: center; gap: 10px; width: 100%; height: 60px; margin-top: 26px; padding: 0 8px 0 18px;
-    border-radius: 99px; background: #fff; color: var(--ink); font-size: 16px; font-weight: 600; letter-spacing: -.01em;
-    box-shadow: 0 16px 34px -16px rgba(242, 107, 29, .75);
+    display: flex; align-items: center; gap: 10px; width: 100%; height: 62px; margin-top: 34px; padding: 0 8px 0 20px;
+    border-radius: 99px; background: linear-gradient(100deg, #ffd36b 0%, #fbb22e 55%, #fb9413 100%); color: #140604;
+    font-size: 16.5px; font-weight: 600; letter-spacing: -.01em;
+    box-shadow: 0 18px 40px -16px rgba(251, 148, 19, .7), inset 0 1px 0 rgba(255, 255, 255, .45);
   }
   .faq .about-cta .btn-work::before, .faq .about-cta .btn-work::after { display: none; }
-  .cta-wa { width: 22px; height: 22px; fill: none; stroke: #1a8d4f; stroke-width: 1.7; stroke-linejoin: round; }
-  .cta-go { display: grid !important; place-items: center; width: 44px; height: 44px; margin-left: auto; border-radius: 50%; background: var(--orange); transition: transform .4s cubic-bezier(.2, .7, .2, 1); }
-  .cta-go svg { width: 18px; height: 18px; fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .cta-wa { width: 22px; height: 22px; fill: none; stroke: #140604; stroke-width: 1.7; stroke-linejoin: round; }
+  .cta-go { display: grid !important; place-items: center; width: 44px; height: 44px; margin-left: auto; border-radius: 50%; background: #140604; transition: transform .4s cubic-bezier(.2, .7, .2, 1); }
+  .cta-go svg { width: 18px; height: 18px; fill: none; stroke: #fbb22e; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
   .faq .about-cta .btn-work:active .cta-go { transform: translateX(3px); }
-  .faq .about-cta .cta-note { margin: 14px 0 0; max-width: none; text-align: center; font-size: 12px; line-height: 1.3; letter-spacing: .01em; color: rgba(255, 240, 228, .55); }
+  .faq .about-cta .cta-note { margin: 16px 0 0; max-width: none; text-align: center; font-size: 12px; line-height: 1.3; letter-spacing: .01em; color: rgba(255, 240, 228, .6); }
 
   /* letreiro: inteiro no creme, só em contorno fino escuro, com as bolinhas laranja */
-  .faq-marquee { margin: 34px -20px 0; }
+  .faq-marquee { margin: 30px -20px 0; }
   .faq-marquee .mq-row { color: transparent; -webkit-text-stroke: 1px rgba(17, 17, 17, .2); }
   .faq-marquee .mq-lit { color: rgba(242, 107, 29, .9); -webkit-text-stroke-color: rgba(242, 107, 29, .9); }
   .faq-marquee .mq-lit i { background: var(--orange); }
 
   @media (prefers-reduced-motion: no-preference) {
     .cta-status i::after { animation: cta-ping 2.2s cubic-bezier(0, 0, .2, 1) infinite; }
-    .cta-live { opacity: 0; transform: translateY(40px) scale(.96); }
+    .cta-live { clip-path: inset(40px 20px 0 round 28px); }   /* começa como cartão e abre até as bordas da tela */
     .cta-live :is(.cta-status, .cta-head, .cta-chips, .btn-work, .cta-note) { opacity: 0; transform: translateY(16px); }
-    .cta-live.is-in { opacity: 1; transform: none; transition: opacity .9s ease, transform 1.2s cubic-bezier(.16, 1, .3, 1); }
+    .cta-live.is-in { clip-path: inset(0 0 0 round 0); transition: clip-path 1.3s cubic-bezier(.7, 0, .2, 1); }
+    .cta-live::before { transform: translate(40px, -40px) scale(.7); opacity: 0; }
+    .cta-live.is-in::before { transform: none; opacity: 1; transition: transform 1.6s cubic-bezier(.16, 1, .3, 1) .2s, opacity 1s ease .2s; }
     .cta-live.is-in :is(.cta-status, .cta-head, .cta-chips, .btn-work, .cta-note) { opacity: 1; transform: none; transition: opacity .8s ease, transform 1s cubic-bezier(.16, 1, .3, 1); }
     .cta-live.is-in .cta-status { transition-delay: .2s; }
     .cta-live.is-in .cta-head { transition-delay: .28s; }
