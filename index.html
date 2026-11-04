@@ -576,6 +576,10 @@
               <stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff"/>
             </linearGradient>
             <mask id="fw-top-m" maskUnits="userSpaceOnUse" x="-1600" y="-40" width="2040" height="2450"><rect x="-1600" y="-40" width="2040" height="2450" fill="url(#fw-top)"/></mask>
+            <!-- emenda com a Stack no celular: o topo da onda começa no laranja do pé da Stack (#b9480f) e se dissolve -->
+            <linearGradient id="fw-seam" gradientUnits="userSpaceOnUse" x1="0" y1="-40" x2="0" y2="190">
+              <stop offset="0" stop-color="#b9480f"/><stop offset=".22" stop-color="#b9480f"/><stop offset=".6" stop-color="#b9480f" stop-opacity=".55"/><stop offset="1" stop-color="#b9480f" stop-opacity="0"/>
+            </linearGradient>
             <mask id="fw-fade-m" maskUnits="userSpaceOnUse" x="100" y="250" width="340" height="260"><rect x="100" y="250" width="340" height="260" fill="url(#fw-fade)" mask="url(#fw-fade-y-m)"/></mask>
           </defs>
           <use href="#fw-shape" fill="url(#fw-base)"/>
@@ -601,15 +605,16 @@
             <use href="#fw-shape" fill="none" stroke="url(#fw-rim)" stroke-width="6" stroke-opacity=".1"/>
             <use href="#fw-shape" fill="none" stroke="url(#fw-rim)" stroke-width="3" stroke-opacity=".1"/>
             </g>
+            <rect class="fw-seam" x="-1600" y="-40" width="2040" height="230" fill="url(#fw-seam)"/>
           </g>
         </svg>
       </div>
       <!-- crista: o creme sobe em ondas até a Stack, continuando a onda da esquerda (no lugar da emenda reta) -->
       <svg class="faq-crest" viewBox="0 0 1000 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
         <path class="cr-wide" d="M0 100C60 100 90 42 180 40C280 38 330 80 430 78C530 76 580 20 690 22C800 24 860 72 1000 54V100Z" fill="#f9f7f5"/>
-        <path class="cr-narrow" d="M0 100C150 100 280 36 560 34C800 32 920 62 1000 58V100Z" fill="#f9f7f5"/>
+        <path class="cr-narrow" d="M0 100C140 72 190 14 420 10C640 4 860 16 1000 20V100Z" fill="#f9f7f5"/>
         <path class="cr-wide" d="M0 100C60 100 90 42 180 40C280 38 330 80 430 78C530 76 580 20 690 22C800 24 860 72 1000 54" fill="none" stroke="#ffd2a8" stroke-opacity=".45" stroke-width="2" vector-effect="non-scaling-stroke"/>
-        <path class="cr-narrow" d="M0 100C150 100 280 36 560 34C800 32 920 62 1000 58" fill="none" stroke="#ffd2a8" stroke-opacity=".45" stroke-width="2" vector-effect="non-scaling-stroke"/>
+        <path class="cr-narrow" d="M0 100C140 72 190 14 420 10C640 4 860 16 1000 20" fill="none" stroke="#ffd2a8" stroke-opacity=".45" stroke-width="2" vector-effect="non-scaling-stroke"/>
       </svg>
       <p class="about-kicker" data-ab><span class="k-dash" aria-hidden="true"></span><span class="k-num">(06)</span><span class="k-name">Perguntas frequentes</span><span class="k-line" aria-hidden="true"></span><span class="k-sub">Tudo antes de começar</span></p>
       <div class="faq-grid">

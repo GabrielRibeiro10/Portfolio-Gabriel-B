@@ -1195,8 +1195,11 @@ html, body { overflow-x: clip; }
   left: calc(var(--cl) + 318 * var(--u)); width: calc(100% - var(--cl) - 318 * var(--u) + 2px); top: calc(1px - max(34px, 50 * var(--u))); height: max(34px, 50 * var(--u));
 }
 .faq-crest .cr-narrow { display: none; }
+.faq-wave .fw-seam { display: none; }
+@media (max-width: 860px) { .faq-wave .fw-seam { display: inline; } }   /* emenda suave com a Stack (só no celular) */
 @media (max-width: 860px) {   /* no celular a faixa de creme é estreita: uma ondulação só, mais baixa */
-  .faq-crest { top: -21px; height: 22px; }
+  /* a área clara sobe arredondada a partir da borda da onda e sai na mesma inclinação, sem degrau */
+  .faq-crest { top: -51px; height: 52px; }   /* posição medida no js/main.js (crestFit) */
   .faq-crest .cr-wide { display: none; }
   .faq-crest .cr-narrow { display: inline; }
 }
