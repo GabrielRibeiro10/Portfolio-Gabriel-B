@@ -540,10 +540,34 @@ if (animate) {
   if (wave && 'ResizeObserver' in window) {
     const side = faq.querySelector('.faq-side'), cta = faq.querySelector('.about-cta');
     const phone = matchMedia('(max-width: 860px)');
+    const shape = wave.querySelector('#fw-shape');
     const fit = () => {
       const top = cta.offsetTop;
       [0, 0, 0, 0, top + 90, top + 91].forEach((v, i) => faq.style.setProperty(`--m${i + 1}`, Math.round(v) + 'px'));
       faq.style.setProperty('--wy', Math.round(side.offsetTop + side.offsetHeight + 4) + 'px');
+      // PC: a borda de cima da chamada final sai da onda laranja da esquerda. Acha onde a borda da onda cruza o topo
+      // da faixa (ponto do desenho da onda que ainda é laranja, vindo da direita) e desenha dali uma curva que desce
+      // arredondada e segue em ondas até a direita: as duas viram uma onda só, sem quina
+      if (phone.matches || !shape || !shape.isPointInFill) { cta.style.removeProperty('--ctop'); cta.style.removeProperty('--ex'); return; }
+      const wr = wave.getBoundingClientRect(), cr = cta.getBoundingClientRect();
+      const k = Math.max(wr.width / 420, wr.height / 2400), uy = (cr.top - wr.top) / k;
+      let ux = -1;
+      for (let x = 420; x > -200; x -= 1) if (shape.isPointInFill(new DOMPoint(x, uy))) { ux = x; break; }
+      if (ux < 0) { cta.style.removeProperty('--ctop'); return; }
+      // inclinação da borda da onda logo acima do topo da faixa (px de x por px de y): a curva da faixa sai nessa
+      // mesma direção, desce um pouco e vira para a direita, e a borda fica contínua (sem ponta)
+      let ux2 = ux;
+      for (let x = ux + 40; x > -200; x -= 1) if (shape.isPointInFill(new DOMPoint(x, uy - 24 / k))) { ux2 = x; break; }
+      const sl = Math.max(-2.5, Math.min(0, -(ux2 - ux) * k / 24));
+      const W = Math.round(cr.width), H = Math.min(84, Math.max(56, innerWidth * 0.054));
+      const ex = wr.left + ux * k - cr.left, yb = H * 0.82, bx = ex + sl * H * 0.5 + H * 1.6, x1 = bx + (W - bx) * 0.5;
+      const f = (v) => v.toFixed(1);
+      const d = `M0 0H${f(ex)}C${f(ex + sl * H * 0.45)} ${f(H * 0.45)} ${f(bx - H * 1.1)} ${f(yb)} ${f(bx)} ${f(yb)}`
+        + `C${f(bx + (x1 - bx) * 0.45)} ${f(yb)} ${f(x1 - (x1 - bx) * 0.45)} ${f(H * 0.2)} ${f(x1)} ${f(H * 0.22)}`
+        + `C${f(x1 + (W - x1) * 0.4)} ${f(H * 0.24)} ${f(W - (W - x1) * 0.35)} ${f(H * 0.5)} ${f(W)} ${f(H * 0.36)}V${f(H)}H0Z`;
+      const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${W} ${f(H)}' preserveAspectRatio='none'><path d='${d}'/></svg>`;
+      cta.style.setProperty('--ctop', `url("data:image/svg+xml,${encodeURIComponent(svg)}")`);
+      cta.style.setProperty('--ex', Math.round(ex) + 'px');
     };
     new ResizeObserver(fit).observe(faq);
     phone.addEventListener('change', fit);
