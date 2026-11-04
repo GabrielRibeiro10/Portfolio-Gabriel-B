@@ -1040,8 +1040,7 @@ html, body { overflow-x: clip; }
 }
 
 /* ---------- Bônus: item 06 de "O que eu entrego" ----------
-   Visual do design aprovado, no layout da lista: faixa pêssego de ponta a ponta atrás do item (o fio laranja
-   passa por cima), o número 06 na coluna dos números, o selo "Bônus" laranja preso por um alfinete e o título
+   Visual do design aprovado, no layout da lista e no mesmo fundo claro dos outros itens: o número 06 na coluna dos números, o selo "Bônus" laranja preso por um alfinete e o título
    na coluna dos títulos, e os dois bônus (ícone em círculo branco, título e texto) alinhados às colunas de
    título e descrição dos itens de cima (subgrid). Encosta na Stack embaixo. A linha pequena na chamada final
    também fala dos bônus. */
@@ -1051,13 +1050,6 @@ html, body { overflow-x: clip; }
   position: relative; isolation: isolate; border-bottom: 0; align-items: center;
   row-gap: clamp(26px, 2.8vw, 40px);
   padding-top: clamp(38px, 4vw, 60px); padding-bottom: clamp(42px, 4.6vw, 70px);
-}
-.about-areas ol > li.bonus::before {   /* faixa pêssego de ponta a ponta, com o brilho laranja à direita */
-  content: ""; position: absolute; z-index: -1; top: 0; bottom: 0; left: calc(50% - 50vw); width: 100vw; pointer-events: none;
-  background:
-    radial-gradient(55% 140% at 100% 62%, rgba(255, 149, 54, .34), rgba(255, 149, 54, 0) 70%),
-    radial-gradient(40% 120% at 0% 0%, rgba(255, 210, 168, .5), rgba(255, 210, 168, 0) 70%),
-    linear-gradient(180deg, var(--peach-50), var(--peach-100));
 }
 @media (hover: hover) { .about-areas ol > li.bonus:hover { padding-left: clamp(22px, 2.4vw, 40px); } }   /* o bloco grande não anda no hover */
 .about-areas li.bonus > .n { grid-column: 1; grid-row: 1; }
@@ -1167,6 +1159,16 @@ html, body { overflow-x: clip; }
 }
 .about-cta p span { color: var(--peach); }
 .about-cta .cta-bonus { color: rgba(255, 246, 239, .88); }
+/* agora ela fica logo depois das perguntas (dentro do .faq) e a onda laranja escorre até ela: o canto de
+   cima à esquerda tem o mesmo laranja do pé da onda (antes era café escuro) e o café fica no canto de baixo */
+.faq .about-cta {
+  z-index: 1; margin-top: clamp(64px, 7vw, 120px);
+  background:
+    radial-gradient(60% 120% at 74% 35%, rgba(255, 170, 90, .8), rgba(255, 160, 70, 0) 70%),
+    radial-gradient(70% 150% at 100% 100%, rgba(122, 42, 10, .75), rgba(122, 42, 10, 0) 70%),
+    linear-gradient(160deg, #e06a1f 0%, #e9721f 38%, #df681c 70%, #b9480f 100%);
+  box-shadow: 0 30px 60px -34px rgba(122, 42, 10, .7);
+}
 .cta-bonus i { background: #fff; box-shadow: 0 0 10px 2px rgba(255, 210, 168, .9); }
 
 /* ---------- Rodapé ----------

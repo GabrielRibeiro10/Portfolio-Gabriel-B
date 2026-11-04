@@ -463,16 +463,16 @@ if (animate) {
   });
   // a onda do fundo só balança com a seção à vista (e fica parada para quem prefere menos movimento)
   const wave = faq && faq.querySelector('.faq-wave');
-  // e se dissolve no creme: no PC entre o fim da lista (a coluna fixa nunca passa dali) e o texto em
-  // contorno; no celular logo depois da coluna da esquerda, para as perguntas ficarem no claro.
+  // e se dissolve no creme: no PC ela escorre até a chamada final (logo depois da lista) e some por trás
+  // dela; no celular logo depois da coluna da esquerda, para as perguntas ficarem no claro.
   // --wf-a/--wf-b: começo e fim do esmaecido, em px do topo do FAQ (offsetTop ignora as animações de entrada)
   if (wave && 'ResizeObserver' in window) {
-    const side = faq.querySelector('.faq-side'), grid = faq.querySelector('.faq-grid'), mq = faq.querySelector('.faq-marquee');
+    const side = faq.querySelector('.faq-side'), cta = faq.querySelector('.about-cta');
     const phone = matchMedia('(max-width: 860px)');
     const fit = () => {
       let a, b;
       if (phone.matches) { a = side.offsetTop + side.offsetHeight + 4; b = a + 190; }
-      else { a = grid.offsetTop + grid.offsetHeight - 10; b = Math.max(a + 90, mq.offsetTop + 30); }
+      else { a = cta.offsetTop + cta.offsetHeight * 0.15; b = cta.offsetTop + cta.offsetHeight * 0.85; }
       faq.style.setProperty('--wf-a', a + 'px');
       faq.style.setProperty('--wf-b', b + 'px');
     };
