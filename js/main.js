@@ -505,7 +505,7 @@ if (animate) {
   });
 })();
 
-// Perguntas frequentes: abre uma por vez (a primeira já vem aberta); a resposta fechada fica
+// Perguntas frequentes: abre uma por vez (todas chegam fechadas); a resposta fechada fica
 // "inert" para não ser lida nem focada. A lista entra em cascata quando aparece na tela.
 {
   const faq = document.querySelector('.faq');
@@ -515,8 +515,8 @@ if (animate) {
     item.querySelector('button').setAttribute('aria-expanded', open);
     item.querySelector('.faq-a').inert = !open;
   };
-  items.forEach((item, i) => {
-    set(item, i === 0);
+  items.forEach((item) => {
+    set(item, false);
     item.querySelector('button').addEventListener('click', () => {
       const open = !item.classList.contains('is-open');
       items.forEach((o) => set(o, o === item && open));
@@ -559,14 +559,41 @@ if (animate) {
     document.addEventListener('gr:leve', () => wave.pauseAnimations());   // modo leve: a borda da onda fica parada
   }
   if (faq && !reduceMotion && 'IntersectionObserver' in window) {
-    const grid = faq.querySelector('.faq-grid');
+    // entrada: a coluna da esquerda e cada pergunta animam quando aparecem; as que chegam juntas entram em
+    // cascata (80 ms). Quando tudo entrou, as classes saem, para o atraso não atrasar o abrir/fechar
+    const grid = faq.querySelector('.faq-grid'), side = faq.querySelector('.faq-side');
+    const parts = [side, ...items];
+    let left = parts.length;
     grid.classList.add('faq-live');
-    // depois da entrada tira as classes, para o atraso da cascata não atrasar o abrir/fechar
+    const io = new IntersectionObserver((entries) => {
+      entries.filter((e) => e.isIntersecting).forEach((e, k) => {
+        e.target.style.setProperty('--d', (k * 0.08).toFixed(2) + 's');
+        e.target.classList.add('is-in');
+        io.unobserve(e.target);
+        if (--left === 0) setTimeout(() => {   // troca o fio desenhado pela borda sem transição (não pisca)
+          items.forEach((el) => { el.style.transition = 'none'; });
+          grid.classList.remove('faq-live');
+          parts.forEach((el) => { el.classList.remove('is-in'); el.style.removeProperty('--d'); });
+          requestAnimationFrame(() => requestAnimationFrame(() => items.forEach((el) => { el.style.transition = ''; })));
+        }, 2600);
+      });
+    }, { threshold: 0.2, rootMargin: '0px 0px -6% 0px' });
+    parts.forEach((el) => io.observe(el));
+  }
+}
+
+// Segmentos: título, texto e cartões entram em cascata quando a seção aparece; depois as classes saem,
+// para o hover dos cartões não herdar o atraso da cascata
+{
+  const ni = document.querySelector('.nichos');
+  if (ni && !reduceMotion && 'IntersectionObserver' in window) {
+    ni.classList.add('ni-live');
     const io = new IntersectionObserver(([e]) => {
       if (!e.isIntersecting) return;
-      grid.classList.add('is-in'); io.disconnect();
-      setTimeout(() => grid.classList.remove('faq-live', 'is-in'), 2000);
-    }, { threshold: 0.15 });
-    io.observe(grid);
+      io.disconnect();
+      ni.classList.add('is-in');
+      setTimeout(() => ni.classList.remove('ni-live', 'is-in'), 2600);
+    }, { threshold: 0.12 });
+    io.observe(ni);
   }
 }
