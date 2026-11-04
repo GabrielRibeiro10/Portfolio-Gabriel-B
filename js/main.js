@@ -522,19 +522,21 @@ if (animate) {
   // some depois da coluna da esquerda (as perguntas ficam no claro) e volta suave em cima da chamada.
   // Máscara em 6 pontos (--m1…--m6, px do topo do FAQ): cheio, some, vazio, volta, cheio, some.
   if (wave && 'ResizeObserver' in window) {
-    const side = faq.querySelector('.faq-side'), cta = faq.querySelector('.about-cta'), pool = wave.querySelector('#fw-pool');
+    const side = faq.querySelector('.faq-side'), list = faq.querySelector('.faq-list'), cta = faq.querySelector('.about-cta'), pool = wave.querySelector('#fw-pool');
     const phone = matchMedia('(max-width: 860px)');
     const fit = () => {
       const fr = faq.getBoundingClientRect(), wr = wave.getBoundingClientRect();
       const k = Math.max(wr.width / 420, wr.height / 2400);       // px por unidade do SVG (preserveAspectRatio slice)
       const top = cta.offsetTop, bot = top + cta.offsetHeight;
-      const y0 = (top - 30) / k, y1 = (bot + 260) / k, R = (fr.right - wr.left) / k + 40;
+      // celular: a faixa começa colada na linha de baixo da última pergunta
+      const lb = list.offsetTop + list.offsetHeight;
+      const y0 = (phone.matches ? lb - 80 : top - 30) / k, y1 = (bot + 260) / k, R = (fr.right - wr.left) / k + 40;
       // borda de cima: sai de dentro da onda numa curva (sem quina) e segue em ondas suaves até a borda direita
       let d = `M-1600 ${(y0 - 170).toFixed(1)}H290C350 ${(y0 - 150).toFixed(1)} 380 ${y0.toFixed(1)} 520 ${y0.toFixed(1)}`;
       for (let x = 520, i = 0; x < R; x += 360, i++) d += `S${(x + 300).toFixed(1)} ${(y0 + (i % 2 ? -14 : 14)).toFixed(1)} ${(x + 360).toFixed(1)} ${y0.toFixed(1)}`;
       pool.setAttribute('d', d + `V${y1.toFixed(1)}H-1600Z`);
       let m = phone.matches
-        ? [side.offsetTop + side.offsetHeight + 4, side.offsetTop + side.offsetHeight + 190, top - 50, top + 20, bot - 30, bot + 80]
+        ? [side.offsetTop + side.offsetHeight + 4, side.offsetTop + side.offsetHeight + 190, lb, lb + 28, bot - 30, bot + 80]
         : [0, 0, 0, 0, bot + 10, bot + 170];
       m.forEach((v, i) => faq.style.setProperty(`--m${i + 1}`, Math.round(v) + 'px'));
     };
