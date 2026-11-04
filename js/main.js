@@ -6,8 +6,10 @@ const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const leve = () => document.documentElement.classList.contains('leve');
 const hero = document.querySelector('.hero');
 const person = document.querySelector('.person');
-const art = document.querySelector('.hero-art');   // design amarelo atrás da foto: anda junto com ela
-const withArt = art ? [person, art] : person;
+// design amarelo atrás da foto e, no PC, o halo amarelo em volta da pessoa (camada própria, por cima do painel
+// claro): andam junto com a foto
+const art = [...document.querySelectorAll('.hero-art, .person-halo')];
+const withArt = art.length ? [person, ...art] : person;
 const { gsap, ScrollTrigger } = window;
 const animate = Boolean(gsap && hero) && !reduceMotion;
 // mesma condição do layout de celular no css/style.css
@@ -129,7 +131,7 @@ if (animate) {
   // fixo de 0,5 s: o painel claro aparecia através dela ("branco por cima da foto, depois
   // atrás") e, com internet lenta, ela surgia pela metade. Se demorar, entra assim que chegar.
   gsap.set(person, { autoAlpha: 0 });
-  if (art) gsap.set(art, { autoAlpha: 0, scale: 0.94, transformOrigin: '50% 45%' });
+  if (art.length) gsap.set(art, { autoAlpha: 0, scale: 0.94, transformOrigin: '50% 45%' });
   photoReady().then(() => requestAnimationFrame(() => requestAnimationFrame(() => {
     gsap.fromTo(person,
       // sobe de baixo da moldura, inteira e opaca (sem efeito de aparecer)
@@ -138,7 +140,7 @@ if (animate) {
       { yPercent: 0, duration: 1.4, ease: 'expo.out',
         delay: Math.max(0, 0.5 - tl.time()) });
     // o desenho amarelo aparece atrás quando a foto está chegando
-    if (art) gsap.to(art, { autoAlpha: 1, scale: 1, duration: 1.3, ease: 'expo.out', delay: Math.max(0, 0.5 - tl.time()) + 0.55 });
+    if (art.length) gsap.to(art, { autoAlpha: 1, scale: 1, duration: 1.3, ease: 'expo.out', delay: Math.max(0, 0.5 - tl.time()) + 0.55 });
   })));
 
   // card da citação: brilho que passa de tempos em tempos e, no PC (mouse), inclinação 3D seguindo o ponteiro.
@@ -208,8 +210,8 @@ if (animate && person) {
     // 1,8 s para alcançar o mouse (antes 0,9 s): o usuário pediu a foto mais lenta
     const toX = gsap.quickTo(person, 'x', { duration: 1.8, ease: 'power3.out' });
     const toY = gsap.quickTo(person, 'y', { duration: 1.8, ease: 'power3.out' });
-    const artX = art ? gsap.quickTo(art, 'x', { duration: 1.8, ease: 'power3.out' }) : () => {};
-    const artY = art ? gsap.quickTo(art, 'y', { duration: 1.8, ease: 'power3.out' }) : () => {};
+    const artX = art.length ? gsap.quickTo(art, 'x', { duration: 1.8, ease: 'power3.out' }) : () => {};
+    const artY = art.length ? gsap.quickTo(art, 'y', { duration: 1.8, ease: 'power3.out' }) : () => {};
     const move = (e) => {
       const r = hero.getBoundingClientRect();
       const mx = (((e.clientX - r.left) / r.width) * 2 - 1) * 18, my = (((e.clientY - r.top) / r.height) * 2 - 1) * 11;   // antes 26/16 px
