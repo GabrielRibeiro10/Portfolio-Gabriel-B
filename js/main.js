@@ -143,16 +143,30 @@ if (animate) {
     if (art.length) gsap.to(art, { autoAlpha: 1, scale: 1, duration: 1.3, ease: 'expo.out', delay: Math.max(0, 0.5 - tl.time()) + 0.55 });
   })));
 
-  // card da citação: brilho que passa de tempos em tempos e, no PC (mouse), inclinação 3D seguindo o ponteiro.
-  // Nada disso no modo leve.
+  // card da citação, depois da entrada: parallax e luz que acompanham a rolagem (ScrollTrigger com scrub) e, no PC
+  // (mouse), inclinação 3D seguindo o ponteiro. Ao descer a página o card anda numa velocidade própria, a faixa de
+  // luz atravessa o card e um brilho quente dentro dele vai de um canto ao outro, de laranja para dourado. Subindo,
+  // tudo volta. Nada disso no modo leve.
   const card = $('.quote-card');
-  const shine = document.createElement('span');
-  shine.className = 'quote-shine'; shine.setAttribute('aria-hidden', 'true');
-  card.append(shine);
+  const shine = document.createElement('span'), glow = document.createElement('span');
+  shine.className = 'quote-shine'; glow.className = 'quote-glow';
+  shine.setAttribute('aria-hidden', 'true'); glow.setAttribute('aria-hidden', 'true');
+  card.prepend(glow); card.append(shine);
   gsap.set(shine, { xPercent: -130 });
   function cardAlive() {
     if (leve()) return;
-    gsap.fromTo(shine, { xPercent: -130 }, { xPercent: 130, duration: 1.3, ease: 'power2.inOut', repeat: -1, repeatDelay: 6.5 });
+    if (ScrollTrigger) {
+      // PC: o card está na hero desde o começo; vale do topo até a hero sair da tela.
+      // Celular: ele fica mais embaixo; vale enquanto ele atravessa a tela.
+      const range = isMobile
+        ? { trigger: card, start: 'top bottom', end: 'bottom top' }
+        : { trigger: hero, start: 'top top', end: 'bottom top' };
+      const st = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { ...range, scrub: 0.8, invalidateOnRefresh: true } });
+      st.fromTo(card, { yPercent: isMobile ? 16 : 0 }, { yPercent: isMobile ? -16 : -42 }, 0)
+        .fromTo(shine, { xPercent: -130 }, { xPercent: 130 }, 0)
+        .fromTo(glow, { '--gx': '0%', '--gy': '0%', '--gc': 'rgba(255, 122, 46, .30)' },
+          { '--gx': '100%', '--gy': '100%', '--gc': 'rgba(255, 196, 80, .38)' }, 0);
+    }
     if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
     gsap.set(card, { transformPerspective: 900 });
     const rx = gsap.quickTo(card, 'rotationX', { duration: 0.7, ease: 'power3.out' });
@@ -174,13 +188,13 @@ if (animate) {
     .from(pitchWords, { yPercent: 110, duration: 1, stagger: 0.025 }, at + 0.05)
     .from(smallWords, { yPercent: 110, duration: 0.8, stagger: 0.03 }, at + 0.4)
     // card da citação: levanta em 3D (dobrado para trás, de baixo), a foto salta, nome e cargo deslizam, as
-    // palavras sobem e um brilho passa por cima; no PC depois ele inclina seguindo o mouse
+    // palavras sobem; depois a rolagem move o card e a luz dele, e no PC ele inclina seguindo o mouse
     .fromTo(card, { y: 70, rotationX: -24, scale: 0.94, autoAlpha: 0, transformPerspective: 900, transformOrigin: '50% 100%' },
       { y: 0, rotationX: 0, scale: 1, autoAlpha: 1, duration: 1.4, ease: 'expo.out', clearProps: 'transform,opacity,visibility' }, at + 0.3)
     .from($('.quote-head img'), { scale: 0.3, rotation: -14, autoAlpha: 0, duration: 0.9, ease: 'back.out(2.2)', clearProps: 'transform,opacity,visibility' }, at + 0.55)
     .from($$('.quote-head strong, .quote-head span'), { x: -18, autoAlpha: 0, duration: 0.8, stagger: 0.08, clearProps: 'transform,opacity,visibility' }, at + 0.62)
     .from(quoteWords, { yPercent: 110, duration: 0.9, stagger: 0.03 }, at + 0.7)
-    .call(cardAlive, null, at + 1.35);
+    .call(cardAlive, null, at + 1.75);   // depois do fim da entrada (o clearProps dela apagaria o parallax)
   if (!isMobile) {
     panelIn(tl, 0.7);
   } else {

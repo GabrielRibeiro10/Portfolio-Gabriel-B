@@ -1831,12 +1831,19 @@ html.leve .intro .btn-work, html.leve .intro .btn-work::before, html.leve .intro
 .about-title .at-line { display: block; transform-origin: 0 100%; }
 .about-title.ab-slide .at-line { transform: translate3d(-34vw, 0, 0); opacity: 0; will-change: transform, opacity; }
 
-/* card da citação: brilho que passa por cima (js/main.js, GSAP) */
+/* card da citação: faixa de luz e brilho quente que andam com a rolagem (js/main.js, GSAP ScrollTrigger) */
+@property --gx { syntax: '<percentage>'; inherits: false; initial-value: 0%; }
+@property --gy { syntax: '<percentage>'; inherits: false; initial-value: 0%; }
+.quote-glow {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit;
+  background: radial-gradient(70% 90% at var(--gx, 0%) var(--gy, 0%), var(--gc, rgba(255, 122, 46, .3)), rgba(255, 150, 60, 0) 70%);
+}
+.quote-head, .quote-card blockquote { position: relative; z-index: 1; }
 .quote-card { overflow: hidden; will-change: transform; }
 .quote-shine {
   position: absolute; inset: 0; z-index: 2; pointer-events: none;
   background: linear-gradient(105deg, rgba(255, 255, 255, 0) 35%, rgba(255, 255, 255, .7) 48%, rgba(255, 214, 170, .45) 52%, rgba(255, 255, 255, 0) 65%);
-  transform: translateX(-130%);
+  /* posição (xPercent) toda pelo GSAP: um transform aqui somava com o dele */
 }
 @media (max-width: 860px), (max-aspect-ratio: 4/5), (orientation: landscape) and (max-height: 500px) and (max-width: 1000px) {
   .quote-card { position: relative; inset: auto; }   /* no celular ele fica no fluxo (sem o top/left do PC) */
