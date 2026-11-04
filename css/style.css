@@ -1214,6 +1214,15 @@ html, body { overflow-x: clip; }
   font-size: clamp(30px, 3.4vw, 54px); font-weight: 400; line-height: 1.04; letter-spacing: -.035em; text-wrap: balance;
 }
 .ft-statement em { font-style: normal; color: var(--orange); }
+/* "vender": onda de luz que atravessa a palavra em loop, como em "emociona" (texto recortado no gradiente) */
+.ft-statement em {
+  background: linear-gradient(105deg, var(--orange) 0%, var(--orange) 36%, #ff9536 44%, #ffd9b0 50%, #ff9536 56%, var(--orange) 64%, var(--orange) 100%);
+  background-size: 260% 100%; background-position: 100% 0;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: about-shine 3.6s cubic-bezier(.5, 0, .3, 1) .8s infinite;
+}
+@media (prefers-reduced-motion: reduce) { .ft-statement em { animation: none; background-position: 0 0; } }
+html.leve .ft-statement em { animation: none; background-position: 0 0; }
 .ft-status {
   display: inline-flex; align-items: center; gap: 10px; margin: clamp(24px, 2.6vw, 36px) 0 0;
   padding: 9px 16px 9px 13px; border-radius: 999px; background: var(--peach-100);
