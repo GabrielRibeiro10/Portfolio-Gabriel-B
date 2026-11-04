@@ -677,3 +677,31 @@ if (animate) {
     io.observe(ni);
   }
 }
+
+// Ponte hero -> Projetos: altura até 200 px abaixo do topo do painel (cobre os cantos arredondados) e parallax dos
+// brilhos: --py vai de -1 (a faixa entrando por baixo da tela) a 1 (saindo por cima). Só mexe com a faixa à vista;
+// sem parallax para quem prefere menos movimento e no modo leve.
+{
+  const about = document.querySelector('.about'), bridge = about && about.querySelector('.pj-bridge');
+  const panel = about && about.querySelector('.projects .pj');
+  if (bridge && panel) {
+    const size = () => bridge.style.setProperty('--bh', Math.round(panel.getBoundingClientRect().top - about.getBoundingClientRect().top + 200) + 'px');
+    size();
+    addEventListener('resize', size);
+    addEventListener('load', size);
+    if ('ResizeObserver' in window) new ResizeObserver(size).observe(panel.parentElement);
+    if (!reduceMotion && 'IntersectionObserver' in window) {
+      let raf = 0, on = false;
+      const frame = () => {
+        raf = 0;
+        if (leve()) return;
+        const r = bridge.getBoundingClientRect(), v = innerHeight;
+        const py = Math.max(-1, Math.min(1, ((r.top + r.height / 2) - v / 2) / (v / 2 + r.height / 2)));
+        bridge.style.setProperty('--py', py.toFixed(3));
+      };
+      const go = () => { if (on && !raf) raf = requestAnimationFrame(frame); };
+      new IntersectionObserver(([e]) => { on = e.isIntersecting; go(); }).observe(bridge);
+      addEventListener('scroll', go, { passive: true });
+    }
+  }
+}
