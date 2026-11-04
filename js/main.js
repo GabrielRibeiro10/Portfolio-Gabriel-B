@@ -6,6 +6,8 @@ const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const leve = () => document.documentElement.classList.contains('leve');
 const hero = document.querySelector('.hero');
 const person = document.querySelector('.person');
+const art = document.querySelector('.hero-art');   // design amarelo atrás da foto: anda junto com ela
+const withArt = art ? [person, art] : person;
 const { gsap, ScrollTrigger } = window;
 const animate = Boolean(gsap && hero) && !reduceMotion;
 // mesma condição do layout de celular no css/style.css
@@ -101,7 +103,7 @@ if (animate) {
   nums.forEach(resetCount);
 
   // a foto é centralizada com translateX(-50%) no CSS; o GSAP passa a cuidar do transform
-  gsap.set(person, { xPercent: -50, x: 0, y: 0 });
+  gsap.set(withArt, { xPercent: -50, x: 0, y: 0 });
 
   // clearProps devolve o controle ao CSS no fim (efeitos de hover usam transform)
   const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
@@ -127,6 +129,7 @@ if (animate) {
   // fixo de 0,5 s: o painel claro aparecia através dela ("branco por cima da foto, depois
   // atrás") e, com internet lenta, ela surgia pela metade. Se demorar, entra assim que chegar.
   gsap.set(person, { autoAlpha: 0 });
+  if (art) gsap.set(art, { autoAlpha: 0, scale: 0.94, transformOrigin: '50% 45%' });
   photoReady().then(() => requestAnimationFrame(() => requestAnimationFrame(() => {
     gsap.fromTo(person,
       // sobe de baixo da moldura, inteira e opaca (sem efeito de aparecer)
@@ -134,6 +137,8 @@ if (animate) {
       { autoAlpha: 1, yPercent: 100 },
       { yPercent: 0, duration: 1.4, ease: 'expo.out',
         delay: Math.max(0, 0.5 - tl.time()) });
+    // o desenho amarelo aparece atrás quando a foto está chegando
+    if (art) gsap.to(art, { autoAlpha: 1, scale: 1, duration: 1.3, ease: 'expo.out', delay: Math.max(0, 0.5 - tl.time()) + 0.55 });
   })));
 
   // conteúdo do painel: selo, apresentação palavra por palavra e card da citação
@@ -172,19 +177,21 @@ if (animate && person) {
     // 1,8 s para alcançar o mouse (antes 0,9 s): o usuário pediu a foto mais lenta
     const toX = gsap.quickTo(person, 'x', { duration: 1.8, ease: 'power3.out' });
     const toY = gsap.quickTo(person, 'y', { duration: 1.8, ease: 'power3.out' });
+    const artX = art ? gsap.quickTo(art, 'x', { duration: 1.8, ease: 'power3.out' }) : () => {};
+    const artY = art ? gsap.quickTo(art, 'y', { duration: 1.8, ease: 'power3.out' }) : () => {};
     const move = (e) => {
       const r = hero.getBoundingClientRect();
-      toX((((e.clientX - r.left) / r.width) * 2 - 1) * 18);   // antes 26 px: o usuário pediu menos parallax
-      toY((((e.clientY - r.top) / r.height) * 2 - 1) * 11);   // antes 16 px
+      const mx = (((e.clientX - r.left) / r.width) * 2 - 1) * 18, my = (((e.clientY - r.top) / r.height) * 2 - 1) * 11;   // antes 26/16 px
+      toX(mx); toY(my); artX(mx); artY(my);
     };
-    const reset = () => { toX(0); toY(0); };
+    const reset = () => { toX(0); toY(0); artX(0); artY(0); };
     hero.addEventListener('pointermove', move);
     hero.addEventListener('pointerleave', reset);
     return () => { hero.removeEventListener('pointermove', move); hero.removeEventListener('pointerleave', reset); };
   });
   mm.add('not ((hover: hover) and (pointer: fine))', () => {
     if (!ScrollTrigger) return;
-    gsap.to(person, { y: () => innerHeight * 0.18, ease: 'none',
+    gsap.to(withArt, { y: () => innerHeight * 0.18, ease: 'none',
       scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.6, invalidateOnRefresh: true } });
   });
   // PC: descendo a página, a foto desce junto (30% da altura dela até a hero sair da tela);
@@ -192,7 +199,7 @@ if (animate && person) {
   // mesmo efeito acima, com y.)
   mm.add('(hover: hover) and (pointer: fine)', () => {
     if (!ScrollTrigger) return;
-    gsap.to(person, { yPercent: 30, ease: 'none',
+    gsap.to(withArt, { yPercent: 30, ease: 'none',
       scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.6, invalidateOnRefresh: true } });
   });
 }
