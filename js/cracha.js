@@ -112,7 +112,10 @@ async function lanyard() {
   const until = performance.now() + 3000;
   const follow = () => { place(); if (performance.now() < until) requestAnimationFrame(follow); };
   requestAnimationFrame(follow);
-  if ('ResizeObserver' in window) new ResizeObserver(() => requestAnimationFrame(relayout)).observe(about);
+  // só a largura importa (o "g" muda de lugar quando a largura muda). A altura da seção muda a cada quadro quando uma
+  // resposta do FAQ abre (o FAQ fica dentro dela): reagir à altura redesenhava a letra num canvas a cada quadro e travava
+  let lastW = about.clientWidth;
+  if ('ResizeObserver' in window) new ResizeObserver(() => { const w = about.clientWidth; if (w !== lastW) { lastW = w; requestAnimationFrame(relayout); } }).observe(about);
   else addEventListener('resize', relayout);
 }
 
