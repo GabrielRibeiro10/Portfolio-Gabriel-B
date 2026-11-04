@@ -927,7 +927,12 @@ html, body { overflow-x: clip; }
   --mk: linear-gradient(180deg, #000 var(--m1, 0px), transparent var(--m2, 0px), transparent var(--m3, 0px), #000 var(--m4, 0px), #000 var(--m5, calc(100% - 330px)), transparent var(--m6, calc(100% - 170px)));
   -webkit-mask-image: var(--mk); mask-image: var(--mk);
 }
-.faq-wave { position: absolute; top: 0; left: calc(var(--cl) - 42 * var(--u)); width: calc(420 * var(--u)); height: 100%; overflow: visible; }   /* em telas largas o laranja passa da moldura até a borda esquerda */
+.faq-wave { position: absolute; top: 0; left: calc(var(--cl) - 42 * var(--u)); width: calc(420 * var(--u)); height: 100%; overflow: visible; }
+/* a onda balança só com transform (roda no compositor, não redesenha o svg; antes a borda era refeita a cada quadro) */
+.faq-wave { transform-origin: 0 50%; animation: fw-sway 7s ease-in-out infinite; will-change: transform; }
+@keyframes fw-sway { 0%, 100% { transform: translateX(0) scaleX(1); } 50% { transform: translateX(calc(var(--u) * -5)) scaleX(1.03); } }
+@media (prefers-reduced-motion: reduce) { .faq-wave { animation: none; } }
+html.leve .faq-wave { animation: none; }   /* em telas largas o laranja passa da moldura até a borda esquerda */
 
 .faq .about-kicker { display: flex; align-items: center; gap: 0; font-size: max(13px, calc(14 * var(--u))); line-height: 1; }
 .faq .about-kicker .k-line, .faq .about-kicker .k-sub { display: none; }
@@ -1012,20 +1017,26 @@ html, body { overflow-x: clip; }
 
 /* faixa de texto gigante em contorno, correndo devagar */
 .faq-marquee { position: relative; z-index: 1; margin: clamp(-8px, -.6vw, 0px) calc(-1 * max(24px, calc((100vw - 1320px) / 2))) 0; overflow: hidden; pointer-events: none; user-select: none; }
-.faq-marquee > div { display: flex; width: max-content; align-items: center; gap: .35em; padding-bottom: .08em;
+.faq-marquee .mq-row { display: flex; width: max-content; align-items: center; gap: .35em; padding-bottom: .08em;
   font-size: clamp(72px, 12vw, 210px); font-weight: 500; letter-spacing: -.04em; line-height: 1; white-space: nowrap;
-  color: transparent; -webkit-text-stroke: 1.5px rgba(196, 82, 15, .62);
-  /* onda de luz laranja: uma faixa de brilho que atravessa as letras por dentro do contorno */
-  background: linear-gradient(100deg, rgba(255, 210, 168, 0) 40%, rgba(255, 210, 168, .7) 47%, rgba(255, 246, 239, .95) 50%, rgba(255, 210, 168, .7) 53%, rgba(255, 210, 168, 0) 60%) 0 0 / 100vw 100% repeat-x,
-    linear-gradient(180deg, rgba(233, 114, 31, .16), rgba(233, 114, 31, .05) 70%);   /* uma faixa por largura de tela */
-  -webkit-background-clip: text; background-clip: text;
+  color: rgba(233, 114, 31, .08); -webkit-text-stroke: 1.5px rgba(196, 82, 15, .62);
 }
+/* luz que passa: janela com bordas suaves deslizando; dentro, a cópia acesa anda ao contrário e fica parada no lugar */
+.mq-shine { position: absolute; left: 0; top: 0; bottom: 0; width: 34vw; overflow: hidden; transform: translateX(-34vw);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 42%, #000 58%, transparent); mask-image: linear-gradient(90deg, transparent, #000 42%, #000 58%, transparent); }
+.mq-counter { transform: translateX(34vw); }
+.faq-marquee .mq-lit { color: rgba(255, 228, 198, .9); -webkit-text-stroke-color: rgba(255, 246, 239, .95); }
+.faq-marquee .mq-lit i { background: #fff3e6; box-shadow: none; }
 .faq-marquee i { flex: none; width: .16em; height: .16em; border-radius: 50%; background: linear-gradient(135deg, #f26b1d, #ffb36b); box-shadow: 0 0 30px 4px rgba(242, 107, 29, .35); }
 @media (prefers-reduced-motion: no-preference) {
-  .faq-marquee > div { animation: faq-marquee 38s linear infinite, faq-glow 4.5s cubic-bezier(.45, 0, .3, 1) infinite; }
+  .faq-marquee .mq-row { animation: faq-marquee 38s linear infinite; }
+  .mq-shine { animation: mq-win 4.5s cubic-bezier(.45, 0, .3, 1) infinite; }
+  .mq-counter { animation: mq-cnt 4.5s cubic-bezier(.45, 0, .3, 1) infinite; }
 }
-@keyframes faq-glow { from { background-position: 0 0, 0 0; } to { background-position: 100vw 0, 0 0; } }
 @keyframes faq-marquee { to { transform: translateX(-50%); } }
+@keyframes mq-win { from { transform: translateX(-34vw); } to { transform: translateX(100vw); } }
+@keyframes mq-cnt { from { transform: translateX(34vw); } to { transform: translateX(-100vw); } }
+@media (prefers-reduced-motion: reduce) { .mq-shine { display: none; } }
 
 /* entrada em cascata (só com JS e sem "reduzir movimento") */
 @media (prefers-reduced-motion: no-preference) {
@@ -1051,7 +1062,7 @@ html, body { overflow-x: clip; }
   .faq-a p { padding: 0 8px 20px 40px; font-size: 15px; }
   .faq-item::before { inset: -1px -10px; border-radius: 14px; }
   .faq-marquee { margin: -6px -20px 0; }
-  .faq-marquee > div { font-size: 64px; }
+  .faq-marquee .mq-row { font-size: 64px; }
 }
 
 /* ---------- Bônus: item 06 de "O que eu entrego" ----------
@@ -1443,7 +1454,7 @@ label.ck-opt { cursor: pointer; }
 html.leve :is(.hero-bg, .hero-bg::after, .stack::before, .doc-hero::before, .doc-art) { animation: none !important; }
 html.leve .hero-bg { inset: 0; }
 html.leve .about-title em .word, html.leve .about-title em:not(:has(.word)) { animation: none; background-position: 0 0; }
-html.leve .faq-marquee > div { animation: faq-marquee 38s linear infinite; background: none; }
+html.leve .mq-shine { display: none; }
 html.leve :is(.socials a, .doc-tabs) { backdrop-filter: none; -webkit-backdrop-filter: none; }
 html.leve .socials a { background: rgba(20, 8, 4, .32); }
 html.leve .doc-tabs { background: rgba(36, 10, 3, .3); }
