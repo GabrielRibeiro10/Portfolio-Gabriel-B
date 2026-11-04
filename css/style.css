@@ -1728,17 +1728,29 @@ html.leve .ft-statement em { animation: none; background-position: 0 0; }
 }
 
 @media (max-width: 860px) {
-  .site-footer { padding-top: 32px; }
+  /* celular: o mesmo conteúdo, mais compacto (frase menor, espaços e letras menores, documentos lado a lado) */
+  .site-footer { padding-top: 26px; }
   .ft-in, .ft-base { width: calc(100% - 40px); }
-  .ft-top { grid-template-columns: 1fr; gap: 36px; }
-  .ft-statement { font-size: clamp(30px, 9vw, 40px); }
-  .ft-cols { grid-template-columns: 1fr 1fr; gap: 36px 20px; }
-  .ft-cols > :last-child { grid-column: 1 / -1; }
-  .ft-base { flex-direction: column; align-items: flex-start; gap: 8px; padding-bottom: 32px; }
-  .ft-top-btn { margin-top: 14px; }
-  .ft-legal { width: calc(100% - 40px); margin-top: 56px; flex-direction: column; align-items: flex-start; gap: 14px; padding: 22px 0; }
-  .ft-legal ul { flex-direction: column; gap: 12px; }
-  .ft-legal li { font-size: 16px; }
+  .ft-top { grid-template-columns: 1fr; gap: 26px; }
+  .ft-mark { height: 20px; }
+  .ft-name { font-size: 11px; }
+  .ft-statement { margin-top: 16px; font-size: clamp(26px, 7.6vw, 32px); }
+  .ft-status { margin-top: 14px; padding: 6px 12px 6px 10px; font-size: 12.5px; }
+  .ft-cols { grid-template-columns: 1fr 1fr; gap: 24px 16px; }
+  .ft-cols > :last-child { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; column-gap: 16px; }
+  .ft-cols > :last-child .ft-title { grid-column: 1 / -1; }
+  .ft-cols > :last-child .ft-place { margin-top: 0; }
+  .ft-title { margin-bottom: 11px; font-size: 12px; }
+  .ft-col ul { gap: 6px; }
+  .ft-col li, .ft-place, .ft-time { font-size: 14.5px; }
+  .ft-col small, .ft-clock { font-size: 12px; }
+  .ft-base { flex-direction: column; align-items: flex-start; gap: 4px; padding-bottom: 22px; font-size: 12px; }
+  .ft-top-btn { margin-top: 10px; font-size: 13px; }
+  .ft-top-btn i { width: 34px; height: 34px; }
+  .ft-legal { width: calc(100% - 40px); margin-top: 30px; flex-direction: column; align-items: flex-start; gap: 10px; padding: 14px 0; }
+  .ft-legal ul { flex-direction: row; flex-wrap: wrap; gap: 6px 18px; }
+  .ft-legal li { font-size: 14px; }
+  .ft-legal + .ft-base { padding-top: 14px; }
 }
 
 /* ---------- Aviso de cookies (js/cookies.js) ----------
