@@ -2,6 +2,8 @@
 // parallax da foto, com GSAP. Quem prefere menos movimento (prefers-reduced-motion) vê tudo
 // parado e os números finais; se o GSAP não carregar, tudo aparece normalmente.
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+// modo leve (js/desempenho.js): aparelho fraco; o que pesa fica desligado. Pode ligar no meio do uso ('gr:leve')
+const leve = () => document.documentElement.classList.contains('leve');
 const hero = document.querySelector('.hero');
 const person = document.querySelector('.person');
 const { gsap, ScrollTrigger } = window;
@@ -87,7 +89,7 @@ function photoReady() {
 
 // ---------- Entrada da hero (linha do tempo única, estilo awwwards) ----------
 if (animate) {
-  if (ScrollTrigger) gsap.registerPlugin(ScrollTrigger);
+  if (ScrollTrigger) { gsap.registerPlugin(ScrollTrigger); if (window.grReload) ScrollTrigger.clearScrollMemory('manual'); }
   const $ = (s) => hero.querySelector(s), $$ = (s) => hero.querySelectorAll(s);
   const isMobile = matchMedia(MOBILE).matches;
 
@@ -206,13 +208,32 @@ document.querySelectorAll('.about-kicker').forEach((k) => {
 // ---------- Rolagem suave leve (Lenis) ----------
 // só no mouse/touchpad; inércia curta (lerp alto) para não "prender" entre seções.
 // Celular segue com a rolagem nativa.
-if (window.Lenis && !reduceMotion && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+// No modo leve fica a rolagem nativa (e ela é desligada se o modo leve ligar no meio do uso).
+if (window.Lenis && !reduceMotion && !leve() && matchMedia('(hover: hover) and (pointer: fine)').matches) {
   const lenis = new Lenis({ lerp: 0.11, wheelMultiplier: 1, smoothWheel: true, anchors: true, autoRaf: !window.gsap });
+  const raf = (t) => lenis.raf(t * 1000);
   if (window.gsap) {
     if (ScrollTrigger) lenis.on('scroll', ScrollTrigger.update);
-    gsap.ticker.add((t) => lenis.raf(t * 1000));
+    gsap.ticker.add(raf);
   }
+  if (window.grReload) lenis.scrollTo(0, { immediate: true, force: true });
+  document.addEventListener('gr:leve', () => { if (window.gsap) gsap.ticker.remove(raf); lenis.destroy(); }, { once: true });
 }
+
+// Para todos: as animações de enfeite (fundos que se mexem, brilhos, letreiro, a marca GR) param quando a
+// parte delas sai da tela e voltam quando ela aparece (o navegador não gasta tempo pintando o que não se vê)
+if ('IntersectionObserver' in window) {
+  const logo = document.querySelector('.logo-mark');
+  const io = new IntersectionObserver((es) => es.forEach((e) => {
+    e.target.classList.toggle('is-off', !e.isIntersecting);
+    if (logo && e.target.classList.contains('hero')) (e.isIntersecting && !leve() ? logo.unpauseAnimations() : logo.pauseAnimations());
+  }), { rootMargin: '120px 0px' });
+  document.querySelectorAll('.hero, .about-title, .stack, .faq-marquee, .site-footer, .doc-hero').forEach((el) => io.observe(el));
+}
+// modo leve: a marca GR fica parada (o degradê que corre redesenha o traço com sombra a cada quadro)
+const stopLogo = () => { const l = document.querySelector('.logo-mark'); if (l) l.pauseAnimations(); };
+if (leve()) stopLogo();
+document.addEventListener('gr:leve', stopLogo);
 
 // "O que eu entrego": o fio laranja desce junto com a rolagem (a ponta fica a 60% da altura da tela),
 // com um leve atraso para ficar macio; o item acende quando o fio passa do começo dele. No mesmo quadro
@@ -270,7 +291,7 @@ document.querySelectorAll('.about-areas ol').forEach((list) => {
       const o = vid(old);
       if (o) { o.canStart = false; setTimeout(() => { if (old !== slides[cur]) { o.pause(); o.classList.remove('is-on'); } }, 700); }
       const v = vid(s);
-      if (!v || reduceMotion) return;
+      if (!v || reduceMotion || leve()) return;   // modo leve: fica a captura rolando, sem baixar nem tocar vídeo
       clearTimeout(v.startTimer);
       v.canStart = false;
       v.pause();
@@ -287,6 +308,10 @@ document.querySelectorAll('.about-areas ol').forEach((list) => {
       const v = vid(s);
       if (v) v.addEventListener('playing', () => v.classList.add('is-on'));
     });
+    document.addEventListener('gr:leve', () => slides.forEach((s) => {
+      const v = vid(s);
+      if (v) { clearTimeout(v.startTimer); v.canStart = false; v.pause(); v.classList.remove('is-on'); }
+    }));
     const show = (i, dir = 1) => {
       i = (i + slides.length) % slides.length;
       if (i === cur) return;
@@ -326,7 +351,7 @@ document.querySelectorAll('.about-areas ol').forEach((list) => {
         if (v && v.canStart) { if (inView) v.play().catch(() => {}); else v.pause(); }
       }).observe(pj);
       // o vídeo do primeiro projeto começa a baixar quando a seção chega perto
-      new IntersectionObserver(([e], o) => { if (e.isIntersecting) { o.disconnect(); const v = vid(slides[0]); load(v); } }, { rootMargin: '600px 0px' })
+      new IntersectionObserver(([e], o) => { if (e.isIntersecting) { o.disconnect(); if (!leve()) load(vid(slides[0])); } }, { rootMargin: '600px 0px' })
         .observe(pj);
     } else show(0);
 
@@ -438,6 +463,7 @@ if (animate) {
   const pj = document.querySelector('.pj'), bg = pj && pj.querySelector('.pj-bg');
   if (!bg || matchMedia('(hover: none)').matches) return;
   pj.addEventListener('pointermove', (e) => {
+    if (leve()) return;   // modo leve: o holofote fica parado (repintar a máscara do fundo a cada movimento pesa)
     const r = pj.getBoundingClientRect();
     bg.style.setProperty('--mx', (e.clientX - r.left) + 'px');
     bg.style.setProperty('--my', (e.clientY - r.top) + 'px');
@@ -490,7 +516,8 @@ if (animate) {
   if (wave && (reduceMotion || !('IntersectionObserver' in window))) { if (reduceMotion) wave.pauseAnimations(); }
   else if (wave) {
     wave.pauseAnimations();
-    new IntersectionObserver(([e]) => (e.isIntersecting ? wave.unpauseAnimations() : wave.pauseAnimations())).observe(faq);
+    new IntersectionObserver(([e]) => (e.isIntersecting && !leve() ? wave.unpauseAnimations() : wave.pauseAnimations())).observe(faq);
+    document.addEventListener('gr:leve', () => wave.pauseAnimations());   // modo leve: a borda da onda fica parada
   }
   if (faq && !reduceMotion && 'IntersectionObserver' in window) {
     const grid = faq.querySelector('.faq-grid');

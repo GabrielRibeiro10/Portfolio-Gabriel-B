@@ -13,6 +13,8 @@ if (fig && title) {
   new IntersectionObserver((e, o) => {
     if (!e[0].isIntersecting) return;
     o.disconnect();
+    // modo leve (js/desempenho.js): fica o crachá estático, sem baixar o three.js
+    if (document.documentElement.classList.contains('leve')) { about.classList.remove('cracha-loading'); return; }
     start().catch((err) => {
       console.warn('crachá 3D desligado:', err);
       about.classList.remove('cracha-loading', 'cracha-3d');
@@ -330,8 +332,14 @@ async function start() {
   // ----- arrastar: o canvas não recebe cliques (o texto embaixo continua clicável), então testa o cartão aqui -----
   const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
   const local = (e) => { const ar = about.getBoundingClientRect(); return { x: e.clientX - ar.left, y: e.clientY - ar.top }; };
+  // modo leve ligado no meio do uso: some o 3D e volta o crachá estático
+  let dead = false;
+  document.addEventListener('gr:leve', () => {
+    dead = true; visible = false; drag = null; about.style.cursor = '';
+    canvas.remove(); renderer.dispose(); about.classList.remove('cracha-3d', 'cracha-loading');
+  }, { once: true });
   function onCard(e) {
-    if (!shown) return false;
+    if (!shown || dead) return false;
     const p = local(e);
     if (p.x < 0 || p.y < 0 || p.x > cw || p.y > ch) return false;
     ndc.set(p.x / cw * 2 - 1, 1 - p.y / ch * 2);
