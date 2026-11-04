@@ -222,7 +222,7 @@ async function start() {
   const pts = Array.from({ length: N + 3 }, (_, i) => ({ x: 0, y: 0, z: 0, px: 0, py: 0, pz: 0, w: i === 0 ? 0 : i >= N ? 0.35 : 1, card: i >= N }));
   const A = pts[0], T = pts[N], BL = pts[N + 1], BR = pts[N + 2], cardPts = [T, BL, BR];
   const D = Math.hypot(W / 2, H);
-  let cw = 0, ch = 0, L = 200, drag = null, shown = false, X0 = 0, vw = 0;   // X0/vw: faixa da seção que o canvas desenha
+  let cw = 0, ch = 0, L = 200, drag = null, shown = false, X0 = 0, vw = 0, Y0 = 0, rh = 0;   // X0/vw e Y0/rh: faixa da seção que o canvas desenha
 
   const P = { x: 0, y: 0 };   // centro do traço do "g", onde o gancho gira
   function pin() {
@@ -260,9 +260,12 @@ async function start() {
     cw = about.clientWidth; ch = Math.min(about.clientHeight, Math.ceil(A.y + L + H + 120));
     // desempenho: o canvas cobre só uma faixa de até 900px em volta do gancho (antes, a largura toda da seção)
     vw = Math.min(cw, 900); X0 = Math.round(Math.min(Math.max(P.x - vw / 2, 0), cw - vw));
-    renderer.setSize(vw, ch); canvas.style.left = X0 + 'px';
+    // e na altura começa pouco acima do gancho (folga para levantar o cartão arrastando): a seção tem os Projetos
+    // em cima, e sem isso o canvas teria mais de mil pixels transparentes desenhados a cada quadro
+    Y0 = Math.max(0, Math.round(P.y - L - 80)); rh = ch - Y0;
+    renderer.setSize(vw, rh); canvas.style.left = X0 + 'px'; canvas.style.top = Y0 + 'px';
     camera.aspect = cw / ch;
-    camera.setViewOffset(cw, ch, X0, 0, vw, ch);
+    camera.setViewOffset(cw, ch, X0, Y0, vw, rh);
     camera.position.z = ch / 2 / Math.tan(THREE.MathUtils.degToRad(15));   // 1 unidade = 1px no plano z = 0
     camera.near = camera.position.z * 0.5; camera.far = camera.position.z * 1.5;
     camera.updateProjectionMatrix();
@@ -403,8 +406,8 @@ async function start() {
   function onCard(e) {
     if (!shown || dead) return false;
     const p = local(e);
-    if (p.x < X0 || p.y < 0 || p.x > X0 + vw || p.y > ch) return false;
-    ndc.set((p.x - X0) / vw * 2 - 1, 1 - p.y / ch * 2);
+    if (p.x < X0 || p.y < Y0 || p.x > X0 + vw || p.y > ch) return false;
+    ndc.set((p.x - X0) / vw * 2 - 1, 1 - (p.y - Y0) / rh * 2);
     ray.setFromCamera(ndc, camera);
     return ray.intersectObject(card, true).length > 0;
   }

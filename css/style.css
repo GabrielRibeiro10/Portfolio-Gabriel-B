@@ -799,6 +799,8 @@ a { color: inherit; text-decoration: none; }
 }
 
 .projects { margin-top: clamp(80px, 9vw, 150px); scroll-margin-top: 24px; }
+.about-in > .projects:first-child { margin-top: 0; }   /* Projetos abrem a seção, logo depois da hero */
+.about-me { margin-top: clamp(80px, 9vw, 150px); scroll-margin-top: 24px; }
 .pj {
   position: relative; overflow: hidden; border-radius: 20px; color: #fff;
   padding: clamp(28px, 4.4vw, 72px) clamp(24px, 4.4vw, 72px) clamp(24px, 3vw, 44px);
@@ -1870,4 +1872,36 @@ html.leve .intro .btn-work, html.leve .intro .btn-work::before, html.leve .intro
 }
 @media (orientation: landscape) and (max-height: 500px) and (max-width: 1000px) {
   .hero-art { grid-column: 1 / -1; left: 58%; width: calc(var(--stage) * .92 * 2 / 3); }
+}
+
+/* ---------- Stack compacta ----------
+   As 6 áreas viram uma grade (3 colunas no PC, 2 no tablet e no celular) no lugar da lista de 6 linhas: o mesmo
+   conteúdo em bem menos altura. Título, números e etiquetas menores. */
+.stack { padding-top: clamp(56px, 6vw, 96px); padding-bottom: clamp(72px, 7vw, 116px); }
+.stack .stack-top { margin: clamp(18px, 2vw, 30px) 0 clamp(26px, 3vw, 44px); }
+.stack .stack-title { font-size: clamp(38px, 4.8vw, 80px); }
+.stack .stack-facts { margin-top: 16px; padding-top: 14px; }
+.stack .stack-facts strong { font-size: clamp(24px, 2.1vw, 32px); }
+.stack .stack-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 clamp(20px, 2.6vw, 44px); border-top: 0; }
+.stack .stack-list > li { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: 18px 0 22px; border-top: 1px solid rgba(255, 255, 255, .22); border-bottom: 0; }
+.stack .stack-group h3 { font-size: clamp(17px, 1.35vw, 21px); }
+.stack .stack-group p { margin-top: 2px; font-size: 12.5px; }
+.stack .stack-chips { gap: 6px; }
+.stack .stack-chips li { gap: 7px; padding: 7px 12px 7px 10px; font-size: 13px; }
+.stack .stack-chips svg { width: 15px; height: 15px; }
+@media (max-width: 1100px) { .stack .stack-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 860px) {
+  .stack { padding-top: 52px; padding-bottom: 64px; }
+  .stack .stack-top { gap: 14px; margin: 18px 0 22px; }
+  .stack .stack-title { font-size: clamp(32px, 9vw, 44px); }
+  .stack .stack-note { font-size: 14px; }
+  .stack .stack-list { gap: 0 14px; }
+  .stack .stack-list > li { gap: 9px; padding: 14px 0 16px; }
+  .stack .stack-group { grid-template-columns: 24px 1fr; }
+  .stack .stack-group .n { font-size: 11px; }
+  .stack .stack-group h3 { font-size: 15.5px; }
+  .stack .stack-group p { display: none; }
+  .stack .stack-chips { gap: 5px; }
+  .stack .stack-chips li { gap: 5px; padding: 5px 9px 5px 7px; font-size: 11.5px; }
+  .stack .stack-chips svg { width: 12px; height: 12px; }
 }
