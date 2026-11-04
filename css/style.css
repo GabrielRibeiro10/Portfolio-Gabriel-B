@@ -928,7 +928,7 @@ html, body { overflow-x: clip; }
   --cl: max(24px, calc((100vw - 1320px) / 2));   /* margem do conteúdo */
   --t: clamp(46px, 6.1vw, 92px);                 /* tamanho do título */
   --u: calc(var(--t) / 59);
-  position: relative; isolation: isolate; overflow: clip;
+  position: relative; isolation: isolate; overflow-x: clip;   /* em cima fica aberto: a crista sobe na Stack */
   width: 100vw; margin: clamp(80px, 9vw, 150px) 0 0 calc(50% - 50vw);
   padding: calc(var(--u) * 57) var(--cl) 0;
   color: var(--ink); background: #f9f7f5;
@@ -946,6 +946,17 @@ html, body { overflow-x: clip; }
 .faq-wave { transform-origin: 0 50%; animation: fw-sway 7s ease-in-out infinite; will-change: transform; }
 @keyframes fw-sway { 0%, 100% { transform: translateX(0) scaleX(1); } 50% { transform: translateX(calc(var(--u) * -5)) scaleX(1.03); } }
 @media (prefers-reduced-motion: reduce) { .faq-wave { animation: none; } }
+/* crista: o creme sobe em ondas na Stack a partir do topo da onda (x = 362 do svg dela), sem a emenda reta */
+.faq-crest {
+  position: absolute; z-index: 0; pointer-events: none; display: block;
+  left: calc(var(--cl) + 318 * var(--u)); width: calc(100% - var(--cl) - 318 * var(--u)); top: calc(1px - max(34px, 50 * var(--u))); height: max(34px, 50 * var(--u));
+}
+.faq-crest .cr-narrow { display: none; }
+@media (max-width: 860px) {   /* no celular a faixa de creme é estreita: uma ondulação só, mais baixa */
+  .faq-crest { top: -21px; height: 22px; }
+  .faq-crest .cr-wide { display: none; }
+  .faq-crest .cr-narrow { display: inline; }
+}
 html.leve .faq-wave { animation: none; }   /* em telas largas o laranja passa da moldura até a borda esquerda */
 
 .faq .about-kicker { display: flex; align-items: center; gap: 0; font-size: max(13px, calc(14 * var(--u))); line-height: 1; }
