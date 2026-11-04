@@ -235,7 +235,7 @@ if ('IntersectionObserver' in window) {
     e.target.classList.toggle('is-off', !e.isIntersecting);
     if (logo && e.target.classList.contains('hero')) (e.isIntersecting && !leve() ? logo.unpauseAnimations() : logo.pauseAnimations());
   }), { rootMargin: '120px 0px' });
-  document.querySelectorAll('.hero, .about-title, .stack, .faq-marquee, .site-footer, .doc-hero').forEach((el) => io.observe(el));
+  document.querySelectorAll('.hero, .about-title, .stack, .faq-bg, .faq-marquee, .site-footer, .doc-hero').forEach((el) => io.observe(el));
 }
 // modo leve: a marca GR fica parada (o degradê que corre redesenha o traço com sombra a cada quadro)
 const stopLogo = () => { const l = document.querySelector('.logo-mark'); if (l) l.pauseAnimations(); };

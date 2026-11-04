@@ -42,8 +42,8 @@ async function start() {
   canvas.className = 'cracha-canvas';
   canvas.setAttribute('aria-hidden', 'true');
   canvas.style.visibility = 'hidden';
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: devicePixelRatio < 1.5, alpha: true, powerPreference: 'high-performance' });   // tela de alta densidade não precisa de antisserrilhado (mais leve)
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));   // desempenho: até 1,5x
   about.appendChild(canvas);
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(30, 1, 1, 10);
@@ -125,7 +125,7 @@ async function start() {
   const pts = Array.from({ length: N + 3 }, (_, i) => ({ x: 0, y: 0, z: 0, px: 0, py: 0, pz: 0, w: i === 0 ? 0 : i >= N ? 0.35 : 1, card: i >= N }));
   const A = pts[0], T = pts[N], BL = pts[N + 1], BR = pts[N + 2], cardPts = [T, BL, BR];
   const D = Math.hypot(W / 2, H);
-  let cw = 0, ch = 0, L = 200, drag = null, shown = false;
+  let cw = 0, ch = 0, L = 200, drag = null, shown = false, X0 = 0, vw = 0;   // X0/vw: faixa da seção que o canvas desenha
 
   const mob = () => matchMedia('(max-width: 860px)').matches;
   // posição da letra onde o gancho prende (o título pode estar separado em palavras pelo GSAP):
@@ -200,8 +200,11 @@ async function start() {
     const ar = about.getBoundingClientRect(), sr = slot.getBoundingClientRect();
     L = Math.max(120, sr.top - ar.top + 40 - A.y - (mob() ? 18 : 0));   // o cartão fica 40px abaixo do topo da coluna (no celular a fita é um pouco mais curta)
     cw = about.clientWidth; ch = Math.min(about.clientHeight, Math.ceil(A.y + L + H + 120));
-    renderer.setSize(cw, ch);
+    // desempenho: o canvas cobre só uma faixa de até 900px em volta do gancho (antes, a largura toda da seção)
+    vw = Math.min(cw, 900); X0 = Math.round(Math.min(Math.max(P.x - vw / 2, 0), cw - vw));
+    renderer.setSize(vw, ch); canvas.style.left = X0 + 'px';
     camera.aspect = cw / ch;
+    camera.setViewOffset(cw, ch, X0, 0, vw, ch);
     camera.position.z = ch / 2 / Math.tan(THREE.MathUtils.degToRad(15));   // 1 unidade = 1px no plano z = 0
     camera.near = camera.position.z * 0.5; camera.far = camera.position.z * 1.5;
     camera.updateProjectionMatrix();
@@ -303,17 +306,18 @@ async function start() {
   }
 
   // ----- laço: só roda enquanto a seção está na tela e algo se mexe -----
-  let running = false, visible = true, last = 0, acc = 0, still = 0;
+  let running = false, visible = true, last = 0, acc = 0, still = 0, since = 0;
   function frame(t) {
     const dt = Math.min(0.05, (t - last) / 1000 || 1 / 60); last = t; acc += dt;
     pin();   // o título pode estar animando: o "g" muda de lugar
     let moved = 0;
     while (acc >= STEP) { moved = Math.max(moved, step()); acc -= STEP; }
     draw();
-    still = moved < 0.02 && !drag ? still + dt : 0;
-    if (visible && still < 0.5) requestAnimationFrame(frame); else running = false;
+    still = moved < 0.05 && !drag ? still + dt : 0;
+    since = drag ? 0 : since + dt;   // nunca fica rodando sozinho para sempre (tremidinhas de arredondamento)
+    if (visible && still < 0.5 && since < 7) requestAnimationFrame(frame); else running = false;
   }
-  const kick = () => { still = 0; if (!running && visible && shown) { running = true; last = performance.now(); acc = 0; requestAnimationFrame(frame); } };
+  const kick = () => { still = 0; since = 0; if (!running && visible && shown) { running = true; last = performance.now(); acc = 0; requestAnimationFrame(frame); } };
 
   layout(); hang(0); draw();
   about.classList.add('cracha-3d'); about.classList.remove('cracha-loading');
@@ -323,7 +327,7 @@ async function start() {
     if (!e[0].isIntersecting) return;
     o.disconnect(); pin(); hang(0.9); show();
   }, { threshold: 0.25 }).observe(slot);
-  new IntersectionObserver((e) => { visible = e[0].isIntersecting; kick(); }).observe(about);
+  new IntersectionObserver((e) => { visible = e[0].isIntersecting; kick(); }).observe(canvas);   // só o pedaço do crachá, não a seção inteira
   const relayout = () => { layout(); if (!running) draw(); kick(); };
   addEventListener('resize', relayout);
   addEventListener('load', relayout);
@@ -341,8 +345,8 @@ async function start() {
   function onCard(e) {
     if (!shown || dead) return false;
     const p = local(e);
-    if (p.x < 0 || p.y < 0 || p.x > cw || p.y > ch) return false;
-    ndc.set(p.x / cw * 2 - 1, 1 - p.y / ch * 2);
+    if (p.x < X0 || p.y < 0 || p.x > X0 + vw || p.y > ch) return false;
+    ndc.set((p.x - X0) / vw * 2 - 1, 1 - p.y / ch * 2);
     ray.setFromCamera(ndc, camera);
     return ray.intersectObject(card, true).length > 0;
   }
