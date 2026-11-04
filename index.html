@@ -54,28 +54,36 @@
 <main class="hero">
   <!-- Lado laranja: fundo em gradiente com o brilho que flutua, logo, textos e números -->
   <div class="hero-bg" aria-hidden="true"></div>
-  <!-- design amarelo atrás da foto, igual à referência: círculo vermelho-alaranjado no alto e disco amarelo
-       atrás do ombro, os dois recortados por uma oval inclinada em volta da cabeça (mostra o brilho do fundo),
-       e o halo amarelo em volta da pessoa. Coordenadas em pixels da foto (1024×1536): o desenho tem a mesma
-       caixa da .person e anda junto com ela (js/main.js); fica atrás do painel claro. -->
+  <!-- design da referência atrás da foto (cores e formas medidas na imagem de referência): luzes quentes atrás da
+       pessoa (em volta da cabeça, no pescoço/ombro e um dourado embaixo à esquerda), um círculo grande cor de ferrugem
+       no alto e um disco dourado atrás do ombro, os dois recortados por uma oval inclinada em volta da cabeça (que
+       mostra as luzes). Coordenadas em pixels da foto (1024×1536): o desenho tem a mesma caixa da .person e anda junto
+       com ela (js/main.js); no PC fica atrás do painel claro. -->
   <svg class="hero-art" viewBox="0 0 1024 1536" aria-hidden="true" focusable="false">
     <defs>
-      <linearGradient id="ha-top" gradientUnits="userSpaceOnUse" x1="177.2" y1="-207.1" x2="411" y2="251.7">
-        <stop offset="0" stop-color="#942207"/><stop offset="1" stop-color="#d24306"/>
+      <radialGradient id="ha-l-sun"><stop offset="0" stop-color="#ff960a" stop-opacity=".7"/><stop offset=".55" stop-color="#ff8205" stop-opacity=".32"/><stop offset="1" stop-color="#ff7800" stop-opacity="0"/></radialGradient>
+      <radialGradient id="ha-l-wide"><stop offset="0" stop-color="#ff7006" stop-opacity=".62"/><stop offset=".55" stop-color="#fa6404" stop-opacity=".28"/><stop offset="1" stop-color="#f05a00" stop-opacity="0"/></radialGradient>
+      <radialGradient id="ha-l-head"><stop offset="0" stop-color="#ec5c04" stop-opacity=".7"/><stop offset=".55" stop-color="#e65803" stop-opacity=".32"/><stop offset="1" stop-color="#e15502" stop-opacity="0"/></radialGradient>
+      <radialGradient id="ha-l-core"><stop offset="0" stop-color="#ff9614" stop-opacity=".8"/><stop offset=".55" stop-color="#ff8c0a" stop-opacity=".35"/><stop offset="1" stop-color="#ff8200" stop-opacity="0"/></radialGradient>
+      <linearGradient id="ha-top" gradientUnits="userSpaceOnUse" x1="150" y1="0" x2="700" y2="0">
+        <stop offset="0" stop-color="#9e2f01"/><stop offset="1" stop-color="#882501"/>
       </linearGradient>
-      <radialGradient id="ha-sun" gradientUnits="userSpaceOnUse" cx="142.8" cy="793.7" r="415.2">
-        <stop offset="0" stop-color="#e69924"/><stop offset=".58" stop-color="#fb9413"/><stop offset="1" stop-color="#ca6710"/>
+      <radialGradient id="ha-sun" gradientUnits="userSpaceOnUse" cx="330" cy="880" r="300">
+        <stop offset="0" stop-color="#fdab0e"/><stop offset=".55" stop-color="#fb9606"/><stop offset="1" stop-color="#f38202"/>
       </radialGradient>
-      <mask id="ha-oval" maskUnits="userSpaceOnUse" x="-600" y="-600" width="2400" height="2800">
-        <rect x="-600" y="-600" width="2400" height="2800" fill="#fff"/>
-        <ellipse cx="253.1" cy="497.6" rx="242.1" ry="355.5" transform="rotate(-20.1 253.1 497.6)" fill="#000"/>
+      <mask id="ha-oval" maskUnits="userSpaceOnUse" x="-600" y="-900" width="2400" height="3100">
+        <rect x="-600" y="-900" width="2400" height="3100" fill="#fff"/>
+        <ellipse cx="445" cy="550" rx="254.2" ry="373.3" transform="rotate(-20.1 445 550)" fill="#000"/>
       </mask>
     </defs>
+    <ellipse cx="183.7" cy="1039.3" rx="510.7" ry="418.3" fill="url(#ha-l-sun)"/>
+    <ellipse cx="293.1" cy="751.7" rx="656.7" ry="810.5" fill="url(#ha-l-wide)"/>
+    <ellipse cx="366.1" cy="333.3" rx="255.4" ry="313.7" fill="url(#ha-l-head)"/>
+    <ellipse cx="274.9" cy="712.4" rx="273.6" ry="392.2" fill="url(#ha-l-core)"/>
     <g mask="url(#ha-oval)">
-      <circle cx="294.1" cy="22.3" r="257.5" fill="url(#ha-top)"/>
-      <circle cx="276.7" cy="1012.8" r="386.7" fill="url(#ha-sun)"/>
+      <circle cx="700.5" cy="-98.3" r="658.7" fill="url(#ha-top)"/>
+      <circle cx="269.2" cy="955.3" r="242.2" fill="url(#ha-sun)"/>
     </g>
-    <image class="hero-halo" href="img/gabriel-halo.webp" x="0" y="0" width="1024" height="1536" preserveAspectRatio="none"/>
   </svg>
 
   <!-- marca: G e R ligados (a barra do G é a base da barriga do R) e um cursor de terminal piscando -->
@@ -147,14 +155,13 @@
     </figure>
   </section>
 
-  <!-- Halo amarelo em volta da pessoa, no PC: mesma imagem do halo do desenho (svg.hero-art), mas numa camada
-       própria por cima do painel claro e atrás da foto, para contornar a cabeça inteira como no celular -->
-  <img class="person-halo" src="img/gabriel-halo.webp" alt="" aria-hidden="true" width="1024" height="1536" decoding="async">
-
   <!-- Foto recortada: fica na frente do painel, como na referência -->
   <div class="person">
     <img src="img/gabriel-recorte.webp" srcset="img/gabriel-recorte.webp 1024w, img/gabriel-recorte-1536.webp 1536w, img/gabriel-recorte-2048.webp 2048w" sizes="(max-width: 860px) 100vw, 79vh" alt="Gabriel Ribeiro, sorrindo e olhando para cima" width="1024" height="1536" fetchpriority="high">
     <span class="person-light" aria-hidden="true"></span>
+    <!-- luz de contorno: a luz quente do fundo "abraçando" a borda do cabelo, do rosto e dos ombros, por dentro do
+         recorte (img/gabriel-luz.webp, gerada a partir do recorte e das cores do fundo atrás de cada ponto) -->
+    <span class="person-rim" aria-hidden="true"></span>
   </div>
 
   <nav class="socials" aria-label="Redes sociais">

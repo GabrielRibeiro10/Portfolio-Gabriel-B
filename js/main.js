@@ -6,9 +6,8 @@ const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const leve = () => document.documentElement.classList.contains('leve');
 const hero = document.querySelector('.hero');
 const person = document.querySelector('.person');
-// design amarelo atrás da foto e, no PC, o halo amarelo em volta da pessoa (camada própria, por cima do painel
-// claro): andam junto com a foto
-const art = [...document.querySelectorAll('.hero-art, .person-halo')];
+// design da referência atrás da foto (svg.hero-art): anda junto com ela
+const art = [...document.querySelectorAll('.hero-art')];
 const withArt = art.length ? [person, ...art] : person;
 const { gsap, ScrollTrigger } = window;
 const animate = Boolean(gsap && hero) && !reduceMotion;
