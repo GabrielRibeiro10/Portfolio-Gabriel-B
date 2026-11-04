@@ -1830,6 +1830,7 @@ html.leve .intro .btn-work, html.leve .intro .btn-work::before, html.leve .intro
    até o lugar (a de baixo leva o crachá). */
 .about-title .at-line { display: block; transform-origin: 0 100%; }
 .about-title.ab-slide .at-line { transform: translate3d(-34vw, 0, 0); opacity: 0; will-change: transform, opacity; }
+@media (max-width: 860px) { .about-title.ab-slide .at-line { transform: translate3d(-105vw, 0, 0); } }
 
 /* card da citação: faixa de luz e brilho quente que andam com a rolagem (js/main.js, GSAP ScrollTrigger) */
 @property --gx { syntax: '<percentage>'; inherits: false; initial-value: 0%; }
