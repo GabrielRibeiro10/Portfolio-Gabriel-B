@@ -141,13 +141,44 @@ if (animate) {
     if (art) gsap.to(art, { autoAlpha: 1, scale: 1, duration: 1.3, ease: 'expo.out', delay: Math.max(0, 0.5 - tl.time()) + 0.55 });
   })));
 
+  // card da citação: brilho que passa de tempos em tempos e, no PC (mouse), inclinação 3D seguindo o ponteiro.
+  // Nada disso no modo leve.
+  const card = $('.quote-card');
+  const shine = document.createElement('span');
+  shine.className = 'quote-shine'; shine.setAttribute('aria-hidden', 'true');
+  card.append(shine);
+  gsap.set(shine, { xPercent: -130 });
+  function cardAlive() {
+    if (leve()) return;
+    gsap.fromTo(shine, { xPercent: -130 }, { xPercent: 130, duration: 1.3, ease: 'power2.inOut', repeat: -1, repeatDelay: 6.5 });
+    if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    gsap.set(card, { transformPerspective: 900 });
+    const rx = gsap.quickTo(card, 'rotationX', { duration: 0.7, ease: 'power3.out' });
+    const ry = gsap.quickTo(card, 'rotationY', { duration: 0.7, ease: 'power3.out' });
+    const lift = gsap.quickTo(card, 'y', { duration: 0.7, ease: 'power3.out' });
+    card.addEventListener('pointermove', (e) => {
+      if (leve()) return;
+      const r = card.getBoundingClientRect();
+      ry(((e.clientX - r.left) / r.width - 0.5) * 10);
+      rx(-((e.clientY - r.top) / r.height - 0.5) * 8);
+      lift(-6);
+    });
+    card.addEventListener('pointerleave', () => { rx(0); ry(0); lift(0); });
+  }
+
   // conteúdo do painel: selo, apresentação palavra por palavra e card da citação
   const panelIn = (t, at) => t
     .from($('.badge'), { scale: 0.6, autoAlpha: 0, duration: 0.8, ease: 'back.out(2)', clearProps: 'transform,opacity,visibility' }, at)
     .from(pitchWords, { yPercent: 110, duration: 1, stagger: 0.025 }, at + 0.05)
     .from(smallWords, { yPercent: 110, duration: 0.8, stagger: 0.03 }, at + 0.4)
-    .from($('.quote-card'), { y: 50, autoAlpha: 0, duration: 1.1, clearProps: 'transform,opacity,visibility' }, at + 0.3)
-    .from(quoteWords, { yPercent: 110, duration: 0.9, stagger: 0.03 }, at + 0.5);
+    // card da citação: levanta em 3D (dobrado para trás, de baixo), a foto salta, nome e cargo deslizam, as
+    // palavras sobem e um brilho passa por cima; no PC depois ele inclina seguindo o mouse
+    .fromTo(card, { y: 70, rotationX: -24, scale: 0.94, autoAlpha: 0, transformPerspective: 900, transformOrigin: '50% 100%' },
+      { y: 0, rotationX: 0, scale: 1, autoAlpha: 1, duration: 1.4, ease: 'expo.out', clearProps: 'transform,opacity,visibility' }, at + 0.3)
+    .from($('.quote-head img'), { scale: 0.3, rotation: -14, autoAlpha: 0, duration: 0.9, ease: 'back.out(2.2)', clearProps: 'transform,opacity,visibility' }, at + 0.55)
+    .from($$('.quote-head strong, .quote-head span'), { x: -18, autoAlpha: 0, duration: 0.8, stagger: 0.08, clearProps: 'transform,opacity,visibility' }, at + 0.62)
+    .from(quoteWords, { yPercent: 110, duration: 0.9, stagger: 0.03 }, at + 0.7)
+    .call(cardAlive, null, at + 1.35);
   if (!isMobile) {
     panelIn(tl, 0.7);
   } else {
