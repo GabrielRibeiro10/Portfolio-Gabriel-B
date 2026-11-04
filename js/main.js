@@ -582,7 +582,19 @@ if (animate) {
     // Altura do fundo da onda fixa em px (altura do FAQ + 400 px de folga), refeita só quando o tamanho para de mudar.
     // Sem isso, abrir uma resposta mudava a altura do fundo a cada quadro e o navegador redesenhava a camada inteira
     // (enorme, com máscara) em todos os quadros: era o que travava. A sobra abaixo do fim da onda é transparente.
-    const settle = () => { put(bg, 'height', (faq.offsetHeight + 400) + 'px'); marks(); edge(); };
+    // crista (a área clara que sobe para dentro da Stack): começa exatamente na borda da onda no topo do FAQ. No celular
+    // o desenho da onda é escalado pela altura (o FAQ é alto), então a posição da borda muda de aparelho para aparelho e
+    // é medida aqui; se a borda cai fora da tela (celular estreito), o laranja vai até a borda e a crista some
+    const crest = faq.querySelector('.faq-crest');
+    const crestFit = () => {
+      if (!crest || !shape || !shape.isPointInFill) return;
+      const wr = wave.getBoundingClientRect(), fr = faq.getBoundingClientRect();
+      const k = Math.max(wr.width / 420, wr.height / 2400), ux = edgeAt((fr.top - wr.top) / k, 420);
+      const left = wr.left + ux * k - fr.left - 1, w = fr.width - left + 2;
+      if (ux < 0 || w < 18) { put(crest, 'display', 'none'); return; }
+      put(crest, 'display', ''); put(crest, 'left', left.toFixed(1) + 'px'); put(crest, 'width', w.toFixed(1) + 'px');
+    };
+    const settle = () => { put(bg, 'height', (faq.offsetHeight + 400) + 'px'); marks(); edge(); crestFit(); };
     let t = 0;
     const fit = () => { clearTimeout(t); t = setTimeout(settle, 150); };
     settle();
