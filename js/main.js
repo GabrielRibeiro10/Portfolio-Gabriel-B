@@ -9,7 +9,7 @@ const person = document.querySelector('.person');
 const { gsap, ScrollTrigger } = window;
 const animate = Boolean(gsap && hero) && !reduceMotion;
 // mesma condição do layout de celular no css/style.css
-const MOBILE = '(max-width: 860px), (orientation: landscape) and (max-height: 500px) and (max-width: 1000px)';
+const MOBILE = '(max-width: 860px), (max-aspect-ratio: 4/5), (orientation: landscape) and (max-height: 500px) and (max-width: 1000px)';
 
 // ---------- Números contando (0 → valor final) ----------
 function countUp(el) {
