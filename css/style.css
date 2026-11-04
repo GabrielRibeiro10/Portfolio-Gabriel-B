@@ -936,7 +936,8 @@ html, body { overflow-x: clip; }
 .faq .about-kicker .k-name { font-size: 1.02em; font-weight: 400; letter-spacing: 0; color: #fff; }
 .faq-grid { display: grid; grid-template-columns: 5fr 7fr; gap: clamp(32px, 6vw, 110px); margin-top: calc(var(--u) * 35); align-items: start; }
 .faq-side { position: sticky; top: clamp(24px, 12vh, 120px); }
-.faq-title { margin: 0; font-size: var(--t); font-weight: 700; line-height: .915; letter-spacing: -.02em; color: #fff; text-shadow: 0 2px 30px rgba(90, 28, 6, .18); }
+/* mesma fonte do título da Stack ("Do design ao deploy."): Inter Tight 400, espaçamento -.045em */
+.faq-title { margin: 0; font-size: var(--t); font-weight: 400; line-height: .98; letter-spacing: -.045em; color: #fff; text-shadow: 0 2px 30px rgba(90, 28, 6, .18); }
 .faq-title em { font-style: normal; color: var(--peach); }
 .faq-lead { margin: calc(var(--u) * 15) 0 0; max-width: 19.4em; font-size: max(12px, calc(11.9 * var(--u))); line-height: 1.325; color: rgba(255, 246, 239, .92); }
 .faq-wa {
