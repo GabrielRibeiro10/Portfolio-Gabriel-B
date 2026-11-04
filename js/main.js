@@ -631,53 +631,19 @@ if (animate) {
   }
 }
 
-// Segmentos: a lista troca a página-conceito do navegador (passar o mouse ou clicar no PC; tocar na etiqueta no
-// celular). Sozinha ela gira a cada 4,8 s enquanto a seção está na tela e ninguém mexeu (a barrinha laranja da
-// legenda mostra o tempo); qualquer interação para o giro de vez. A seção entra em cascata quando aparece.
+// Segmentos: título, texto e cartões entram em cascata quando a seção aparece (depois as classes saem, para o hover
+// dos cartões não herdar o atraso da cascata)
 {
   const ni = document.querySelector('.nichos');
-  if (ni) {
-    const items = [...ni.querySelectorAll('.sg-item')], sites = [...ni.querySelectorAll('.sg-site')];
-    const list = ni.querySelector('.sg-list'), mdesc = ni.querySelector('.sg-mdesc'), prog = ni.querySelector('.sg-prog');
-    const T = 4800;
-    let cur = 0, timer = 0, auto = !reduceMotion, seen = false;
-    const set = (i, fromAuto) => {
-      cur = (i + items.length) % items.length;
-      items.forEach((it, k) => { it.classList.toggle('is-on', k === cur); it.querySelector('button').setAttribute('aria-pressed', k === cur); });
-      sites.forEach((st, k) => st.classList.toggle('is-on', k === cur));
-      const it = items[cur];
-      if (mdesc) mdesc.innerHTML = `<b>${it.querySelector('.sg-name').textContent}</b>${it.querySelector('.sg-more p').textContent}`;
-      // no celular a etiqueta ativa vem para a vista, rolando só a fileira (não a página)
-      if (list && list.scrollWidth > list.clientWidth) {
-        const b = list.scrollLeft + it.getBoundingClientRect().left - list.getBoundingClientRect().left - 20;
-        list.scrollTo({ left: Math.max(0, b), behavior: fromAuto || reduceMotion ? 'auto' : 'smooth' });
-      }
-      if (prog) { prog.classList.remove('run'); void prog.offsetWidth; if (auto) prog.classList.add('run'); }
-    };
-    const stop = () => { auto = false; clearInterval(timer); timer = 0; ni.classList.remove('sg-auto'); };
-    const play = () => { if (!auto || timer || !seen) return; ni.classList.add('sg-auto'); set(cur, true); timer = setInterval(() => set(cur + 1, true), T); };
-    const pause = () => { clearInterval(timer); timer = 0; };
-    // tocar, arrastar ou rolar a fileira de etiquetas (celular) também para o giro: ele não pode puxar a fileira de volta
-    if (list) ['pointerdown', 'touchstart', 'wheel'].forEach((ev) => list.addEventListener(ev, stop, { passive: true }));
-    items.forEach((it, k) => {
-      const btn = it.querySelector('button');
-      btn.addEventListener('click', () => { stop(); set(k); });
-      if (matchMedia('(hover: hover)').matches) btn.addEventListener('mouseenter', () => { stop(); set(k); });
-    });
-    set(0, true);
-    if ('IntersectionObserver' in window) {
-      new IntersectionObserver(([e]) => { seen = e.isIntersecting; seen ? play() : pause(); }, { threshold: 0.35 }).observe(ni.querySelector('.sg-view'));
-      if (!reduceMotion) {
-        ni.classList.add('ni-live');
-        const io = new IntersectionObserver(([e]) => {
-          if (!e.isIntersecting) return;
-          io.disconnect();
-          ni.classList.add('is-in');
-          setTimeout(() => ni.classList.remove('ni-live', 'is-in'), 2800);
-        }, { threshold: 0.12 });
-        io.observe(ni);
-      }
-    }
+  if (ni && !reduceMotion && 'IntersectionObserver' in window) {
+    ni.classList.add('ni-live');
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      ni.classList.add('is-in');
+      setTimeout(() => ni.classList.remove('ni-live', 'is-in'), 2600);
+    }, { threshold: 0.12 });
+    io.observe(ni);
   }
 }
 
