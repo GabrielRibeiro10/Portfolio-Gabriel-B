@@ -224,6 +224,15 @@ if (window.Lenis && !reduceMotion && !leve() && matchMedia('(hover: hover) and (
     gsap.ticker.add(raf);
   }
   if (window.grReload) lenis.scrollTo(0, { immediate: true, force: true });
+  // Barra de rolagem do navegador ou teclado no meio de uma rolagem animada (ex.: "Ver meus projetos" leva ~1,7 s
+  // descendo): o Lenis ignorava a barra e continuava puxando a página para o destino, e ela parecia travada.
+  // Agora qualquer um dos dois cancela a animação na hora e a rolagem volta a ser da pessoa.
+  const cancel = () => { if (lenis.isScrolling === 'smooth') lenis.scrollTo(lenis.actualScroll, { immediate: true, force: true }); };
+  // clique na barra: fora da área do conteúdo (barra clássica) ou na borda direita da própria página (barra fina por cima, Mac)
+  const onBar = (e) => { const w = document.documentElement.clientWidth; if (e.clientX >= w || (e.target === document.documentElement && e.clientX >= w - 20)) cancel(); };
+  addEventListener('pointerdown', onBar, { passive: true });
+  addEventListener('mousedown', onBar, { passive: true });
+  addEventListener('keydown', (e) => { if (/^(Arrow|Page|Home|End| )/.test(e.key)) cancel(); });
   document.addEventListener('gr:leve', () => { if (window.gsap) gsap.ticker.remove(raf); lenis.destroy(); }, { once: true });
 }
 
