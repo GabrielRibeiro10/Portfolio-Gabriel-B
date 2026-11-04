@@ -1490,3 +1490,41 @@ html.leve .pj-bg::before { -webkit-mask-image: none; mask-image: none; opacity: 
 @keyframes bw-sweep { 0% { transform: translateX(-120%) skewX(-18deg); } 45%, 100% { transform: translateX(480%) skewX(-18deg); } }
 @media (prefers-reduced-motion: reduce) { .intro .btn-work, .intro .btn-work::before, .intro .btn-work::after { animation: none; } }
 html.leve .intro .btn-work, html.leve .intro .btn-work::before, html.leve .intro .btn-work::after { animation: none; }
+
+/* ---------- Hero: o "sol" amarelo atrás da foto ----------
+   Paleta amarela da referência: um disco de luz amarelo → âmbar → laranja atrás da cabeça, com borda que se
+   dissolve no laranja do fundo, anéis concêntricos bem finos (dourados) em volta e um halo largo e suave.
+   Fica atrás do painel claro e da foto (z-index -1). Respira devagar; parado fora da tela, com "menos
+   movimento" e no modo leve. */
+.hero-sun {
+  position: absolute; z-index: -1; pointer-events: none;
+  left: 50cqw; top: 39.5cqh; width: 72cqh; aspect-ratio: 1; transform: translate(-50%, -50%);
+}
+.hero-sun::before {   /* halo largo amarelo-âmbar */
+  content: ""; position: absolute; inset: -38%; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 196, 64, .55), rgba(255, 166, 40, .28) 45%, rgba(255, 140, 30, 0) 100%);
+}
+.hero-sun i {         /* o disco: centro amarelo-claro, borda âmbar que se dissolve */
+  position: absolute; inset: 0; border-radius: 50%;
+  background:
+    radial-gradient(circle at 46% 42%, #fff1b8 0%, #ffe07a 16%, #ffc83d 36%, #ffab2a 56%, rgba(255, 140, 30, .55) 72%, rgba(255, 128, 28, 0) 82%);
+  box-shadow: 0 0 80px 20px rgba(255, 186, 60, .35);
+  animation: sun-breathe 7s ease-in-out infinite alternate;
+}
+.hero-sun::after {    /* anéis concêntricos finos */
+  content: ""; position: absolute; inset: -30%; border-radius: 50%;
+  background: repeating-radial-gradient(circle, rgba(255, 224, 140, 0) 0 calc(6.2% - 1px), rgba(255, 224, 140, .42) calc(6.2% - 1px) 6.2%);
+  -webkit-mask-image: radial-gradient(closest-side, transparent 52%, #000 60%, #000 74%, transparent 100%);
+          mask-image: radial-gradient(closest-side, transparent 52%, #000 60%, #000 74%, transparent 100%);
+  opacity: .85;
+}
+@keyframes sun-breathe { from { transform: scale(.97); filter: brightness(.97); } to { transform: scale(1.03); filter: brightness(1.05); } }
+@media (max-width: 860px), (max-aspect-ratio: 4/5), (orientation: landscape) and (max-height: 500px) and (max-width: 1000px) {
+  .hero-sun { left: 50%; top: calc(var(--stage) * .5); width: min(118vw, calc(var(--stage) * .62)); }
+}
+@media (orientation: landscape) and (max-height: 500px) and (max-width: 1000px) {
+  .hero-sun { left: 58%; top: calc(var(--stage) * .46); width: calc(var(--stage) * .82); }
+}
+@media (prefers-reduced-motion: reduce) { .hero-sun i { animation: none; } }
+html.leve .hero-sun i { animation: none; }
+.gsap-loading .hero-sun { opacity: 0; }
