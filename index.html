@@ -193,133 +193,159 @@
 
     <!-- Projetos: um notebook 3D por site (CSS 3D, js/main.js). A tela mostra a captura da página
          inteira rolando sozinha (por cima, quando carrega, o vídeo do site com os efeitos); ao passar para o lado, o notebook fecha e sai, e o próximo entra e abre -->
-    <!-- Segmentos: lista editorial dos segmentos (esquerda) e um navegador com a página-conceito do segmento ativo
-         (direita). Cada conceito tem marca fictícia, tipografia, paleta e elementos reais do negócio (agenda, cardápio,
-         planos, anúncio). Passar o mouse ou tocar troca o conceito; sozinho ele gira enquanto ninguém mexe (js/main.js).
-         As páginas são só ilustração (aria-hidden): o conteúdo para leitores de tela está na lista -->
+    <!-- Segmentos: grade de cartões; cada um traz uma mini landing page do segmento (barra do navegador, foto gerada
+         para o portfólio, marca e título na tipografia do segmento, botão) e embaixo o que a página precisa fazer.
+         Marcas fictícias, só para ilustrar. No celular os cartões viram um carrossel que desliza de lado -->
     <div class="nichos" id="segmentos">
       <p class="about-kicker" data-ab><span class="k-num">(02)</span><span class="k-name">Segmentos</span><span class="k-line" aria-hidden="true"></span><span class="k-sub">Landing pages para cada negócio</span></p>
-      <div class="sg-top">
-        <h2 class="sg-title">Cada negócio pede uma <em>página</em> diferente.</h2>
-        <p class="sg-intro">O advogado precisa passar confiança, a imobiliária precisa mostrar imóveis e o restaurante precisa abrir o apetite. Escolha um segmento e veja um conceito de como eu pensaria a página.</p>
-      </div>
-      <div class="sg-grid">
-        <div class="sg-side">
-          <ol class="sg-list">
-          <li style="--i:0" class="sg-item is-on" data-sg="law">
-            <button type="button" aria-pressed="true"><span class="sg-n">01</span><span class="sg-name">Advocacia</span><span class="sg-arrow" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5 10h10M11 6l4 4-4 4"/></svg></span></button>
-            <div class="sg-more"><div><p>Passar confiança e autoridade antes do primeiro contato.</p><ul><li>Áreas de atuação</li><li>Equipe</li><li>Consulta pelo WhatsApp</li></ul></div></div>
-          </li>
-          <li style="--i:1" class="sg-item" data-sg="imob">
-            <button type="button" aria-pressed="false"><span class="sg-n">02</span><span class="sg-name">Imobiliária</span><span class="sg-arrow" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5 10h10M11 6l4 4-4 4"/></svg></span></button>
-            <div class="sg-more"><div><p>Mostrar imóveis com fotos grandes e levar o visitante até o corretor.</p><ul><li>Busca por bairro</li><li>Fichas de imóvel</li><li>Corretor no WhatsApp</li></ul></div></div>
-          </li>
-          <li style="--i:2" class="sg-item" data-sg="odonto">
-            <button type="button" aria-pressed="false"><span class="sg-n">03</span><span class="sg-name">Odontologia</span><span class="sg-arrow" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5 10h10M11 6l4 4-4 4"/></svg></span></button>
-            <div class="sg-more"><div><p>Encher a agenda: tratamentos claros e horário marcado em um toque.</p><ul><li>Tratamentos</li><li>Antes e depois</li><li>Agenda online</li></ul></div></div>
-          </li>
-          <li style="--i:3" class="sg-item" data-sg="beauty">
-            <button type="button" aria-pressed="false"><span class="sg-n">04</span><span class="sg-name">Estética</span><span class="sg-arrow" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5 10h10M11 6l4 4-4 4"/></svg></span></button>
-            <div class="sg-more"><div><p>Despertar desejo: procedimentos, resultados e avaliação agendada.</p><ul><li>Procedimentos</li><li>Resultados</li><li>Avaliação</li></ul></div></div>
-          </li>
-          <li style="--i:4" class="sg-item" data-sg="food">
-            <button type="button" aria-pressed="false"><span class="sg-n">05</span><span class="sg-name">Restaurantes</span><span class="sg-arrow" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5 10h10M11 6l4 4-4 4"/></svg></span></button>
-            <div class="sg-more"><div><p>Abrir o apetite e levar ao pedido: cardápio, horários e localização.</p><ul><li>Cardápio digital</li><li>Horários e mapa</li><li>Pedido no WhatsApp</li></ul></div></div>
-          </li>
-          <li style="--i:5" class="sg-item" data-sg="gym">
-            <button type="button" aria-pressed="false"><span class="sg-n">06</span><span class="sg-name">Academias</span><span class="sg-arrow" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5 10h10M11 6l4 4-4 4"/></svg></span></button>
-            <div class="sg-more"><div><p>Energia e decisão rápida: planos, modalidades e aula experimental.</p><ul><li>Planos</li><li>Modalidades</li><li>Aula grátis</li></ul></div></div>
-          </li>
-          <li style="--i:6" class="sg-item" data-sg="arq">
-            <button type="button" aria-pressed="false"><span class="sg-n">07</span><span class="sg-name">Arquitetura</span><span class="sg-arrow" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5 10h10M11 6l4 4-4 4"/></svg></span></button>
-            <div class="sg-more"><div><p>Deixar o portfólio falar: projetos grandes, processo e orçamento.</p><ul><li>Portfólio de projetos</li><li>Processo</li><li>Orçamento</li></ul></div></div>
-          </li>
-          <li style="--i:7" class="sg-item" data-sg="cont">
-            <button type="button" aria-pressed="false"><span class="sg-n">08</span><span class="sg-name">Contabilidade</span><span class="sg-arrow" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5 10h10M11 6l4 4-4 4"/></svg></span></button>
-            <div class="sg-more"><div><p>Simplificar o complicado: serviços claros e atendimento rápido.</p><ul><li>Serviços para MEI e empresas</li><li>Abertura de CNPJ</li><li>Atendimento online</li></ul></div></div>
-          </li>
-          </ol>
-          <a class="sg-go" href="https://wa.me/5512991145851?text=Ol%C3%A1%2C%20Gabriel%21%20Vi%20seu%20portf%C3%B3lio%20e%20gostaria%20de%20pedir%20um%20or%C3%A7amento%20de%20landing%20page%20para%20o%20meu%20neg%C3%B3cio." target="_blank" rel="noopener">Quero uma página assim<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10M11 6l4 4-4 4"/></svg></a>
-          <p class="sg-other">Seu segmento não está aqui? Pet shop, salão, oficina, escola… <a href="https://wa.me/5512991145851?text=Ol%C3%A1%2C%20Gabriel%21%20Vi%20seu%20portf%C3%B3lio%20e%20gostaria%20de%20pedir%20um%20or%C3%A7amento%20de%20landing%20page%20para%20o%20meu%20neg%C3%B3cio." target="_blank" rel="noopener">Me chama</a>.</p>
+      <div class="nc-top">
+        <h2 class="nc-title">Cada negócio pede uma <em>página</em> diferente.</h2>
+        <div class="nc-intro">
+          <p>O advogado precisa passar confiança, a imobiliária precisa mostrar imóveis e o restaurante precisa abrir o apetite. Cada página nasce do que o <strong>seu cliente</strong> procura.</p>
+          <a class="nc-go" href="https://wa.me/5512991145851?text=Ol%C3%A1%2C%20Gabriel%21%20Vi%20seu%20portf%C3%B3lio%20e%20gostaria%20de%20pedir%20um%20or%C3%A7amento%20de%20landing%20page%20para%20o%20meu%20neg%C3%B3cio." target="_blank" rel="noopener">Quero uma landing page<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10M11 6l4 4-4 4"/></svg></a>
         </div>
-        <figure class="sg-view">
-          <div class="sg-frame" aria-hidden="true">
-            <div class="sg-site sg-law is-on" data-sg="law">
-              <div class="sg-url"><i></i><i></i><i></i><span>almeidarocha.adv.br</span></div>
-              <div class="sg-nav"><span class="sg-logo">Almeida <i>&amp;</i> Rocha</span><span class="sg-links"><span>Atuação</span><span>Equipe</span><span>Contato</span></span><span class="sg-btn">Fale conosco</span></div>
-              <div class="sg-hero">
-                <div class="sg-txt"><span class="sg-eye">Advocacia empresarial e família</span><span class="sg-h">Seus direitos, defendidos com <em>estratégia</em>.</span><span class="sg-p">Atendimento próximo, linguagem clara e acompanhamento em cada etapa do processo.</span><span class="sg-ctas"><span class="sg-cta">Agendar consulta</span><span class="sg-cta2">Áreas de atuação</span></span></div>
-                <div class="sg-media"><img src="img/segmentos/law.webp" alt="" width="640" height="640" loading="lazy" decoding="async"><div class="sgv-law"><span class="sgv-k">Áreas de atuação</span><ul><li>Direito de Família<b>→</b></li><li>Trabalhista<b>→</b></li><li>Empresarial<b>→</b></li><li>Previdenciário<b>→</b></li></ul><p>Primeira conversa sem compromisso</p></div></div>
-              </div>
-              <div class="sg-foot"><span>Atendimento presencial e online</span><span>Resposta no mesmo dia</span><span>Sigilo absoluto</span></div>
-            </div>
-            <div class="sg-site sg-imob" data-sg="imob">
-              <div class="sg-url"><i></i><i></i><i></i><span>casanorte.com.br</span></div>
-              <div class="sg-nav"><span class="sg-logo">casa<b>norte</b></span><span class="sg-links"><span>Comprar</span><span>Alugar</span><span>Anunciar</span></span><span class="sg-btn">Entrar</span></div>
-              <div class="sg-hero">
-                <div class="sg-txt"><span class="sg-eye">Imóveis na zona sul</span><span class="sg-h">O imóvel certo, no bairro que você <em>ama</em>.</span><span class="sg-p">Mais de cem opções com visita agendada pelo WhatsApp e documentação acompanhada.</span><span class="sg-ctas"><span class="sg-cta">Ver imóveis</span><span class="sg-cta2">Anunciar imóvel</span></span></div>
-                <div class="sg-media"><img src="img/segmentos/imob.webp" alt="" width="640" height="640" loading="lazy" decoding="async"><div class="sgv-imob"><span class="sgv-new">Novo</span><div class="sgv-in"><span class="sgv-k">Apartamento · Vila Mariana</span><strong>R$ 890.000</strong><p>3 quartos · 2 vagas · 118 m²</p></div></div></div>
-              </div>
-              <div class="sg-foot"><span>Comprar</span><span>Alugar</span><span>Avaliar meu imóvel</span></div>
-            </div>
-            <div class="sg-site sg-odonto" data-sg="odonto">
-              <div class="sg-url"><i></i><i></i><i></i><span>clinicalumi.com.br</span></div>
-              <div class="sg-nav"><span class="sg-logo">lumi<i>.</i></span><span class="sg-links"><span>Tratamentos</span><span>Clínica</span><span>Convênios</span></span><span class="sg-btn">Agendar</span></div>
-              <div class="sg-hero">
-                <div class="sg-txt"><span class="sg-eye">Clínica odontológica</span><span class="sg-h">Seu sorriso merece cuidado de <em>verdade</em>.</span><span class="sg-p">Implantes, lentes e ortodontia com avaliação completa e plano de tratamento por escrito.</span><span class="sg-ctas"><span class="sg-cta">Agendar avaliação</span><span class="sg-cta2">Tratamentos</span></span></div>
-                <div class="sg-media"><img src="img/segmentos/odonto.webp" alt="" width="640" height="640" loading="lazy" decoding="async"><div class="sgv-odonto"><span class="sgv-k">Agende sua avaliação</span><div class="sgv-days"><span>Seg<b>11</b></span><span class="on">Ter<b>12</b></span><span>Qua<b>13</b></span><span>Qui<b>14</b></span></div><div class="sgv-times"><span>09:00</span><span class="on">10:30</span><span>14:00</span><span>16:30</span></div><span class="sgv-ok">Confirmar horário</span></div></div>
-              </div>
-              <div class="sg-foot"><span>Aceitamos convênios</span><span>Parcelamento em até 12x</span><span>Estacionamento no local</span></div>
-            </div>
-            <div class="sg-site sg-beauty" data-sg="beauty">
-              <div class="sg-url"><i></i><i></i><i></i><span>atelierbela.com.br</span></div>
-              <div class="sg-nav"><span class="sg-logo">Atelier <i>Bela</i></span><span class="sg-links"><span>Procedimentos</span><span>Sobre</span><span>Agenda</span></span><span class="sg-btn">Agendar</span></div>
-              <div class="sg-hero">
-                <div class="sg-txt"><span class="sg-eye">Estética facial e corporal</span><span class="sg-h">Beleza que realça o que <em>já é seu</em>.</span><span class="sg-p">Protocolos personalizados, profissionais especializadas e um espaço pensado para você.</span><span class="sg-ctas"><span class="sg-cta">Agendar avaliação</span><span class="sg-cta2">Procedimentos</span></span></div>
-                <div class="sg-media"><img src="img/segmentos/beauty.webp" alt="" width="640" height="640" loading="lazy" decoding="async"><div class="sgv-beauty"><div><span class="sgv-k">Limpeza de pele</span><p>60 min</p><b>a partir de R$ 180</b></div><div><span class="sgv-k">Drenagem linfática</span><p>50 min</p><b>a partir de R$ 150</b></div><div><span class="sgv-k">Peeling de diamante</span><p>40 min</p><b>a partir de R$ 210</b></div></div></div>
-              </div>
-              <div class="sg-foot"><span>Avaliação gratuita</span><span>Produtos profissionais</span><span>Ambiente climatizado</span></div>
-            </div>
-            <div class="sg-site sg-food" data-sg="food">
-              <div class="sg-url"><i></i><i></i><i></i><span>brasaeco.com.br</span></div>
-              <div class="sg-nav"><span class="sg-logo">Brasa <i>&amp;</i> Co.</span><span class="sg-links"><span>Cardápio</span><span>Reservas</span><span>Onde estamos</span></span><span class="sg-btn">Pedir agora</span></div>
-              <div class="sg-hero">
-                <div class="sg-txt"><span class="sg-eye">Cozinha de fogo · desde 2016</span><span class="sg-h">Fogo, tempo e <em>ingrediente</em> bom.</span><span class="sg-p">Carnes na brasa, pratos da casa e drinks autorais. Reserve sua mesa ou peça em casa.</span><span class="sg-ctas"><span class="sg-cta">Ver cardápio</span><span class="sg-cta2">Reservar mesa</span></span></div>
-                <div class="sg-media"><img src="img/segmentos/food.webp" alt="" width="640" height="640" loading="lazy" decoding="async"><div class="sgv-food"><span class="sgv-k">Da brasa</span><ul><li><span>Picanha na brasa</span><i></i><b>89</b></li><li><span>Costela 12 horas</span><i></i><b>76</b></li><li><span>Risoto de cogumelos</span><i></i><b>64</b></li><li><span>Pudim da casa</span><i></i><b>22</b></li></ul><span class="sgv-ok">Pedir no WhatsApp</span></div></div>
-              </div>
-              <div class="sg-foot"><span>Ter a Dom · 18h às 23h</span><span>Delivery próprio</span><span>Estacionamento</span></div>
-            </div>
-            <div class="sg-site sg-gym" data-sg="gym">
-              <div class="sg-url"><i></i><i></i><i></i><span>pulsefit.com.br</span></div>
-              <div class="sg-nav"><span class="sg-logo">PULSE<b>/</b></span><span class="sg-links"><span>Planos</span><span>Modalidades</span><span>Unidades</span></span><span class="sg-btn">Matricule-se</span></div>
-              <div class="sg-hero">
-                <div class="sg-txt"><span class="sg-eye">Musculação · funcional · lutas</span><span class="sg-h">Treine forte. <em>Todo dia.</em></span><span class="sg-p">Estrutura completa, professores em todos os horários e aula experimental grátis.</span><span class="sg-ctas"><span class="sg-cta">Aula grátis</span><span class="sg-cta2">Ver planos</span></span></div>
-                <div class="sg-media"><img src="img/segmentos/gym.webp" alt="" width="640" height="640" loading="lazy" decoding="async"><div class="sgv-gym"><div><span class="sgv-k">Mensal</span><strong>R$ 119</strong><p>Sem fidelidade</p></div><div class="on"><span class="sgv-k">Anual</span><strong>R$ 89</strong><p>por mês · mais escolhido</p></div></div></div>
-              </div>
-              <div class="sg-foot"><span>Aberto das 5h às 23h</span><span>Avaliação física</span><span>App de treinos</span></div>
-            </div>
-            <div class="sg-site sg-arq" data-sg="arq">
-              <div class="sg-url"><i></i><i></i><i></i><span>studiooka.com.br</span></div>
-              <div class="sg-nav"><span class="sg-logo">STUDIO OKA</span><span class="sg-links"><span>Projetos</span><span>Escritório</span><span>Contato</span></span><span class="sg-btn">Orçamento</span></div>
-              <div class="sg-hero">
-                <div class="sg-txt"><span class="sg-eye">Arquitetura e interiores</span><span class="sg-h">Espaços com alma e <em>propósito</em>.</span><span class="sg-p">Projetos residenciais e comerciais do primeiro traço à obra entregue.</span><span class="sg-ctas"><span class="sg-cta">Ver projetos</span><span class="sg-cta2">Nosso processo</span></span></div>
-                <div class="sg-media"><img src="img/segmentos/arq.webp" alt="" width="640" height="640" loading="lazy" decoding="async"><div class="sgv-arq"><div class="sgv-cap"><span>Casa Litoral</span><span>Residencial · 2025</span></div></div></div>
-              </div>
-              <div class="sg-foot"><span>Residencial</span><span>Comercial</span><span>Interiores</span></div>
-            </div>
-            <div class="sg-site sg-cont" data-sg="cont">
-              <div class="sg-url"><i></i><i></i><i></i><span>contaclara.com.br</span></div>
-              <div class="sg-nav"><span class="sg-logo">conta<b>clara</b></span><span class="sg-links"><span>Serviços</span><span>Planos</span><span>Contato</span></span><span class="sg-btn">Falar agora</span></div>
-              <div class="sg-hero">
-                <div class="sg-txt"><span class="sg-eye">Contabilidade online</span><span class="sg-h">Sua empresa em dia, sem <em>dor de cabeça</em>.</span><span class="sg-p">Impostos, folha e abertura de empresa com um contador dedicado e tudo pelo celular.</span><span class="sg-ctas"><span class="sg-cta">Abrir minha empresa</span><span class="sg-cta2">Ver planos</span></span></div>
-                <div class="sg-media"><img src="img/segmentos/cont.webp" alt="" width="640" height="640" loading="lazy" decoding="async"><div class="sgv-cont"><span class="sgv-k">Painel da empresa</span><div class="sgv-row"><span>Impostos de outubro</span><b>Pagos</b></div><div class="sgv-bars"><i style="--h:40%"></i><i style="--h:62%"></i><i style="--h:48%"></i><i style="--h:75%"></i><i style="--h:58%"></i><i style="--h:88%"></i></div><div class="sgv-row"><span>Faturamento no ano</span><strong>+ 32%</strong></div></div></div>
-              </div>
-              <div class="sg-foot"><span>MEI, Simples e Lucro Presumido</span><span>Contador dedicado</span><span>Tudo pelo celular</span></div>
+      </div>
+      <ul class="nc-grid">
+        <li class="nc-card nc-law" style="--i:0">
+          <div class="nc-shot" aria-hidden="true">
+            <span class="nc-bar"><i></i><i></i><i></i><em>almeidarocha.adv.br</em></span>
+            <div class="nc-hero">
+              <img src="img/segmentos/law.webp" alt="" width="640" height="640" loading="lazy" decoding="async">
+              <span class="nc-nav"><span class="nc-brand">Almeida <i>&amp;</i> Rocha</span><span class="nc-dots"><i></i><i></i><i></i></span></span>
+              <span class="nc-h">Seus direitos, defendidos com <em>estratégia</em>.</span>
+              <span class="nc-btn">Agendar consulta<svg viewBox="0 0 20 20"><path d="M5 10h10M11 6l4 4-4 4"/></svg></span>
             </div>
           </div>
-          <figcaption class="sg-cap"><span class="sg-tag">Conceito</span><span class="sg-cap-t">Páginas de exemplo, criadas para mostrar o estilo de cada segmento. Marcas fictícias.</span><span class="sg-prog" aria-hidden="true"><i></i></span></figcaption>
-        </figure>
-        <p class="sg-mdesc" aria-live="polite"></p>
+          <div class="nc-body">
+            <span class="nc-n">01</span>
+            <h3>Advocacia</h3>
+            <p>Passar confiança e autoridade antes do primeiro contato.</p>
+            <ul aria-label="O que a página tem"><li>Áreas de atuação</li><li>Equipe</li><li>Consulta no WhatsApp</li></ul>
+          </div>
+        </li>
+        <li class="nc-card nc-imob" style="--i:1">
+          <div class="nc-shot" aria-hidden="true">
+            <span class="nc-bar"><i></i><i></i><i></i><em>casanorte.com.br</em></span>
+            <div class="nc-hero">
+              <img src="img/segmentos/imob.webp" alt="" width="640" height="640" loading="lazy" decoding="async">
+              <span class="nc-nav"><span class="nc-brand">casa<b>norte</b></span><span class="nc-dots"><i></i><i></i><i></i></span></span>
+              <span class="nc-h">O imóvel certo, no bairro que você <em>ama</em>.</span>
+              <span class="nc-btn">Ver imóveis<svg viewBox="0 0 20 20"><path d="M5 10h10M11 6l4 4-4 4"/></svg></span>
+            </div>
+          </div>
+          <div class="nc-body">
+            <span class="nc-n">02</span>
+            <h3>Imobiliária</h3>
+            <p>Mostrar imóveis com fotos grandes e levar o visitante até o corretor.</p>
+            <ul aria-label="O que a página tem"><li>Busca por bairro</li><li>Fichas de imóvel</li><li>Corretor no WhatsApp</li></ul>
+          </div>
+        </li>
+        <li class="nc-card nc-odonto" style="--i:2">
+          <div class="nc-shot" aria-hidden="true">
+            <span class="nc-bar"><i></i><i></i><i></i><em>clinicalumi.com.br</em></span>
+            <div class="nc-hero">
+              <img src="img/segmentos/odonto.webp" alt="" width="640" height="640" loading="lazy" decoding="async">
+              <span class="nc-nav"><span class="nc-brand">lumi<i>.</i></span><span class="nc-dots"><i></i><i></i><i></i></span></span>
+              <span class="nc-h">Seu sorriso merece cuidado de <em>verdade</em>.</span>
+              <span class="nc-btn">Agendar avaliação<svg viewBox="0 0 20 20"><path d="M5 10h10M11 6l4 4-4 4"/></svg></span>
+            </div>
+          </div>
+          <div class="nc-body">
+            <span class="nc-n">03</span>
+            <h3>Odontologia</h3>
+            <p>Encher a agenda: tratamentos claros e horário marcado em um toque.</p>
+            <ul aria-label="O que a página tem"><li>Tratamentos</li><li>Antes e depois</li><li>Agenda online</li></ul>
+          </div>
+        </li>
+        <li class="nc-card nc-beauty" style="--i:3">
+          <div class="nc-shot" aria-hidden="true">
+            <span class="nc-bar"><i></i><i></i><i></i><em>atelierbela.com.br</em></span>
+            <div class="nc-hero">
+              <img src="img/segmentos/beauty.webp" alt="" width="640" height="640" loading="lazy" decoding="async">
+              <span class="nc-nav"><span class="nc-brand">Atelier <i>Bela</i></span><span class="nc-dots"><i></i><i></i><i></i></span></span>
+              <span class="nc-h">Beleza que realça o que <em>já é seu</em>.</span>
+              <span class="nc-btn">Agendar avaliação<svg viewBox="0 0 20 20"><path d="M5 10h10M11 6l4 4-4 4"/></svg></span>
+            </div>
+          </div>
+          <div class="nc-body">
+            <span class="nc-n">04</span>
+            <h3>Estética</h3>
+            <p>Despertar desejo: procedimentos, resultados e avaliação agendada.</p>
+            <ul aria-label="O que a página tem"><li>Procedimentos</li><li>Resultados</li><li>Avaliação</li></ul>
+          </div>
+        </li>
+        <li class="nc-card nc-food" style="--i:4">
+          <div class="nc-shot" aria-hidden="true">
+            <span class="nc-bar"><i></i><i></i><i></i><em>brasaeco.com.br</em></span>
+            <div class="nc-hero">
+              <img src="img/segmentos/food.webp" alt="" width="640" height="640" loading="lazy" decoding="async">
+              <span class="nc-nav"><span class="nc-brand">Brasa <i>&amp;</i> Co.</span><span class="nc-dots"><i></i><i></i><i></i></span></span>
+              <span class="nc-h">Fogo, tempo e <em>ingrediente</em> bom.</span>
+              <span class="nc-btn">Ver cardápio<svg viewBox="0 0 20 20"><path d="M5 10h10M11 6l4 4-4 4"/></svg></span>
+            </div>
+          </div>
+          <div class="nc-body">
+            <span class="nc-n">05</span>
+            <h3>Restaurantes</h3>
+            <p>Abrir o apetite e levar ao pedido: cardápio, horários e localização.</p>
+            <ul aria-label="O que a página tem"><li>Cardápio digital</li><li>Horários e mapa</li><li>Pedido no WhatsApp</li></ul>
+          </div>
+        </li>
+        <li class="nc-card nc-gym" style="--i:5">
+          <div class="nc-shot" aria-hidden="true">
+            <span class="nc-bar"><i></i><i></i><i></i><em>pulsefit.com.br</em></span>
+            <div class="nc-hero">
+              <img src="img/segmentos/gym.webp" alt="" width="640" height="640" loading="lazy" decoding="async">
+              <span class="nc-nav"><span class="nc-brand">PULSE<b>/</b></span><span class="nc-dots"><i></i><i></i><i></i></span></span>
+              <span class="nc-h">Treine forte. <em>Todo dia.</em></span>
+              <span class="nc-btn">Aula grátis<svg viewBox="0 0 20 20"><path d="M5 10h10M11 6l4 4-4 4"/></svg></span>
+            </div>
+          </div>
+          <div class="nc-body">
+            <span class="nc-n">06</span>
+            <h3>Academias</h3>
+            <p>Energia e decisão rápida: planos, modalidades e aula experimental.</p>
+            <ul aria-label="O que a página tem"><li>Planos</li><li>Modalidades</li><li>Aula grátis</li></ul>
+          </div>
+        </li>
+        <li class="nc-card nc-arq" style="--i:6">
+          <div class="nc-shot" aria-hidden="true">
+            <span class="nc-bar"><i></i><i></i><i></i><em>studiooka.com.br</em></span>
+            <div class="nc-hero">
+              <img src="img/segmentos/arq.webp" alt="" width="640" height="640" loading="lazy" decoding="async">
+              <span class="nc-nav"><span class="nc-brand">STUDIO OKA</span><span class="nc-dots"><i></i><i></i><i></i></span></span>
+              <span class="nc-h">Espaços com alma e <em>propósito</em>.</span>
+              <span class="nc-btn">Ver projetos<svg viewBox="0 0 20 20"><path d="M5 10h10M11 6l4 4-4 4"/></svg></span>
+            </div>
+          </div>
+          <div class="nc-body">
+            <span class="nc-n">07</span>
+            <h3>Arquitetura</h3>
+            <p>Deixar o portfólio falar: projetos grandes, processo e orçamento.</p>
+            <ul aria-label="O que a página tem"><li>Portfólio de projetos</li><li>Processo</li><li>Orçamento</li></ul>
+          </div>
+        </li>
+        <li class="nc-card nc-cont" style="--i:7">
+          <div class="nc-shot" aria-hidden="true">
+            <span class="nc-bar"><i></i><i></i><i></i><em>contaclara.com.br</em></span>
+            <div class="nc-hero">
+              <img src="img/segmentos/cont.webp" alt="" width="640" height="640" loading="lazy" decoding="async">
+              <span class="nc-nav"><span class="nc-brand">conta<b>clara</b></span><span class="nc-dots"><i></i><i></i><i></i></span></span>
+              <span class="nc-h">Sua empresa em dia, sem <em>dor de cabeça</em>.</span>
+              <span class="nc-btn">Abrir empresa<svg viewBox="0 0 20 20"><path d="M5 10h10M11 6l4 4-4 4"/></svg></span>
+            </div>
+          </div>
+          <div class="nc-body">
+            <span class="nc-n">08</span>
+            <h3>Contabilidade</h3>
+            <p>Simplificar o complicado: serviços claros e atendimento rápido.</p>
+            <ul aria-label="O que a página tem"><li>MEI e empresas</li><li>Abertura de CNPJ</li><li>Atendimento online</li></ul>
+          </div>
+        </li>
+      </ul>
+      <div class="nc-foot">
+        <p class="nc-note"><span class="nc-tag">Conceitos</span>Marcas fictícias, criadas para mostrar o estilo de cada segmento.</p>
+        <p class="nc-other">Seu segmento não está aqui? Pet shop, salão, oficina, escola… <a href="https://wa.me/5512991145851?text=Ol%C3%A1%2C%20Gabriel%21%20Vi%20seu%20portf%C3%B3lio%20e%20gostaria%20de%20pedir%20um%20or%C3%A7amento%20de%20landing%20page%20para%20o%20meu%20neg%C3%B3cio." target="_blank" rel="noopener">Me chama</a>.</p>
       </div>
     </div>
 
