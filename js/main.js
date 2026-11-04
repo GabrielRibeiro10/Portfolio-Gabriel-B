@@ -151,19 +151,19 @@ if (animate) {
   shine.className = 'quote-shine'; glow.className = 'quote-glow';
   shine.setAttribute('aria-hidden', 'true'); glow.setAttribute('aria-hidden', 'true');
   card.prepend(glow); card.append(shine);
-  gsap.set(shine, { xPercent: -130 });
+  gsap.set(shine, { xPercent: -70 });
   function cardAlive() {
     if (leve()) return;
     if (ScrollTrigger) {
       // PC: o card está na hero desde o começo; vale do topo até a hero sair da tela.
       // Celular: ele fica mais embaixo; vale enquanto ele atravessa a tela.
       const range = isMobile
-        ? { trigger: card, start: 'top bottom', end: 'bottom top' }
+        ? { trigger: card, start: 'top 125%', end: 'bottom 15%' }   // começa um pouco antes de ele entrar na tela
         : { trigger: hero, start: 'top top', end: 'bottom top' };
       const st = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { ...range, scrub: 0.8, invalidateOnRefresh: true } });
       st.fromTo(card, { yPercent: isMobile ? 16 : 0 }, { yPercent: isMobile ? -16 : -42 }, 0)
-        .fromTo(shine, { xPercent: -130 }, { xPercent: 130 }, 0)
-        .fromTo(glow, { '--gx': '0%', '--gy': '0%', '--gc': 'rgba(255, 122, 46, .30)' },
+        .fromTo(shine, { xPercent: -70 }, { xPercent: 135 }, 0)   // a luz já aparece na borda esquerda no começo
+        .fromTo(glow, { '--gx': '12%', '--gy': '10%', '--gc': 'rgba(255, 130, 50, .34)' },
           { '--gx': '100%', '--gy': '100%', '--gc': 'rgba(255, 196, 80, .38)' }, 0);
     }
     if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;

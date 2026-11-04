@@ -194,6 +194,7 @@ async function start() {
   const N = 12;                        // pontos da fita
   const G = 3000, DAMPING = 1.2, STEP = 1 / 120, ITER = 12;
   const KF = 0.004, TWIST = 0.12;      // mola que vira o cartão de frente / giro que o balanço dá
+  const TW_MAX = 0.9, VMAX = 16;       // tetos: giro por passo e velocidade dos pontos (px por passo, ~1900 px/s)
 
   // ----- cena -----
   const canvas = document.createElement('canvas');
@@ -362,7 +363,10 @@ async function start() {
     const vcx = (cx - (T.px + BL.px + BR.px) / 3) / STEP;
     let moved = 0;
     for (const p of pts) {
-      const vx = (p.x - p.px) * damp, vy = (p.y - p.py) * damp, vz = (p.z - p.pz) * damp;
+      let vx = (p.x - p.px) * damp, vy = (p.y - p.py) * damp, vz = (p.z - p.pz) * damp;
+      // teto de velocidade: um puxão forte (título entrando, quadro atrasado) não vira um giro desembestado
+      const sp = Math.hypot(vx, vy, vz);
+      if (sp > VMAX) { const k = VMAX / sp; vx *= k; vy *= k; vz *= k; }
       p.px = p.x; p.py = p.y; p.pz = p.z;
       if (p === A) continue;
       if (drag && p.card) { p.x += (drag.x - cx) * 0.3; p.y += (drag.y - cy) * 0.3; p.z += vz; }
@@ -371,8 +375,10 @@ async function start() {
       moved = Math.max(moved, Math.abs(p.x - p.px) + Math.abs(p.y - p.py) + Math.abs(p.z - p.pz));
     }
     // o balanço gira o cartão; a mola o traz de volta de frente
-    const tw = drag ? 0 : vcx * TWIST * STEP;
+    const tw = drag ? 0 : THREE.MathUtils.clamp(vcx * TWIST * STEP, -TW_MAX, TW_MAX);
     BL.z += tw; BR.z -= tw;
+    const zMax = W * 0.42;   // o cartão inclina, mas não roda sem parar
+    BL.z = THREE.MathUtils.clamp(BL.z, -zMax, zMax); BR.z = THREE.MathUtils.clamp(BR.z, -zMax, zMax);
     const yaw = (BR.z - BL.z) * KF, pitch = (T.z - (BL.z + BR.z) / 2) * KF;
     BR.z += pitch - yaw; BL.z += pitch + yaw;
     for (let it = 0; it < ITER; it++) {
@@ -431,9 +437,17 @@ async function start() {
   let running = false, visible = true, last = 0, acc = 0, still = 0, since = 0;
   function frame(t) {
     const dt = Math.min(0.05, (t - last) / 1000 || 1 / 60); last = t; acc += dt;
-    pin();   // o título pode estar animando: o "g" muda de lugar
-    let moved = 0;
-    while (acc >= STEP) { moved = Math.max(moved, step()); acc -= STEP; }
+    // o título pode estar animando: o "g" muda de lugar. O gancho não pula de uma vez para a posição nova: anda um
+    // pedaço em cada passo da física (num quadro atrasado o salto era grande e o cartão disparava a girar)
+    const ox = P.x, oy = P.y;
+    pin();
+    const nx = P.x, ny = P.y, n = Math.floor(acc / STEP);
+    let moved = 0, i = 0;
+    while (acc >= STEP) {
+      i++; P.x = ox + (nx - ox) * (i / n); P.y = oy + (ny - oy) * (i / n); placeA();
+      moved = Math.max(moved, step()); acc -= STEP;
+    }
+    P.x = nx; P.y = ny; placeA();
     draw();
     still = moved < 0.05 && !drag ? still + dt : 0;
     since = drag ? 0 : since + dt;   // nunca fica rodando sozinho para sempre (tremidinhas de arredondamento)
