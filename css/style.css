@@ -1503,14 +1503,19 @@ html.leve .faq-wave { animation: none; }   /* em telas largas o laranja passa da
    de cima é em ondas (máscara: onda + o resto cheio; --cw = altura da onda) */
 .faq .about-cta {
   --cw: 44px;
-  margin: 48px -20px 0; padding: 176px 24px 40px; gap: 0; border-radius: 0; overflow: hidden; isolation: isolate;
+  margin: 48px -20px 0; padding: 176px 24px calc(40px + var(--cbw)); gap: 0; border-radius: 0; overflow: hidden; isolation: isolate;
   background:
     radial-gradient(260px 260px at calc(100% - 45px) 40px, rgba(255, 196, 80, .4), rgba(255, 196, 80, 0) 100%),
     radial-gradient(120% 40% at 50% 100%, rgba(242, 107, 29, .22), rgba(242, 107, 29, 0) 70%),
     linear-gradient(180deg, #e9721f 0%, #dc651b 12%, #b24a12 30%, #6a2509 50%, #2a0e05 70%, #160704 86%, #120603 100%);
   box-shadow: none;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 80' preserveAspectRatio='none'%3E%3Cpath d='M0 30C170 8 320 4 490 20C660 36 780 60 960 56C1140 52 1270 22 1440 26V80H0Z'/%3E%3C/svg%3E") 0 0 / 100% var(--cw) no-repeat, linear-gradient(#000, #000) 0 calc(var(--cw) - 1px) / 100% 100% no-repeat;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 80' preserveAspectRatio='none'%3E%3Cpath d='M0 30C170 8 320 4 490 20C660 36 780 60 960 56C1140 52 1270 22 1440 26V80H0Z'/%3E%3C/svg%3E") 0 0 / 100% var(--cw) no-repeat, linear-gradient(#000, #000) 0 calc(var(--cw) - 1px) / 100% 100% no-repeat;
+  /* máscara em 3 camadas: borda de cima em ondas (--ctop; no PC o js/main.js troca por uma que sai da onda laranja
+     da esquerda, sem quina), o meio cheio e a borda de baixo em ondas (--cbot) */
+  --ctop: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 80' preserveAspectRatio='none'%3E%3Cpath d='M0 30C170 8 320 4 490 20C660 36 780 60 960 56C1140 52 1270 22 1440 26V80H0Z'/%3E%3C/svg%3E");
+  --cbot: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 80' preserveAspectRatio='none'%3E%3Cpath d='M0 0H1440V44C1270 64 1130 38 950 30C770 22 650 52 480 60C310 68 160 58 0 42Z'/%3E%3C/svg%3E");
+  --cbw: 40px;
+  -webkit-mask: var(--ctop) 0 0 / 100% var(--cw) no-repeat, linear-gradient(#000, #000) 0 calc(var(--cw) - 1px) / 100% calc(100% - var(--cw) - var(--cbw) + 2px) no-repeat, var(--cbot) 0 100% / 100% var(--cbw) no-repeat;
+  mask: var(--ctop) 0 0 / 100% var(--cw) no-repeat, linear-gradient(#000, #000) 0 calc(var(--cw) - 1px) / 100% calc(100% - var(--cw) - var(--cbw) + 2px) no-repeat, var(--cbot) 0 100% / 100% var(--cbw) no-repeat;
 }
 .faq .about-cta::before {   /* sol amarelo + anel, no canto de cima à direita */
   content: ''; position: absolute; z-index: -1; pointer-events: none; top: -120px; right: -90px; width: 270px; height: 270px; border-radius: 50%;
@@ -1581,12 +1586,14 @@ html.leve .faq-wave { animation: none; }   /* em telas largas o laranja passa da
 @media (min-width: 861px) {
   .faq .about-cta {
     display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto; align-items: end; column-gap: clamp(40px, 6vw, 110px);
-    --cw: clamp(56px, 5.4vw, 84px);
-    margin: clamp(56px, 5vw, 90px) calc(-1 * var(--cl)) 0; padding: clamp(190px, 16vw, 260px) var(--cl) clamp(64px, 6vw, 100px);
+    --cw: clamp(56px, 5.4vw, 84px); --cbw: clamp(48px, 4.6vw, 72px);
+    margin: clamp(56px, 5vw, 90px) calc(-1 * var(--cl)) 0; padding: clamp(190px, 16vw, 260px) var(--cl) calc(clamp(64px, 6vw, 100px) + var(--cbw));
     background:
       radial-gradient(clamp(380px, 34vw, 560px) clamp(380px, 34vw, 560px) at calc(100% - 9vw) 40px, rgba(255, 196, 80, .36), rgba(255, 196, 80, 0) 100%),
       radial-gradient(90% 50% at 30% 100%, rgba(242, 107, 29, .2), rgba(242, 107, 29, 0) 70%),
-      linear-gradient(180deg, #e9721f 0%, #dc651b 12%, #b24a12 30%, #6a2509 52%, #2a0e05 72%, #160704 88%, #120603 100%);
+      linear-gradient(180deg, rgba(233, 114, 31, 0) 0, #e46c1d 88px, #b24a12 30%, #6a2509 52%, #2a0e05 72%, #160704 88%, #120603 100%),
+      /* à direita da onda laranja o topo é cheio; à esquerda fica transparente e a onda de trás se funde no degradê */
+      linear-gradient(90deg, rgba(233, 114, 31, 0) calc(var(--ex, 0px) - 220px), #e9721f calc(var(--ex, 0px) - 70px)) 0 0 / 100% 100px no-repeat;
   }
   .faq .about-cta .cta-copy { grid-column: 1; grid-row: 1 / 3; }
   .faq .about-cta::before { top: clamp(-220px, -13vw, -130px); right: 6vw; width: clamp(340px, 30vw, 500px); height: clamp(340px, 30vw, 500px); outline-offset: 26px; box-shadow: 0 0 110px 10px rgba(255, 190, 80, .35); }
