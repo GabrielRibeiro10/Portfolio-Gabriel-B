@@ -679,7 +679,7 @@ if (animate) {
 }
 
 // Ponte hero -> Projetos: altura até 200 px abaixo do topo do painel (cobre os cantos arredondados) e parallax dos
-// brilhos: --py vai de -1 (a faixa entrando por baixo da tela) a 1 (saindo por cima). Só mexe com a faixa à vista;
+// brilhos: --py vai de 1 (a faixa entrando por baixo da tela) a -1 (saindo por cima). Só mexe com a faixa à vista;
 // sem parallax para quem prefere menos movimento e no modo leve.
 {
   const about = document.querySelector('.about'), bridge = about && about.querySelector('.pj-bridge');
