@@ -458,6 +458,34 @@ if (animate) {
   }
 }
 
+// Stack: os números (tecnologias, áreas, projetos) contam de 0 até o valor quando aparecem na tela, um depois
+// do outro, desacelerando no fim; cada um sobe um pouco e ganha um brilho que apaga quando chega. Fica no valor
+// final para quem prefere menos movimento ou sem IntersectionObserver.
+{
+  const nums = [...document.querySelectorAll('[data-conta]')];
+  if (nums.length && !reduceMotion && 'IntersectionObserver' in window) {
+    const box = nums[0].closest('ul');
+    nums.forEach((el) => { el.style.minWidth = `${String(el.dataset.conta).length}ch`; el.textContent = '0'; });
+    box.classList.add('conta-pronta');
+    new IntersectionObserver(([e], o) => {
+      if (!e.isIntersecting) return;
+      o.disconnect();
+      box.classList.add('conta-on');
+      nums.forEach((el, i) => {
+        const end = Number(el.dataset.conta), dur = 1500 + end * 12, delay = i * 160;
+        let t0;
+        const f = (t) => {
+          t0 ??= t + delay;
+          const p = Math.max(0, Math.min((t - t0) / dur, 1));
+          el.textContent = Math.round(end * (1 - Math.pow(2, -10 * p)));
+          if (p < 1) requestAnimationFrame(f); else { el.textContent = end; el.classList.add('conta-fim'); }
+        };
+        requestAnimationFrame(f);
+      });
+    }, { threshold: 0.6 }).observe(box);
+  }
+}
+
 // Projetos: o holofote laranja do fundo segue o mouse
 (() => {
   const pj = document.querySelector('.pj'), bg = pj && pj.querySelector('.pj-bg');
