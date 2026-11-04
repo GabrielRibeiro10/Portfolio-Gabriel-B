@@ -410,7 +410,10 @@ if (animate) {
   const svg = curve && curve.querySelector('svg');
   const path = curve && curve.querySelector('path');
   const drop = curve && curve.querySelector('.pj-drop');
-  const line = document.querySelector('.about-areas ol');
+  // a gota só cai no fio de "O que eu entrego" quando ele vem logo depois dos Projetos; senão ela fica pendurada na
+  // curva e some junto com ela (modo sem fio)
+  const next = curve && curve.closest('.projects').nextElementSibling;
+  const line = next && next.matches('.about-areas') ? next.querySelector('ol') : null;
   if (path && drop) {
     const inOut = (x) => (x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2);   // power2.inOut
     const outQ = (x) => 1 - (1 - x) * (1 - x);
