@@ -646,18 +646,3 @@ if (animate) {
     io.observe(ni);
   }
 }
-
-// chamada final no celular: o cartão entra subindo e o que tem dentro vem em cascata (o CSS só anima até 860 px)
-{
-  const cta = document.querySelector('.faq .about-cta');
-  if (cta && !reduceMotion && 'IntersectionObserver' in window) {
-    cta.classList.add('cta-live');
-    const io = new IntersectionObserver(([e]) => {
-      if (!e.isIntersecting) return;
-      io.disconnect();
-      cta.classList.add('is-in');
-      setTimeout(() => cta.classList.remove('cta-live', 'is-in'), 2000);
-    }, { threshold: 0.25 });
-    io.observe(cta);
-  }
-}
