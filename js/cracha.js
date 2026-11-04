@@ -8,6 +8,42 @@ const slot = about && about.querySelector('.cracha-slot');
 const title = about && about.querySelector('.about-title');
 const fig = slot && slot.querySelector('.cracha');
 
+// ----- entrada do título: "Design que emociona. Código que entrega." desliza da esquerda para a direita e leva o
+// crachá junto (ele está preso no "g": a física puxa a fita e o cartão vem atrás, balançando na freada).
+// Começa quando o bloco chega na tela e o crachá está pronto (no máximo 1,5 s de espera). É movido quadro a
+// quadro aqui, e não por transição CSS: se um quadro atrasar, o título espera em vez de pular, e o gancho do
+// crachá (que lê a posição do "g" a cada quadro) acompanha certinho. Quem prefere menos movimento vê tudo parado.
+const slide = Boolean(fig && title) && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+let titleIn = !slide, seen = false, ready = false;
+const waitTitle = [];
+const whenTitleIn = (f) => (titleIn ? f() : waitTitle.push(f));
+const markReady = () => { ready = true; goTitle(); };
+function goTitle() {
+  if (titleIn || !seen || !ready) return;
+  titleIn = true;
+  const D = 2000, X = -0.62 * innerWidth, ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  let p = 0, last = performance.now();
+  const f = (now) => {
+    p = Math.min(1, p + Math.min(now - last, 34) / D); last = now;
+    if (p < 1) {
+      title.style.transform = `translate3d(${(X * (1 - ease(p))).toFixed(1)}px, 0, 0)`;
+      title.style.opacity = Math.min(1, p * 2.4).toFixed(3);
+      requestAnimationFrame(f);
+    } else { title.style.transform = title.style.opacity = ''; title.classList.remove('ab-slide'); }
+  };
+  requestAnimationFrame(f);
+  waitTitle.splice(0).forEach((g) => g());
+}
+if (slide) {
+  title.classList.add('ab-slide');
+  new IntersectionObserver((e, o) => {
+    if (!e[0].isIntersecting) return;
+    o.disconnect();
+    seen = true; goTitle();
+    setTimeout(markReady, 1500);   // o crachá demorou: o título entra assim mesmo e ele chega depois
+  }, { rootMargin: '0px 0px -30% 0px' }).observe(title.parentElement);
+}
+
 if (fig && title) {
   about.classList.add('cracha-loading');
   new IntersectionObserver((e, o) => {
@@ -108,10 +144,13 @@ async function lanyard() {
   }
   const relayout = () => { measureTail(); place(); };
   relayout();
+  markReady();
   // o título pode estar entrando (GSAP move as palavras): acompanha o "g" por 3 s e depois para
-  const until = performance.now() + 3000;
+  let until = performance.now() + 3000;
   const follow = () => { place(); if (performance.now() < until) requestAnimationFrame(follow); };
   requestAnimationFrame(follow);
+  // o título deslizando: acompanha até ele parar
+  whenTitleIn(() => { const go = performance.now() >= until; until = performance.now() + 2600; if (go) requestAnimationFrame(follow); });
   // só a largura importa (o "g" muda de lugar quando a largura muda). A altura da seção muda a cada quadro quando uma
   // resposta do FAQ abre (o FAQ fica dentro dela): reagir à altura redesenhava a letra num canvas a cada quadro e travava
   let lastW = about.clientWidth;
@@ -382,12 +421,10 @@ async function start() {
 
   layout(); hang(0); draw();
   about.classList.add('cracha-3d'); about.classList.remove('cracha-loading');
+  markReady();
   const show = () => { shown = true; canvas.style.visibility = ''; kick(); };
   if (reduce) show();
-  else new IntersectionObserver((e, o) => {   // aparece balançando quando a coluna entra na tela
-    if (!e[0].isIntersecting) return;
-    o.disconnect(); pin(); hang(0.9); show();
-  }, { threshold: 0.25 }).observe(slot);
+  else whenTitleIn(() => { pin(); hang(0.5); show(); });   // aparece junto com o título, que o arrasta para a direita
   new IntersectionObserver((e) => { visible = e[0].isIntersecting; kick(); }).observe(canvas);   // só o pedaço do crachá, não a seção inteira
   const relayout = () => { layout(); if (!running) draw(); kick(); };
   addEventListener('resize', relayout);

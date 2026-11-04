@@ -2018,3 +2018,7 @@ html.leve .intro .btn-work, html.leve .intro .btn-work::before, html.leve .intro
   :root { --seam: linear-gradient(90deg, #e45c00 0%, #e96000 30%, #ec6300 60%, #f06600 100%); }
   .hero::after { height: 64px; }
 }
+
+/* ---------- "Design que emociona. Código que entrega.": entra da esquerda para a direita ----------
+   js/cracha.js põe .ab-slide (só com animação) e move o título quadro a quadro até o lugar, levando o crachá. */
+.about-title.ab-slide { transform: translate3d(-62vw, 0, 0); opacity: 0; will-change: transform; }
