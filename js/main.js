@@ -463,18 +463,26 @@ if (animate) {
   });
   // a onda do fundo só balança com a seção à vista (e fica parada para quem prefere menos movimento)
   const wave = faq && faq.querySelector('.faq-wave');
-  // e se dissolve no creme: no PC ela escorre até a chamada final (logo depois da lista) e some por trás
-  // dela; no celular logo depois da coluna da esquerda, para as perguntas ficarem no claro.
-  // --wf-a/--wf-b: começo e fim do esmaecido, em px do topo do FAQ (offsetTop ignora as animações de entrada)
+  // e se abre numa faixa de ponta a ponta atrás da chamada final ("poça", #fw-pool, pintada com a mesma tinta
+  // da onda: as duas viram uma peça só), que depois se dissolve no creme antes do letreiro. No celular a onda
+  // some depois da coluna da esquerda (as perguntas ficam no claro) e volta suave em cima da chamada.
+  // Máscara em 6 pontos (--m1…--m6, px do topo do FAQ): cheio, some, vazio, volta, cheio, some.
   if (wave && 'ResizeObserver' in window) {
-    const side = faq.querySelector('.faq-side'), cta = faq.querySelector('.about-cta');
+    const side = faq.querySelector('.faq-side'), cta = faq.querySelector('.about-cta'), pool = wave.querySelector('#fw-pool');
     const phone = matchMedia('(max-width: 860px)');
     const fit = () => {
-      let a, b;
-      if (phone.matches) { a = side.offsetTop + side.offsetHeight + 4; b = a + 190; }
-      else { a = cta.offsetTop + cta.offsetHeight * 0.15; b = cta.offsetTop + cta.offsetHeight * 0.85; }
-      faq.style.setProperty('--wf-a', a + 'px');
-      faq.style.setProperty('--wf-b', b + 'px');
+      const fr = faq.getBoundingClientRect(), wr = wave.getBoundingClientRect();
+      const k = Math.max(wr.width / 420, wr.height / 2400);       // px por unidade do SVG (preserveAspectRatio slice)
+      const top = cta.offsetTop, bot = top + cta.offsetHeight;
+      const y0 = (top - 30) / k, y1 = (bot + 260) / k, R = (fr.right - wr.left) / k + 40;
+      // borda de cima: sai de dentro da onda numa curva (sem quina) e segue em ondas suaves até a borda direita
+      let d = `M-1600 ${(y0 - 170).toFixed(1)}H290C350 ${(y0 - 150).toFixed(1)} 380 ${y0.toFixed(1)} 520 ${y0.toFixed(1)}`;
+      for (let x = 520, i = 0; x < R; x += 360, i++) d += `S${(x + 300).toFixed(1)} ${(y0 + (i % 2 ? -14 : 14)).toFixed(1)} ${(x + 360).toFixed(1)} ${y0.toFixed(1)}`;
+      pool.setAttribute('d', d + `V${y1.toFixed(1)}H-1600Z`);
+      let m = phone.matches
+        ? [side.offsetTop + side.offsetHeight + 4, side.offsetTop + side.offsetHeight + 190, top - 50, top + 20, bot - 30, bot + 80]
+        : [0, 0, 0, 0, bot + 10, bot + 170];
+      m.forEach((v, i) => faq.style.setProperty(`--m${i + 1}`, Math.round(v) + 'px'));
     };
     new ResizeObserver(fit).observe(faq);
     phone.addEventListener('change', fit);
