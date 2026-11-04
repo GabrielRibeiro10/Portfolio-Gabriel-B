@@ -1176,15 +1176,12 @@ html, body { overflow-x: clip; }
   --mk: linear-gradient(180deg, #000 var(--m1, 0px), transparent var(--m2, 0px), transparent var(--m3, 0px), #000 var(--m4, 0px), #000 var(--m5, calc(100% - 330px)), transparent var(--m6, calc(100% - 170px)));
   -webkit-mask-image: var(--mk); mask-image: var(--mk);
 }
-/* celular: o laranja termina logo depois da coluna (antes da primeira pergunta) numa borda em ondas, e não em
-   degradê por cima das perguntas. --wy é medido no js/main.js */
+/* celular: o laranja some num degradê suave logo depois da coluna da esquerda, e o degradê termina antes da
+   primeira pergunta (antes ia por cima das perguntas em telas pequenas). --wy (fim da coluna) é medido no js/main.js */
 @media (max-width: 860px) {
   .faq-bg {
-    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 56' preserveAspectRatio='none'%3E%3Cpath d='M0 0H400V22C352 44 300 50 240 36C180 22 128 16 70 30C42 37 18 40 0 38Z'/%3E%3C/svg%3E"), linear-gradient(#000, #000);
-    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 56' preserveAspectRatio='none'%3E%3Cpath d='M0 0H400V22C352 44 300 50 240 36C180 22 128 16 70 30C42 37 18 40 0 38Z'/%3E%3C/svg%3E"), linear-gradient(#000, #000);
-    -webkit-mask-size: 100% 56px, 100% var(--wy, 100%); mask-size: 100% 56px, 100% var(--wy, 100%);
-    -webkit-mask-position: 0 var(--wy, 100%), 0 0; mask-position: 0 var(--wy, 100%), 0 0;
-    -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+    -webkit-mask-image: linear-gradient(180deg, #000 calc(var(--wy, 100%) - 70px), rgba(0, 0, 0, .55) calc(var(--wy, 100%) + 10px), transparent calc(var(--wy, 100%) + 74px));
+    mask-image: linear-gradient(180deg, #000 calc(var(--wy, 100%) - 70px), rgba(0, 0, 0, .55) calc(var(--wy, 100%) + 10px), transparent calc(var(--wy, 100%) + 74px));
   }
 }
 .faq-wave { position: absolute; top: 0; left: calc(var(--cl) - 42 * var(--u)); width: calc(420 * var(--u)); height: 100%; overflow: visible; }
@@ -1348,7 +1345,7 @@ html.leve .faq-wave { animation: none; }   /* em telas largas o laranja passa da
 @media (max-width: 860px) {
   .faq { --t: min(14.6vw, 64px); --cl: calc(var(--u) * 42); margin-top: 56px; padding: calc(var(--u) * 57) 20px 0; }
   .faq .about-kicker, .faq-side { padding-left: calc(var(--cl) - 20px); }   /* a coluna usa a margem da referência; a lista, a do site */
-  .faq-grid { grid-template-columns: 1fr; gap: 72px; margin-top: calc(var(--u) * 35); }
+  .faq-grid { grid-template-columns: 1fr; gap: 84px; margin-top: calc(var(--u) * 35); }   /* espaço para o degradê terminar antes da lista */
   .faq-side { position: static; }
   .faq-q button { grid-template-columns: 30px 1fr 34px; gap: 10px; padding: 18px 0; }
   .faq-ico { width: 34px; height: 34px; }
