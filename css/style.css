@@ -1996,3 +1996,14 @@ html.leve .intro .btn-work, html.leve .intro .btn-work::before, html.leve .intro
 /* ---------- "Design que emociona. Código que entrega.": entra da esquerda para a direita ----------
    js/cracha.js põe .ab-slide (só com animação) e move o título quadro a quadro até o lugar, levando o crachá. */
 .about-title.ab-slide { transform: translate3d(-62vw, 0, 0); opacity: 0; will-change: transform; }
+
+/* card da citação: brilho que passa por cima (js/main.js, GSAP) */
+.quote-card { overflow: hidden; will-change: transform; }
+.quote-shine {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: linear-gradient(105deg, rgba(255, 255, 255, 0) 35%, rgba(255, 255, 255, .7) 48%, rgba(255, 214, 170, .45) 52%, rgba(255, 255, 255, 0) 65%);
+  transform: translateX(-130%);
+}
+@media (max-width: 860px), (max-aspect-ratio: 4/5), (orientation: landscape) and (max-height: 500px) and (max-width: 1000px) {
+  .quote-card { position: relative; inset: auto; }   /* no celular ele fica no fluxo (sem o top/left do PC) */
+}
