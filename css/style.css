@@ -1720,8 +1720,8 @@ html.leve .intro .btn-work, html.leve .intro .btn-work::before, html.leve .intro
 
 /* ---------- Hero: design amarelo da referência (svg.hero-art) ----------
    Mesma caixa da foto (.person) para o desenho acompanhar a pessoa em qualquer tela; atrás do painel claro.
-   O fundo (.hero-bg) tem as cores medidas na referência: canto café, vermelho-alaranjado e o brilho laranja
-   em volta da pessoa, que aparece dentro da oval recortada. Tudo parado (nada repinta). */
+   O fundo (.hero-bg) tem a paleta medida na referência (bordô no alto, âmbar no pé, laranja nos cantos da direita);
+   as luzes atrás da pessoa ficam no svg, na caixa da foto, e aparecem dentro da oval recortada. Tudo parado. */
 .hero-art {
   position: absolute; z-index: -1; left: 48cqw; bottom: -10cqh; height: 117.5cqh; aspect-ratio: 1024 / 1536;
   transform: translateX(-50%); overflow: visible; pointer-events: none;
@@ -1731,19 +1731,19 @@ html.leve .intro .btn-work, html.leve .intro .btn-work::before, html.leve .intro
 .hero-bg { inset: 0; }
 .hero-bg::after { display: none; }
 .hero-bg {
+  /* paleta da referência: degradê vertical do bordô (alto) ao âmbar (pé), luz laranja nos dois cantos da direita */
   background:
-    radial-gradient(63.6cqh 91.6cqh at calc(48cqw - 21.2cqh) 71.3cqh, rgba(255, 153, 20, .87) 0%, rgba(255, 153, 20, .26) 50.8%, rgba(255, 153, 20, 0) 100%),
-    radial-gradient(39.3cqw 80cqh at 0 0, rgba(52, 26, 14, .58) 0%, rgba(52, 26, 14, 0) 100%),
-    linear-gradient(148deg, #b80a01 0%, #c34015 35%, #bf3e02 66.9%, #f36800 100%);
+    radial-gradient(48cqw 46cqh at 100% 0, rgba(224, 100, 4, .98) 0%, rgba(214, 90, 2, .62) 45%, rgba(205, 85, 2, 0) 100%),
+    radial-gradient(30cqw 44cqh at 100% 100%, rgba(216, 88, 2, .95) 0%, rgba(214, 88, 2, .55) 45%, rgba(214, 88, 2, 0) 100%),
+    linear-gradient(180deg, #5f0f01 0%, #671401 12%, #761e01 20%, #882703 30%, #9a2f02 40%, #ab3801 50%, #bc4301 60%, #c74901 70%, #db5c00 80%, #e76a01 90%, #f07a00 100%);
 }
 @media (max-width: 860px), (max-aspect-ratio: 4/5), (orientation: landscape) and (max-height: 500px) and (max-width: 1000px) {
   .hero-art { position: relative; z-index: 1; grid-row: 1; grid-column: 1; left: 50%; bottom: auto; transform: translateX(-50%);
     align-self: end; justify-self: start; width: min(100%, calc(var(--stage) * .5)); height: auto; margin: 0; }
-  .hero-bg {
+  .hero-bg {   /* celular: a mesma paleta na primeira tela (a foto fica embaixo dela); abaixo segue o âmbar */
     background:
-      radial-gradient(80vw 46svh at 42% 72%, rgba(255, 153, 20, .85) 0%, rgba(255, 153, 20, .26) 50%, rgba(255, 153, 20, 0) 100%),
-      radial-gradient(80vw 50svh at 0 0, rgba(52, 26, 14, .6) 0%, rgba(52, 26, 14, 0) 100%),
-      linear-gradient(165deg, #b80a01 0%, #c34015 30%, #bf3e02 60%, #f36800 100%);
+      radial-gradient(60vw 34svh at 100% 0, rgba(224, 100, 4, .9) 0%, rgba(214, 90, 2, .5) 45%, rgba(205, 85, 2, 0) 100%),
+      linear-gradient(180deg, #5f0f01 0, #671401 12svh, #761e01 20svh, #882703 30svh, #9a2f02 40svh, #ab3801 50svh, #bc4301 60svh, #c74901 70svh, #db5c00 80svh, #e76a01 90svh, #f07a00 100svh, #f07a00 100%);
   }
 }
 @media (orientation: landscape) and (max-height: 500px) and (max-width: 1000px) {
@@ -1849,17 +1849,14 @@ html.leve .intro .btn-work, html.leve .intro .btn-work::before, html.leve .intro
   .quote-card { position: relative; inset: auto; }   /* no celular ele fica no fluxo (sem o top/left do PC) */
 }
 
-/* ---------- Halo amarelo em volta da pessoa: igual no PC e no celular ----------
-   No PC o painel claro cobria o halo do desenho (svg.hero-art fica atrás dele), então a luz só aparecia do lado
-   esquerdo da cabeça. Aqui o halo vira uma camada própria (.person-halo), na mesma caixa da foto, por cima do
-   painel (z 1) e atrás da foto (z 2). No celular nada cobre o desenho: continua o halo de dentro do svg. */
-.person-halo {
-  position: absolute; z-index: 1; left: 48cqw; bottom: -10cqh; height: 117.5cqh; aspect-ratio: 1024 / 1536; width: auto;
-  transform: translateX(-50%); pointer-events: none; user-select: none;
-}
-.hero-art .hero-halo { display: none; }
-.gsap-loading .person-halo { opacity: 0; }
-@media (max-width: 860px), (max-aspect-ratio: 4/5), (orientation: landscape) and (max-height: 500px) and (max-width: 1000px) {
-  .person-halo { display: none; }
-  .hero-art .hero-halo { display: inline; }
+/* ---------- Luz de contorno realista (sem brilho por fora) ----------
+   No lugar do halo amarelo em volta da pessoa: a técnica de "light wrap" das composições de cinema. A luz do fundo
+   logo atrás de cada ponto do contorno entra um pouco por dentro do recorte, com a cor e a força daquele ponto:
+   dourada e forte no pescoço e no ombro esquerdo (onde o fundo é mais claro), fraca onde o fundo é ferrugem. É uma
+   imagem (img/gabriel-luz.webp, só onde há pessoa) somada à foto com "screen", dentro da .person: segue o mesmo
+   molde dos ombros e anda junto com a foto. Igual no PC e no celular. */
+.person-rim {
+  position: absolute; inset: 0; pointer-events: none;
+  background: url("../img/gabriel-luz.webp") 0 0 / 100% 100% no-repeat;
+  mix-blend-mode: screen;
 }
