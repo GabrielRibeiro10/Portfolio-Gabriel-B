@@ -8,28 +8,50 @@ const slot = about && about.querySelector('.cracha-slot');
 const title = about && about.querySelector('.about-title');
 const fig = slot && slot.querySelector('.cracha');
 
-// ----- entrada do título: "Design que emociona. Código que entrega." desliza da esquerda para a direita e leva o
-// crachá junto (ele está preso no "g": a física puxa a fita e o cartão vem atrás, balançando na freada).
-// Começa quando o bloco chega na tela e o crachá está pronto (no máximo 1,5 s de espera). É movido quadro a
-// quadro aqui, e não por transição CSS: se um quadro atrasar, o título espera em vez de pular, e o gancho do
-// crachá (que lê a posição do "g" a cada quadro) acompanha certinho. Quem prefere menos movimento vê tudo parado.
+// ----- entrada do título (estilo awwwards): "Design que emociona." e depois "Código que entrega." entram da esquerda
+// para a direita, uma linha logo atrás da outra, com arrancada rápida e freada longa. Enquanto correm, inclinam um
+// pouco e ficam levemente desfocadas na proporção da velocidade (somem na freada). O crachá, preso no "g" da segunda
+// linha, vem arrastado junto (a física puxa a fita e o cartão balança na freada).
+// Começa quando o bloco chega na tela e o crachá está pronto (no máximo 1,2 s de espera). É movido quadro a quadro
+// aqui, e não por transição CSS: se um quadro atrasar, o título espera em vez de pular, e o gancho do crachá (que lê
+// a posição do "g" a cada quadro) acompanha certinho. Quem prefere menos movimento vê tudo parado.
 const slide = Boolean(fig && title) && !matchMedia('(prefers-reduced-motion: reduce)').matches;
 let titleIn = !slide, seen = false, ready = false;
 const waitTitle = [];
 const whenTitleIn = (f) => (titleIn ? f() : waitTitle.push(f));
 const markReady = () => { ready = true; goTitle(); };
+// curva cubic-bezier(.3, 0, .1, 1): acelera rápido e freia devagar, sem o tranco do expo.out (que arremessava o crachá)
+const bezier = (x1, y1, x2, y2) => {
+  const c = (a1, a2) => (t) => ((1 - 3 * a2 + 3 * a1) * t + (3 * a2 - 6 * a1)) * t * t + 3 * a1 * t;
+  const bx = c(x1, x2), by = c(y1, y2);
+  return (x) => {
+    if (x <= 0 || x >= 1) return x <= 0 ? 0 : 1;
+    let lo = 0, hi = 1, t = x;
+    for (let i = 0; i < 22; i++) { if (bx(t) < x) lo = t; else hi = t; t = (lo + hi) / 2; }
+    return by(t);
+  };
+};
+const slideEase = bezier(0.3, 0, 0.1, 1);
 function goTitle() {
   if (titleIn || !seen || !ready) return;
   titleIn = true;
-  const D = 2000, X = -0.62 * innerWidth, ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-  let p = 0, last = performance.now();
+  const lines = [...title.querySelectorAll('.at-line')];
+  const D = 1350, LAG = 110, X = -0.34 * innerWidth, soft = !document.documentElement.classList.contains('leve');
+  let t = 0, last = performance.now();
   const f = (now) => {
-    p = Math.min(1, p + Math.min(now - last, 34) / D); last = now;
-    if (p < 1) {
-      title.style.transform = `translate3d(${(X * (1 - ease(p))).toFixed(1)}px, 0, 0)`;
-      title.style.opacity = Math.min(1, p * 2.4).toFixed(3);
-      requestAnimationFrame(f);
-    } else { title.style.transform = title.style.opacity = ''; title.classList.remove('ab-slide'); }
+    t += Math.min(now - last, 34); last = now;
+    let busy = false;
+    lines.forEach((ln, i) => {
+      const p = Math.max(0, Math.min(1, (t - i * LAG) / D));
+      if (p < 1) busy = true;
+      const e = slideEase(p), v = (slideEase(Math.min(1, p + 0.01)) - e) / 0.01;   // velocidade (0 a ~2,4)
+      // linha que já chegou fica no lugar (none/1) até a outra chegar: o CSS do .ab-slide ainda vale
+      ln.style.transform = p < 1 ? `translate3d(${(X * (1 - e)).toFixed(1)}px, 0, 0) skewX(${(-v * 1.6).toFixed(2)}deg)` : 'none';
+      ln.style.opacity = p < 1 ? Math.min(1, p * 3.2).toFixed(3) : '1';
+      if (soft) ln.style.filter = p < 1 && v > 0.15 ? `blur(${Math.min(4, v * 1.8).toFixed(2)}px)` : '';
+    });
+    if (busy) requestAnimationFrame(f);
+    else { title.classList.remove('ab-slide'); lines.forEach((ln) => { ln.style.transform = ln.style.opacity = ln.style.filter = ''; }); }
   };
   requestAnimationFrame(f);
   waitTitle.splice(0).forEach((g) => g());
@@ -40,8 +62,8 @@ if (slide) {
     if (!e[0].isIntersecting) return;
     o.disconnect();
     seen = true; goTitle();
-    setTimeout(markReady, 1500);   // o crachá demorou: o título entra assim mesmo e ele chega depois
-  }, { rootMargin: '0px 0px -30% 0px' }).observe(title.parentElement);
+    setTimeout(markReady, 1200);   // o crachá demorou: o título entra assim mesmo e ele chega depois
+  }, { rootMargin: '0px 0px -25% 0px' }).observe(title.parentElement);
 }
 
 if (fig && title) {
@@ -150,7 +172,7 @@ async function lanyard() {
   const follow = () => { place(); if (performance.now() < until) requestAnimationFrame(follow); };
   requestAnimationFrame(follow);
   // o título deslizando: acompanha até ele parar
-  whenTitleIn(() => { const go = performance.now() >= until; until = performance.now() + 2600; if (go) requestAnimationFrame(follow); });
+  whenTitleIn(() => { const go = performance.now() >= until; until = performance.now() + 2000; if (go) requestAnimationFrame(follow); });
   // só a largura importa (o "g" muda de lugar quando a largura muda). A altura da seção muda a cada quadro quando uma
   // resposta do FAQ abre (o FAQ fica dentro dela): reagir à altura redesenhava a letra num canvas a cada quadro e travava
   let lastW = about.clientWidth;

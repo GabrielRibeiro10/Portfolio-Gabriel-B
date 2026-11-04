@@ -1994,8 +1994,10 @@ html.leve .intro .btn-work, html.leve .intro .btn-work::before, html.leve .intro
 }
 
 /* ---------- "Design que emociona. Código que entrega.": entra da esquerda para a direita ----------
-   js/cracha.js põe .ab-slide (só com animação) e move o título quadro a quadro até o lugar, levando o crachá. */
-.about-title.ab-slide { transform: translate3d(-62vw, 0, 0); opacity: 0; will-change: transform; }
+   Uma linha por <span class="at-line">; js/cracha.js põe .ab-slide (só com animação) e move cada linha quadro a quadro
+   até o lugar (a de baixo leva o crachá). */
+.about-title .at-line { display: block; transform-origin: 0 100%; }
+.about-title.ab-slide .at-line { transform: translate3d(-34vw, 0, 0); opacity: 0; will-change: transform, opacity; }
 
 /* card da citação: brilho que passa por cima (js/main.js, GSAP) */
 .quote-card { overflow: hidden; will-change: transform; }
