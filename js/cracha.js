@@ -7,6 +7,7 @@ const about = document.querySelector('.about');
 const slot = about && about.querySelector('.cracha-slot');
 const title = about && about.querySelector('.about-title');
 const fig = slot && slot.querySelector('.cracha');
+const mob = () => matchMedia('(max-width: 860px)').matches;
 
 // ----- entrada do título (estilo awwwards): "Design que emociona." e depois "Código que entrega." entram da esquerda
 // para a direita, uma linha logo atrás da outra, com arrancada rápida e freada longa. Enquanto correm, inclinam um
@@ -36,7 +37,9 @@ function goTitle() {
   if (titleIn || !seen || !ready) return;
   titleIn = true;
   const lines = [...title.querySelectorAll('.at-line')];
-  const D = 1350, LAG = 110, X = -0.34 * innerWidth, soft = !document.documentElement.classList.contains('leve');
+  // no celular o título vem de fora da tela (34% da largura de um celular era pouco: ele mal saía do lugar)
+  const D = mob() ? 1600 : 1350, LAG = 110, X = (mob() ? -1.05 : -0.34) * innerWidth;
+  const soft = !document.documentElement.classList.contains('leve');
   let t = 0, last = performance.now();
   const f = (now) => {
     t += Math.min(now - last, 34); last = now;
@@ -63,7 +66,8 @@ if (slide) {
     o.disconnect();
     seen = true; goTitle();
     setTimeout(markReady, 1200);   // o crachá demorou: o título entra assim mesmo e ele chega depois
-  }, { rootMargin: '0px 0px -25% 0px' }).observe(title.parentElement);
+  // no celular só começa com a seção no meio da tela: o crachá (pendurado embaixo do título) já está à vista
+  }, { rootMargin: mob() ? '0px 0px -55% 0px' : '0px 0px -25% 0px' }).observe(title.parentElement);
 }
 
 if (fig && title) {
@@ -81,7 +85,6 @@ if (fig && title) {
   }, { rootMargin: '400px 0px' }).observe(slot);
 }
 
-const mob = () => matchMedia('(max-width: 860px)').matches;
 // posição da letra onde o gancho prende (o título pode estar separado em palavras pelo GSAP):
 // no PC o "g" de "Código"; no celular o "e" do "que" logo depois, que fica no meio da tela
 function anchor() {
