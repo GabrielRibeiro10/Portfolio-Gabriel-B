@@ -1841,3 +1841,18 @@ html.leve .intro .btn-work, html.leve .intro .btn-work::before, html.leve .intro
 @media (max-width: 860px), (max-aspect-ratio: 4/5), (orientation: landscape) and (max-height: 500px) and (max-width: 1000px) {
   .quote-card { position: relative; inset: auto; }   /* no celular ele fica no fluxo (sem o top/left do PC) */
 }
+
+/* ---------- Halo amarelo em volta da pessoa: igual no PC e no celular ----------
+   No PC o painel claro cobria o halo do desenho (svg.hero-art fica atrás dele), então a luz só aparecia do lado
+   esquerdo da cabeça. Aqui o halo vira uma camada própria (.person-halo), na mesma caixa da foto, por cima do
+   painel (z 1) e atrás da foto (z 2). No celular nada cobre o desenho: continua o halo de dentro do svg. */
+.person-halo {
+  position: absolute; z-index: 1; left: 48cqw; bottom: -10cqh; height: 117.5cqh; aspect-ratio: 1024 / 1536; width: auto;
+  transform: translateX(-50%); pointer-events: none; user-select: none;
+}
+.hero-art .hero-halo { display: none; }
+.gsap-loading .person-halo { opacity: 0; }
+@media (max-width: 860px), (max-aspect-ratio: 4/5), (orientation: landscape) and (max-height: 500px) and (max-width: 1000px) {
+  .person-halo { display: none; }
+  .hero-art .hero-halo { display: inline; }
+}
