@@ -199,8 +199,9 @@ a { color: inherit; text-decoration: none; }
 /* a hero ocupa a primeira tela (--stage): título no alto, foto no meio, botão e números
    embaixo à esquerda, redes à direita, menu ao lado do logo. O painel claro (apresentação
    e citação) vem logo depois, como o painel da direita no PC.
-   Vale também para celular deitado (pouca altura), mesmo os mais largos que 860px. */
-@media (max-width: 860px), (orientation: landscape) and (max-height: 500px) and (max-width: 1000px) {
+   Vale também para celular deitado (pouca altura), mesmo os mais largos que 860px, e para qualquer tela em pé
+   (tablet grande como o iPad Pro, monitor vertical): no layout de PC a foto cobria o título e o painel. */
+@media (max-width: 860px), (max-aspect-ratio: 4/5), (orientation: landscape) and (max-height: 500px) and (max-width: 1000px) {
   body { display: block; place-items: normal; }   /* sem centralizar: o hero (container-type) encolhia para 0 */
   /* container-type normal: cqw/cqh viram medidas da tela (svw/svh), que não mudam quando a
      barra de rolagem aparece. Com o hero como contêiner, a largura dele mudava com a barra,
@@ -262,7 +263,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* tablet em pé: um pouco mais de respiro */
-@media (min-width: 600px) and (max-width: 860px) and (orientation: portrait) {
+@media (min-width: 600px) and (max-width: 860px) and (orientation: portrait), (min-width: 600px) and (max-aspect-ratio: 4/5) {
   .intro { padding: 96px 40px 40px; }
   .logo { left: 40px; top: 34px; height: 21px; }
   .nav { top: 38px; right: 40px; gap: 32px; }
@@ -582,13 +583,13 @@ a { color: inherit; text-decoration: none; }
 
 /* Celular: fim do painel claro com borda visível (antes encostava na seção Sobre, da mesma
    cor, e a borda parecia cortada) e título da hero menor em telas baixas (batia no rosto) */
-@media (max-width: 860px) {
+@media (max-width: 860px), (max-aspect-ratio: 4/5) {
   /* 36px ficam sob a seção Sobre (sobe por cima); o que sobra é igual às laterais do painel */
   .hero { padding-bottom: 48px; }
   .panel { border-radius: 18px; box-shadow: 0 18px 40px -24px rgba(60, 18, 5, .55); }
   .intro h1 { font-size: clamp(30px, min(10vw, 4.7svh), 60px); }
 }
-@media (min-width: 600px) and (max-width: 860px) and (orientation: portrait) { .hero { padding-bottom: 56px; } }
+@media (min-width: 600px) and (max-width: 860px) and (orientation: portrait), (min-width: 600px) and (max-aspect-ratio: 4/5) { .hero { padding-bottom: 56px; } }
 @media (max-width: 360px) { .hero { padding-bottom: 44px; } }
 /* "O que eu entrego": fio laranja à esquerda da lista que desce junto com a rolagem (js/main.js põe
    o quanto já desceu em --p, de 0 a 1), com um ponto brilhante na ponta; cada item acende quando o fio chega nele */

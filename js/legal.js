@@ -28,3 +28,8 @@
   addEventListener('resize', () => { if (!raf) raf = requestAnimationFrame(update); });
   update();
 })();
+// Tabelas: cada célula ganha o nome da coluna (no celular a linha vira um cartão com "Coluna: valor")
+document.querySelectorAll('.doc-table table').forEach((t) => {
+  const heads = [...t.querySelectorAll('thead th')].map((th) => th.textContent.trim());
+  t.querySelectorAll('tbody tr').forEach((tr) => [...tr.children].forEach((td, i) => td.setAttribute('data-label', heads[i] || '')));
+});
