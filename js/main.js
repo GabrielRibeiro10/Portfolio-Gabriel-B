@@ -631,6 +631,34 @@ if (animate) {
   }
 }
 
+// Segmentos no celular: os cartões viram um carrossel; as setas levam ao anterior/próximo e o contador mostra qual
+// está no centro (número e nome). Tudo segue a rolagem, então arrastar com o dedo também atualiza o contador.
+{
+  const grid = document.querySelector('.nc-grid'), ctrl = document.querySelector('.nc-ctrl');
+  if (grid && ctrl) {
+    const cards = [...grid.querySelectorAll('.nc-card')], [prev, next] = ctrl.querySelectorAll('.nc-arrow');
+    const num = ctrl.querySelector('.nc-count b'), name = ctrl.querySelector('.nc-count em');
+    let cur = -1, raf = 0;
+    const step = () => (cards[1] ? cards[1].offsetLeft - cards[0].offsetLeft : grid.clientWidth);
+    const update = () => {
+      raf = 0;
+      const i = Math.max(0, Math.min(cards.length - 1, Math.round(grid.scrollLeft / step())));
+      if (i === cur) return;
+      cur = i;
+      num.textContent = String(i + 1).padStart(2, '0');
+      name.textContent = cards[i].querySelector('h3').textContent;
+      prev.disabled = i === 0;
+      next.disabled = i === cards.length - 1;
+    };
+    grid.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(update); }, { passive: true });
+    [prev, next].forEach((b) => b.addEventListener('click', () => {
+      const i = Math.max(0, Math.min(cards.length - 1, cur + Number(b.dataset.dir)));
+      grid.scrollTo({ left: i * step(), behavior: reduceMotion ? 'auto' : 'smooth' });
+    }));
+    update();
+  }
+}
+
 // Segmentos: título, texto e cartões entram em cascata quando a seção aparece (depois as classes saem, para o hover
 // dos cartões não herdar o atraso da cascata)
 {

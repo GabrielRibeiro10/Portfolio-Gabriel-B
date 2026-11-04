@@ -195,17 +195,18 @@
          inteira rolando sozinha (por cima, quando carrega, o vídeo do site com os efeitos); ao passar para o lado, o notebook fecha e sai, e o próximo entra e abre -->
     <!-- Segmentos: grade de cartões; cada um traz uma mini landing page do segmento (barra do navegador, foto gerada
          para o portfólio, marca e título na tipografia do segmento, botão) e embaixo o que a página precisa fazer.
-         Marcas fictícias, só para ilustrar. No celular os cartões viram um carrossel que desliza de lado -->
+         Marcas fictícias, só para ilustrar. Depois, o bloco "e muito mais" com os outros ramos. No celular os cartões
+         viram um carrossel centralizado com setas e contador (js/main.js) e o botão vai para o fim da seção -->
     <div class="nichos" id="segmentos">
       <p class="about-kicker" data-ab><span class="k-num">(02)</span><span class="k-name">Segmentos</span><span class="k-line" aria-hidden="true"></span><span class="k-sub">Landing pages para cada negócio</span></p>
       <div class="nc-top">
         <h2 class="nc-title">Cada negócio pede uma <em>página</em> diferente.</h2>
         <div class="nc-intro">
-          <p>O advogado precisa passar confiança, a imobiliária precisa mostrar imóveis e o restaurante precisa abrir o apetite. Cada página nasce do que o <strong>seu cliente</strong> procura.</p>
-          <a class="nc-go" href="https://wa.me/5512991145851?text=Ol%C3%A1%2C%20Gabriel%21%20Vi%20seu%20portf%C3%B3lio%20e%20gostaria%20de%20pedir%20um%20or%C3%A7amento%20de%20landing%20page%20para%20o%20meu%20neg%C3%B3cio." target="_blank" rel="noopener">Quero uma landing page<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10M11 6l4 4-4 4"/></svg></a>
+          <p>A advogada precisa passar confiança, a confeiteira precisa dar água na boca e o personal precisa mostrar resultado. Cada página nasce do que o <strong>seu cliente</strong> procura.</p>
+          <a class="nc-go nc-go-top" href="https://wa.me/5512991145851?text=Ol%C3%A1%2C%20Gabriel%21%20Vi%20seu%20portf%C3%B3lio%20e%20gostaria%20de%20pedir%20um%20or%C3%A7amento%20de%20landing%20page%20para%20o%20meu%20neg%C3%B3cio." target="_blank" rel="noopener">Quero uma landing page<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10M11 6l4 4-4 4"/></svg></a>
         </div>
       </div>
-      <ul class="nc-grid">
+      <ul class="nc-grid" id="nc-grid">
         <li class="nc-card nc-law" style="--i:0">
           <div class="nc-shot" aria-hidden="true">
             <span class="nc-bar"><i></i><i></i><i></i><em>almeidarocha.adv.br</em></span>
@@ -223,21 +224,21 @@
             <ul aria-label="O que a página tem"><li>Áreas de atuação</li><li>Equipe</li><li>Consulta no WhatsApp</li></ul>
           </div>
         </li>
-        <li class="nc-card nc-imob" style="--i:1">
+        <li class="nc-card nc-beauty" style="--i:1">
           <div class="nc-shot" aria-hidden="true">
-            <span class="nc-bar"><i></i><i></i><i></i><em>casanorte.com.br</em></span>
+            <span class="nc-bar"><i></i><i></i><i></i><em>atelierbela.com.br</em></span>
             <div class="nc-hero">
-              <img src="img/segmentos/imob.webp" alt="" width="640" height="640" loading="lazy" decoding="async">
-              <span class="nc-nav"><span class="nc-brand">casa<b>norte</b></span><span class="nc-dots"><i></i><i></i><i></i></span></span>
-              <span class="nc-h">O imóvel certo, no bairro que você <em>ama</em>.</span>
-              <span class="nc-btn">Ver imóveis<svg viewBox="0 0 20 20"><path d="M5 10h10M11 6l4 4-4 4"/></svg></span>
+              <img src="img/segmentos/beauty.webp" alt="" width="640" height="640" loading="lazy" decoding="async">
+              <span class="nc-nav"><span class="nc-brand">Atelier <i>Bela</i></span><span class="nc-dots"><i></i><i></i><i></i></span></span>
+              <span class="nc-h">Beleza que realça o que <em>já é seu</em>.</span>
+              <span class="nc-btn">Agendar avaliação<svg viewBox="0 0 20 20"><path d="M5 10h10M11 6l4 4-4 4"/></svg></span>
             </div>
           </div>
           <div class="nc-body">
             <span class="nc-n">02</span>
-            <h3>Imobiliária</h3>
-            <p>Mostrar imóveis com fotos grandes e levar o visitante até o corretor.</p>
-            <ul aria-label="O que a página tem"><li>Busca por bairro</li><li>Fichas de imóvel</li><li>Corretor no WhatsApp</li></ul>
+            <h3>Estética</h3>
+            <p>Despertar desejo: procedimentos, resultados e avaliação agendada.</p>
+            <ul aria-label="O que a página tem"><li>Procedimentos</li><li>Antes e depois</li><li>Avaliação</li></ul>
           </div>
         </li>
         <li class="nc-card nc-odonto" style="--i:2">
@@ -254,27 +255,61 @@
             <span class="nc-n">03</span>
             <h3>Odontologia</h3>
             <p>Encher a agenda: tratamentos claros e horário marcado em um toque.</p>
-            <ul aria-label="O que a página tem"><li>Tratamentos</li><li>Antes e depois</li><li>Agenda online</li></ul>
+            <ul aria-label="O que a página tem"><li>Tratamentos</li><li>Convênios</li><li>Agenda online</li></ul>
           </div>
         </li>
-        <li class="nc-card nc-beauty" style="--i:3">
+        <li class="nc-card nc-imob" style="--i:3">
           <div class="nc-shot" aria-hidden="true">
-            <span class="nc-bar"><i></i><i></i><i></i><em>atelierbela.com.br</em></span>
+            <span class="nc-bar"><i></i><i></i><i></i><em>casanorte.com.br</em></span>
             <div class="nc-hero">
-              <img src="img/segmentos/beauty.webp" alt="" width="640" height="640" loading="lazy" decoding="async">
-              <span class="nc-nav"><span class="nc-brand">Atelier <i>Bela</i></span><span class="nc-dots"><i></i><i></i><i></i></span></span>
-              <span class="nc-h">Beleza que realça o que <em>já é seu</em>.</span>
-              <span class="nc-btn">Agendar avaliação<svg viewBox="0 0 20 20"><path d="M5 10h10M11 6l4 4-4 4"/></svg></span>
+              <img src="img/segmentos/imob.webp" alt="" width="640" height="640" loading="lazy" decoding="async">
+              <span class="nc-nav"><span class="nc-brand">casa<b>norte</b></span><span class="nc-dots"><i></i><i></i><i></i></span></span>
+              <span class="nc-h">O imóvel certo, no bairro que você <em>ama</em>.</span>
+              <span class="nc-btn">Ver imóveis<svg viewBox="0 0 20 20"><path d="M5 10h10M11 6l4 4-4 4"/></svg></span>
             </div>
           </div>
           <div class="nc-body">
             <span class="nc-n">04</span>
-            <h3>Estética</h3>
-            <p>Despertar desejo: procedimentos, resultados e avaliação agendada.</p>
-            <ul aria-label="O que a página tem"><li>Procedimentos</li><li>Resultados</li><li>Avaliação</li></ul>
+            <h3>Imobiliária</h3>
+            <p>Mostrar imóveis com fotos grandes e levar o visitante até o corretor.</p>
+            <ul aria-label="O que a página tem"><li>Busca por bairro</li><li>Fichas de imóvel</li><li>Corretor no WhatsApp</li></ul>
           </div>
         </li>
-        <li class="nc-card nc-food" style="--i:4">
+        <li class="nc-card nc-personal" style="--i:4">
+          <div class="nc-shot" aria-hidden="true">
+            <span class="nc-bar"><i></i><i></i><i></i><em>movepersonal.com.br</em></span>
+            <div class="nc-hero">
+              <img src="img/segmentos/personal.webp" alt="" width="640" height="640" loading="lazy" decoding="async">
+              <span class="nc-nav"><span class="nc-brand">MOVE<b>/</b></span><span class="nc-dots"><i></i><i></i><i></i></span></span>
+              <span class="nc-h">Seu melhor shape, <em>com método</em>.</span>
+              <span class="nc-btn">Aula experimental<svg viewBox="0 0 20 20"><path d="M5 10h10M11 6l4 4-4 4"/></svg></span>
+            </div>
+          </div>
+          <div class="nc-body">
+            <span class="nc-n">05</span>
+            <h3>Personal</h3>
+            <p>Mostrar método e resultados, e transformar visita em aluno.</p>
+            <ul aria-label="O que a página tem"><li>Planos e consultoria</li><li>Resultados</li><li>Aula experimental</li></ul>
+          </div>
+        </li>
+        <li class="nc-card nc-nutri" style="--i:5">
+          <div class="nc-shot" aria-hidden="true">
+            <span class="nc-bar"><i></i><i></i><i></i><em>claranutri.com.br</em></span>
+            <div class="nc-hero">
+              <img src="img/segmentos/nutri.webp" alt="" width="640" height="640" loading="lazy" decoding="async">
+              <span class="nc-nav"><span class="nc-brand">clara<i>nutri</i></span><span class="nc-dots"><i></i><i></i><i></i></span></span>
+              <span class="nc-h">Comer bem pode ser <em>leve</em>.</span>
+              <span class="nc-btn">Agendar consulta<svg viewBox="0 0 20 20"><path d="M5 10h10M11 6l4 4-4 4"/></svg></span>
+            </div>
+          </div>
+          <div class="nc-body">
+            <span class="nc-n">06</span>
+            <h3>Nutricionista</h3>
+            <p>Transmitir leveza e cuidado, e encher a agenda de consultas.</p>
+            <ul aria-label="O que a página tem"><li>Consulta online</li><li>Planos alimentares</li><li>Depoimentos</li></ul>
+          </div>
+        </li>
+        <li class="nc-card nc-food" style="--i:6">
           <div class="nc-shot" aria-hidden="true">
             <span class="nc-bar"><i></i><i></i><i></i><em>brasaeco.com.br</em></span>
             <div class="nc-hero">
@@ -285,68 +320,45 @@
             </div>
           </div>
           <div class="nc-body">
-            <span class="nc-n">05</span>
+            <span class="nc-n">07</span>
             <h3>Restaurantes</h3>
             <p>Abrir o apetite e levar ao pedido: cardápio, horários e localização.</p>
             <ul aria-label="O que a página tem"><li>Cardápio digital</li><li>Horários e mapa</li><li>Pedido no WhatsApp</li></ul>
           </div>
         </li>
-        <li class="nc-card nc-gym" style="--i:5">
+        <li class="nc-card nc-confeit" style="--i:7">
           <div class="nc-shot" aria-hidden="true">
-            <span class="nc-bar"><i></i><i></i><i></i><em>pulsefit.com.br</em></span>
+            <span class="nc-bar"><i></i><i></i><i></i><em>doceatelie.com.br</em></span>
             <div class="nc-hero">
-              <img src="img/segmentos/gym.webp" alt="" width="640" height="640" loading="lazy" decoding="async">
-              <span class="nc-nav"><span class="nc-brand">PULSE<b>/</b></span><span class="nc-dots"><i></i><i></i><i></i></span></span>
-              <span class="nc-h">Treine forte. <em>Todo dia.</em></span>
-              <span class="nc-btn">Aula grátis<svg viewBox="0 0 20 20"><path d="M5 10h10M11 6l4 4-4 4"/></svg></span>
-            </div>
-          </div>
-          <div class="nc-body">
-            <span class="nc-n">06</span>
-            <h3>Academias</h3>
-            <p>Energia e decisão rápida: planos, modalidades e aula experimental.</p>
-            <ul aria-label="O que a página tem"><li>Planos</li><li>Modalidades</li><li>Aula grátis</li></ul>
-          </div>
-        </li>
-        <li class="nc-card nc-arq" style="--i:6">
-          <div class="nc-shot" aria-hidden="true">
-            <span class="nc-bar"><i></i><i></i><i></i><em>studiooka.com.br</em></span>
-            <div class="nc-hero">
-              <img src="img/segmentos/arq.webp" alt="" width="640" height="640" loading="lazy" decoding="async">
-              <span class="nc-nav"><span class="nc-brand">STUDIO OKA</span><span class="nc-dots"><i></i><i></i><i></i></span></span>
-              <span class="nc-h">Espaços com alma e <em>propósito</em>.</span>
-              <span class="nc-btn">Ver projetos<svg viewBox="0 0 20 20"><path d="M5 10h10M11 6l4 4-4 4"/></svg></span>
-            </div>
-          </div>
-          <div class="nc-body">
-            <span class="nc-n">07</span>
-            <h3>Arquitetura</h3>
-            <p>Deixar o portfólio falar: projetos grandes, processo e orçamento.</p>
-            <ul aria-label="O que a página tem"><li>Portfólio de projetos</li><li>Processo</li><li>Orçamento</li></ul>
-          </div>
-        </li>
-        <li class="nc-card nc-cont" style="--i:7">
-          <div class="nc-shot" aria-hidden="true">
-            <span class="nc-bar"><i></i><i></i><i></i><em>contaclara.com.br</em></span>
-            <div class="nc-hero">
-              <img src="img/segmentos/cont.webp" alt="" width="640" height="640" loading="lazy" decoding="async">
-              <span class="nc-nav"><span class="nc-brand">conta<b>clara</b></span><span class="nc-dots"><i></i><i></i><i></i></span></span>
-              <span class="nc-h">Sua empresa em dia, sem <em>dor de cabeça</em>.</span>
-              <span class="nc-btn">Abrir empresa<svg viewBox="0 0 20 20"><path d="M5 10h10M11 6l4 4-4 4"/></svg></span>
+              <img src="img/segmentos/confeit.webp" alt="" width="640" height="640" loading="lazy" decoding="async">
+              <span class="nc-nav"><span class="nc-brand">Doce <i>Ateliê</i></span><span class="nc-dots"><i></i><i></i><i></i></span></span>
+              <span class="nc-h">Bolos e doces feitos para <em>celebrar</em>.</span>
+              <span class="nc-btn">Fazer encomenda<svg viewBox="0 0 20 20"><path d="M5 10h10M11 6l4 4-4 4"/></svg></span>
             </div>
           </div>
           <div class="nc-body">
             <span class="nc-n">08</span>
-            <h3>Contabilidade</h3>
-            <p>Simplificar o complicado: serviços claros e atendimento rápido.</p>
-            <ul aria-label="O que a página tem"><li>MEI e empresas</li><li>Abertura de CNPJ</li><li>Atendimento online</li></ul>
+            <h3>Confeitaria</h3>
+            <p>Dar água na boca e facilitar a encomenda pelo WhatsApp.</p>
+            <ul aria-label="O que a página tem"><li>Cardápio de bolos</li><li>Encomendas</li><li>Pedido no WhatsApp</li></ul>
           </div>
         </li>
       </ul>
-      <div class="nc-foot">
-        <p class="nc-note"><span class="nc-tag">Conceitos</span>Marcas fictícias, criadas para mostrar o estilo de cada segmento.</p>
-        <p class="nc-other">Seu segmento não está aqui? Pet shop, salão, oficina, escola… <a href="https://wa.me/5512991145851?text=Ol%C3%A1%2C%20Gabriel%21%20Vi%20seu%20portf%C3%B3lio%20e%20gostaria%20de%20pedir%20um%20or%C3%A7amento%20de%20landing%20page%20para%20o%20meu%20neg%C3%B3cio." target="_blank" rel="noopener">Me chama</a>.</p>
+      <div class="nc-ctrl" aria-label="Trocar de segmento">
+        <button class="nc-arrow" type="button" data-dir="-1" aria-controls="nc-grid" aria-label="Segmento anterior"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4.5L7 10l5.5 5.5"/></svg></button>
+        <p class="nc-count" aria-live="polite"><b>01</b><span> / 08</span><em>Advocacia</em></p>
+        <button class="nc-arrow" type="button" data-dir="1" aria-controls="nc-grid" aria-label="Próximo segmento"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7.5 4.5L13 10l-5.5 5.5"/></svg></button>
       </div>
+      <p class="nc-note"><span class="nc-tag">Conceitos</span>Marcas fictícias, criadas para mostrar o estilo de cada segmento.</p>
+      <div class="nc-more">
+        <div class="nc-more-txt">
+          <span class="nc-more-k">E não para por aí</span>
+          <h3 class="nc-more-h">Seu negócio tem uma história. A página dele também precisa <em>contar</em>.</h3>
+          <p>Crio landing pages para todo tipo de negócio: do consultório à oficina, da escola ao estúdio. Se você atende pessoas, sua página pode trabalhar por você o dia inteiro, apresentando, convencendo e trazendo o cliente até o seu WhatsApp.</p>
+        </div>
+        <ul class="nc-more-list" aria-label="Outros segmentos"><li>Pet shop</li><li>Salão de beleza</li><li>Barbearia</li><li>Psicologia</li><li>Fisioterapia</li><li>Fotografia</li><li>Arquitetura</li><li>Contabilidade</li><li>Escola e cursos</li><li>Oficina</li><li>Eventos</li><li>Igrejas</li><li class="nc-more-etc">e muito mais</li></ul>
+      </div>
+      <a class="nc-go nc-go-end" href="https://wa.me/5512991145851?text=Ol%C3%A1%2C%20Gabriel%21%20Vi%20seu%20portf%C3%B3lio%20e%20gostaria%20de%20pedir%20um%20or%C3%A7amento%20de%20landing%20page%20para%20o%20meu%20neg%C3%B3cio." target="_blank" rel="noopener">Quero uma landing page<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10M11 6l4 4-4 4"/></svg></a>
     </div>
 
     <div class="projects" id="projetos">
