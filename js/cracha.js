@@ -13,13 +13,107 @@ if (fig && title) {
   new IntersectionObserver((e, o) => {
     if (!e[0].isIntersecting) return;
     o.disconnect();
-    // modo leve (js/desempenho.js): fica o crachá estático, sem baixar o three.js
-    if (document.documentElement.classList.contains('leve')) { about.classList.remove('cracha-loading'); return; }
+    // modo leve (js/desempenho.js): fita e gancho desenhados sem 3D (lanyard()), sem baixar o three.js
+    if (document.documentElement.classList.contains('leve')) { lanyard(); return; }
     start().catch((err) => {
       console.warn('crachá 3D desligado:', err);
-      about.classList.remove('cracha-loading', 'cracha-3d');
+      about.classList.remove('cracha-3d');
+      lanyard();
     });
   }, { rootMargin: '400px 0px' }).observe(slot);
+}
+
+const mob = () => matchMedia('(max-width: 860px)').matches;
+// posição da letra onde o gancho prende (o título pode estar separado em palavras pelo GSAP):
+// no PC o "g" de "Código"; no celular o "e" do "que" logo depois, que fica no meio da tela
+function anchor() {
+  const tw = document.createTreeWalker(title, NodeFilter.SHOW_TEXT);
+  let n, seen = false;
+  while ((n = tw.nextNode())) {
+    let i = seen ? 0 : n.data.indexOf('Código');
+    if (i < 0) continue;
+    const rg = document.createRange();
+    if (!mob()) { rg.setStart(n, i + 4); rg.setEnd(n, i + 5); return { r: rg.getBoundingClientRect(), el: n.parentElement, ch: 'g' }; }
+    if (!seen) { seen = true; i += 6; }
+    const j = n.data.indexOf('que', i);
+    if (j < 0) continue;
+    rg.setStart(n, j + 2); rg.setEnd(n, j + 3);
+    return { r: rg.getBoundingClientRect(), el: n.parentElement, ch: 'e' };
+  }
+  return { r: title.getBoundingClientRect(), el: title, ch: 'g' };
+}
+// centro do traço de baixo do "g" e a grossura dele: desenha a letra num canvas com a mesma fonte e procura
+// a tinta mais baixa. Fica como fração da caixa da letra, que acompanha o tamanho da fonte.
+let tail = { x: 0.5, y: 0.88, th: 0.08 };
+function measureTail() {
+  const { r, el, ch } = anchor(), cs = getComputedStyle(el), k = 3;
+  const c = document.createElement('canvas'); c.width = Math.ceil(r.width * k) + 16; c.height = Math.ceil(r.height * k) + 16;
+  const x = c.getContext('2d', { willReadFrequently: true });
+  x.scale(k, k); x.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+  x.fillText(ch, 0, x.measureText(ch).fontBoundingBoxAscent);
+  const a = x.getImageData(0, 0, c.width, c.height).data, ink = (px, py) => a[(py * c.width + px) * 4 + 3] > 128;
+  for (let py = c.height - 1; py >= 0; py--) {
+    let lo = -1, hi = -1;
+    for (let px = 0; px < c.width; px++) if (ink(px, py)) { if (lo < 0) lo = px; hi = px; }
+    if (lo < 0) continue;
+    const cx = Math.round((lo + hi) / 2);
+    let top = py; while (top > 0 && ink(cx, top - 1)) top--;
+    tail = { x: cx / k / r.width, y: (py + top) / 2 / k / r.height, th: (py - top + 1) / k / r.height };
+    return;
+  }
+}
+
+// ----- modo leve (ou sem WebGL): o mesmo crachá pendurado, parado e sem three.js -----
+// Gancho no "g", argola, fita com o nome e o cartão (o próprio <figure>) embaixo, com as medidas do 3D.
+// São só alguns <span> posicionados; nada roda a cada quadro depois que o título termina de entrar.
+let lanyardOn = false;
+async function lanyard() {
+  if (lanyardOn) return;
+  lanyardOn = true;
+  await document.fonts.load('600 20px "Inter Tight"').catch(() => {});
+  await document.fonts.load(getComputedStyle(title).font).catch(() => {});
+  const el = document.createElement('div');
+  el.className = 'lanyard';
+  el.setAttribute('aria-hidden', 'true');
+  el.innerHTML = '<span class="ly-band"><span>' + 'GABRIEL RIBEIRO   •   FULL STACK   •   '.repeat(8) +
+    '</span></span><span class="ly-wire"></span><span class="ly-ring"></span>';
+  const [band, wire, ring] = el.children;
+  about.appendChild(el);
+  about.classList.add('cracha-leve');
+  about.classList.remove('cracha-loading');
+
+  let dx = 0;
+  const px = (n) => n.toFixed(2) + 'px';
+  const box = (n, l, t, w, h) => Object.assign(n.style, { left: px(l), top: px(t), width: px(w), height: px(h) });
+  function place() {
+    const { r } = anchor(), ar = about.getBoundingClientRect();
+    const x = r.left + r.width * tail.x - ar.left, y = r.top + r.height * tail.y - ar.top;   // centro do traço do "g"
+    const W = mob() ? 150 : 180, BAND = Math.round(W * 0.12);
+    // mesmas contas do buildHook() do 3D
+    const t = tail.th * r.height, rw = Math.max(1.4, t * 0.18), R = t / 2 + rw + 0.6;
+    const sh = Math.max(6, BAND * 0.35), wb = BAND + rw * 2 + 3, hb = Math.max(7, BAND * 0.45), rr = hb * 0.45;
+    box(wire, x - rw, y - R, rw * 2, R + sh + rw);
+    box(ring, x - wb / 2 - rw, y + sh - rw, wb + rw * 2, hb + rw * 2);
+    Object.assign(ring.style, { borderWidth: px(rw * 2), borderRadius: px(rr + rw) });
+    // cartão centrado embaixo do gancho; a fita vai da argola até o clipe do cartão
+    const fr = fig.getBoundingClientRect();
+    dx = x - (fr.left - dx + fr.width / 2 - ar.left);
+    fig.style.transform = `translateX(${px(dx)})`;
+    const A = y + sh + hb, top = A - rw * 3.2, bottom = fr.top - ar.top - 3;   // termina dentro do clipe
+    box(band, x - BAND / 2, top, BAND, Math.max(0, bottom - top));
+    Object.assign(band.style, {
+      borderRadius: `${px(BAND / 2)} ${px(BAND / 2)} 0 0 / ${px(rw * 2.2)} ${px(rw * 2.2)} 0 0`,
+      fontSize: px(BAND * 0.42), paddingTop: px(A - top + BAND * 1.3),
+    });
+  }
+  const relayout = () => { measureTail(); place(); };
+  relayout();
+  // o título pode estar entrando (GSAP move as palavras): acompanha o "g" por 3 s e depois para
+  const until = performance.now() + 3000;
+  const follow = () => { place(); if (performance.now() < until) requestAnimationFrame(follow); };
+  requestAnimationFrame(follow);
+  if ('ResizeObserver' in window) new ResizeObserver(() => requestAnimationFrame(relayout)).observe(about);
+  else addEventListener('resize', relayout);
 }
 
 async function start() {
@@ -127,45 +221,6 @@ async function start() {
   const D = Math.hypot(W / 2, H);
   let cw = 0, ch = 0, L = 200, drag = null, shown = false, X0 = 0, vw = 0;   // X0/vw: faixa da seção que o canvas desenha
 
-  const mob = () => matchMedia('(max-width: 860px)').matches;
-  // posição da letra onde o gancho prende (o título pode estar separado em palavras pelo GSAP):
-  // no PC o "g" de "Código"; no celular o "e" do "que" logo depois, que fica no meio da tela
-  function anchor() {
-    const tw = document.createTreeWalker(title, NodeFilter.SHOW_TEXT);
-    let n, seen = false;
-    while ((n = tw.nextNode())) {
-      let i = seen ? 0 : n.data.indexOf('Código');
-      if (i < 0) continue;
-      const rg = document.createRange();
-      if (!mob()) { rg.setStart(n, i + 4); rg.setEnd(n, i + 5); return { r: rg.getBoundingClientRect(), el: n.parentElement, ch: 'g' }; }
-      if (!seen) { seen = true; i += 6; }
-      const j = n.data.indexOf('que', i);
-      if (j < 0) continue;
-      rg.setStart(n, j + 2); rg.setEnd(n, j + 3);
-      return { r: rg.getBoundingClientRect(), el: n.parentElement, ch: 'e' };
-    }
-    return { r: title.getBoundingClientRect(), el: title, ch: 'g' };
-  }
-  // centro do traço de baixo do "g" e a grossura dele: desenha a letra num canvas com a mesma fonte e procura
-  // a tinta mais baixa. Fica como fração da caixa da letra, que acompanha o tamanho da fonte.
-  let tail = { x: 0.5, y: 0.88, th: 0.08 };
-  function measureTail() {
-    const { r, el, ch } = anchor(), cs = getComputedStyle(el), k = 3;
-    const c = document.createElement('canvas'); c.width = Math.ceil(r.width * k) + 16; c.height = Math.ceil(r.height * k) + 16;
-    const x = c.getContext('2d', { willReadFrequently: true });
-    x.scale(k, k); x.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
-    x.fillText(ch, 0, x.measureText(ch).fontBoundingBoxAscent);
-    const a = x.getImageData(0, 0, c.width, c.height).data, ink = (px, py) => a[(py * c.width + px) * 4 + 3] > 128;
-    for (let py = c.height - 1; py >= 0; py--) {
-      let lo = -1, hi = -1;
-      for (let px = 0; px < c.width; px++) if (ink(px, py)) { if (lo < 0) lo = px; hi = px; }
-      if (lo < 0) continue;
-      const cx = Math.round((lo + hi) / 2);
-      let top = py; while (top > 0 && ink(cx, top - 1)) top--;
-      tail = { x: cx / k / r.width, y: (py + top) / 2 / k / r.height, th: (py - top + 1) / k / r.height };
-      return;
-    }
-  }
   const P = { x: 0, y: 0 };   // centro do traço do "g", onde o gancho gira
   function pin() {
     const { r } = anchor(), ar = about.getBoundingClientRect();
@@ -340,7 +395,7 @@ async function start() {
   let dead = false;
   document.addEventListener('gr:leve', () => {
     dead = true; visible = false; drag = null; about.style.cursor = '';
-    canvas.remove(); renderer.dispose(); about.classList.remove('cracha-3d', 'cracha-loading');
+    canvas.remove(); renderer.dispose(); about.classList.remove('cracha-3d'); lanyard();
   }, { once: true });
   function onCard(e) {
     if (!shown || dead) return false;
