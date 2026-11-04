@@ -545,7 +545,8 @@ if (animate) {
       for (let x = 520, i = 0; x < R; x += 360, i++) d += `S${(x + 300).toFixed(1)} ${(y0 + (i % 2 ? -14 : 14)).toFixed(1)} ${(x + 360).toFixed(1)} ${y0.toFixed(1)}`;
       pool.setAttribute('d', d + `V${y1.toFixed(1)}H-1600Z`);
       let m = phone.matches
-        ? [side.offsetTop + side.offsetHeight + 4, side.offsetTop + side.offsetHeight + 190, lb, lb + 28, bot - 20, fadeEnd]
+        // celular: a onda some depois da coluna da esquerda e não volta (a chamada final é um cartão escuro no creme)
+        ? [side.offsetTop + side.offsetHeight + 4, side.offsetTop + side.offsetHeight + 190, 1e6, 1e6, 1e6, 1e6]
         : [0, 0, 0, 0, bot - 10, fadeEnd];
       m.forEach((v, i) => faq.style.setProperty(`--m${i + 1}`, Math.round(v) + 'px'));
     };
@@ -595,5 +596,20 @@ if (animate) {
       setTimeout(() => ni.classList.remove('ni-live', 'is-in'), 2600);
     }, { threshold: 0.12 });
     io.observe(ni);
+  }
+}
+
+// chamada final no celular: o cartão entra subindo e o que tem dentro vem em cascata (o CSS só anima até 860 px)
+{
+  const cta = document.querySelector('.faq .about-cta');
+  if (cta && !reduceMotion && 'IntersectionObserver' in window) {
+    cta.classList.add('cta-live');
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      cta.classList.add('is-in');
+      setTimeout(() => cta.classList.remove('cta-live', 'is-in'), 2000);
+    }, { threshold: 0.25 });
+    io.observe(cta);
   }
 }

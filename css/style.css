@@ -1346,6 +1346,79 @@ html.leve .faq-wave { animation: none; }   /* em telas largas o laranja passa da
 }
 .cta-bonus i { background: #fff; box-shadow: 0 0 10px 2px rgba(255, 210, 168, .9); }
 
+/* Chamada final no celular: cartão escuro (café) sobre o creme, sem a faixa laranja que se desfazia em degradê.
+   Brilho laranja no canto, pontilhado fino que some, selo "disponível" pulsando, bônus em etiquetas, botão branco
+   com o ícone do WhatsApp e a seta num círculo laranja. Entra subindo, e o que tem dentro vem em cascata. */
+.cta-m { display: none; }
+@media (max-width: 860px) {
+  .cta-m { display: revert; }
+  .faq .about-cta {
+    margin: 44px 0 0; padding: 26px 20px 20px; gap: 0; border-radius: 26px; overflow: hidden; isolation: isolate;
+    background:
+      radial-gradient(80% 55% at 100% 100%, rgba(242, 107, 29, .62), rgba(242, 107, 29, 0) 70%),
+      radial-gradient(60% 40% at 0% 0%, rgba(255, 160, 70, .14), rgba(255, 160, 70, 0) 70%),
+      linear-gradient(165deg, #1f0b04 0%, #130603 55%, #1d0904 100%);
+    box-shadow: 0 34px 60px -34px rgba(60, 18, 5, .75), inset 0 0 0 1px rgba(255, 233, 216, .07);
+  }
+  .faq .about-cta::before {   /* pontilhado fino, só no alto à direita */
+    content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background: radial-gradient(circle, rgba(255, 233, 216, .16) 1px, transparent 1.4px) 0 0 / 14px 14px;
+    -webkit-mask-image: radial-gradient(70% 60% at 100% 0%, #000, transparent 75%); mask-image: radial-gradient(70% 60% at 100% 0%, #000, transparent 75%);
+  }
+  .faq .about-cta .cta-copy { gap: 0; }
+  .faq .about-cta .cta-bonus { display: none; }
+  .cta-status {
+    display: inline-flex !important; align-self: flex-start; align-items: center; gap: 8px; margin: 0 0 20px !important; max-width: none !important; white-space: nowrap;
+    padding: 6px 12px 6px 10px; border-radius: 99px; border: 1px solid rgba(255, 233, 216, .14); background: rgba(255, 233, 216, .05);
+    font-size: 12px !important; font-weight: 500; letter-spacing: .01em; line-height: 1.2 !important; color: rgba(255, 240, 228, .88);
+  }
+  .cta-status i { position: relative; width: 7px; height: 7px; border-radius: 50%; background: #ff8a3d; }
+  .cta-status i::after { content: ''; position: absolute; inset: -4px; border-radius: 50%; border: 1px solid #ff8a3d; opacity: 0; }
+  .faq .about-cta .cta-head { font-size: 27px; line-height: 1.1; letter-spacing: -.035em; color: #fff; max-width: 17ch; }
+  .faq .about-cta .cta-head span {
+    background: linear-gradient(100deg, #ffd2a8 0%, #ffa45c 55%, #ff7a2e 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .cta-chips { display: flex !important; flex-wrap: wrap; gap: 8px; margin: 20px 0 0; padding: 0; list-style: none; }
+  .cta-chips li {
+    display: inline-flex; align-items: center; gap: 7px; padding: 8px 12px 8px 10px; border-radius: 99px;
+    background: rgba(255, 210, 168, .07); border: 1px solid rgba(255, 210, 168, .16); color: #ffe9d8; font-size: 13px; line-height: 1;
+  }
+  .cta-chips svg { width: 15px; height: 15px; fill: none; stroke: #ffb37a; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+  .faq .about-cta .btn-work {
+    display: flex; align-items: center; gap: 10px; width: 100%; height: 60px; margin-top: 26px; padding: 0 8px 0 18px;
+    border-radius: 99px; background: #fff; color: var(--ink); font-size: 16px; font-weight: 600; letter-spacing: -.01em;
+    box-shadow: 0 16px 34px -16px rgba(242, 107, 29, .75);
+  }
+  .faq .about-cta .btn-work::before, .faq .about-cta .btn-work::after { display: none; }
+  .cta-wa { width: 22px; height: 22px; fill: none; stroke: #1a8d4f; stroke-width: 1.7; stroke-linejoin: round; }
+  .cta-go { display: grid !important; place-items: center; width: 44px; height: 44px; margin-left: auto; border-radius: 50%; background: var(--orange); transition: transform .4s cubic-bezier(.2, .7, .2, 1); }
+  .cta-go svg { width: 18px; height: 18px; fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .faq .about-cta .btn-work:active .cta-go { transform: translateX(3px); }
+  .faq .about-cta .cta-note { margin: 14px 0 0; max-width: none; text-align: center; font-size: 12px; line-height: 1.3; letter-spacing: .01em; color: rgba(255, 240, 228, .55); }
+
+  /* letreiro: inteiro no creme, só em contorno fino escuro, com as bolinhas laranja */
+  .faq-marquee { margin: 34px -20px 0; }
+  .faq-marquee .mq-row { color: transparent; -webkit-text-stroke: 1px rgba(17, 17, 17, .2); }
+  .faq-marquee .mq-lit { color: rgba(242, 107, 29, .9); -webkit-text-stroke-color: rgba(242, 107, 29, .9); }
+  .faq-marquee .mq-lit i { background: var(--orange); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .cta-status i::after { animation: cta-ping 2.2s cubic-bezier(0, 0, .2, 1) infinite; }
+    .cta-live { opacity: 0; transform: translateY(40px) scale(.96); }
+    .cta-live :is(.cta-status, .cta-head, .cta-chips, .btn-work, .cta-note) { opacity: 0; transform: translateY(16px); }
+    .cta-live.is-in { opacity: 1; transform: none; transition: opacity .9s ease, transform 1.2s cubic-bezier(.16, 1, .3, 1); }
+    .cta-live.is-in :is(.cta-status, .cta-head, .cta-chips, .btn-work, .cta-note) { opacity: 1; transform: none; transition: opacity .8s ease, transform 1s cubic-bezier(.16, 1, .3, 1); }
+    .cta-live.is-in .cta-status { transition-delay: .2s; }
+    .cta-live.is-in .cta-head { transition-delay: .28s; }
+    .cta-live.is-in .cta-chips { transition-delay: .38s; }
+    .cta-live.is-in .btn-work { transition-delay: .46s; }
+    .cta-live.is-in .cta-note { transition-delay: .54s; }
+  }
+}
+@keyframes cta-ping { 0% { transform: scale(.6); opacity: .9; } 80%, 100% { transform: scale(1.7); opacity: 0; } }
+html.leve .cta-status i::after { animation: none; }
+
 /* ---------- Rodapé ----------
    Claro e sem borda: começa no creme da seção de cima (--panel) e vai ao branco, sem emenda.
    Frase da marca grande, colunas com índice laranja, links que "rolam" no hover, e a base. */

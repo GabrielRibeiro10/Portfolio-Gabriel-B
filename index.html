@@ -665,12 +665,20 @@
         </div>
       </div>
       <!-- chamada final logo depois das perguntas: a onda laranja do FAQ escorre até ela; o letreiro fica embaixo -->
+      <!-- chamada final. No PC fica sobre a faixa laranja da onda; no celular vira um cartão escuro (café) com brilho
+           laranja, selo de disponível, bônus em etiquetas e o botão do WhatsApp (os itens .cta-m só aparecem lá) -->
       <div class="about-cta" data-ab>
         <div class="cta-copy">
-          <p>Enquanto você pensa, seu concorrente já está online. <span>Bora tirar sua ideia do papel?</span></p>
+          <p class="cta-status cta-m"><i aria-hidden="true"></i>Disponível para novos projetos</p>
+          <p class="cta-head">Enquanto você pensa, seu concorrente já está online. <span>Bora tirar sua ideia do papel?</span></p>
           <p class="cta-bonus"><i aria-hidden="true"></i>Bônus em todo site: Google Meu Negócio configurado + 2 ajustes grátis.</p>
+          <ul class="cta-chips cta-m" aria-label="Bônus em todo site">
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.3 7-12a7 7 0 10-14 0c0 5.7 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>Google Meu Negócio</li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 11-2.3-5.6M20 4v4.5h-4.5"/></svg>2 ajustes grátis</li>
+          </ul>
         </div>
-        <a class="btn-work" href="https://wa.me/5512991145851?text=Ol%C3%A1%2C%20Gabriel%21%20Vi%20seu%20portf%C3%B3lio%20e%20gostaria%20de%20pedir%20um%20or%C3%A7amento%20para%20um%20site." target="_blank" rel="noopener">Quero meu site</a>
+        <a class="btn-work" href="https://wa.me/5512991145851?text=Ol%C3%A1%2C%20Gabriel%21%20Vi%20seu%20portf%C3%B3lio%20e%20gostaria%20de%20pedir%20um%20or%C3%A7amento%20para%20um%20site." target="_blank" rel="noopener"><svg class="cta-wa cta-m" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2a8.8 8.8 0 00-7.6 13.2L3.2 20.8l4.5-1.2A8.8 8.8 0 1012 3.2z"/></svg><span>Quero meu site</span><span class="cta-go cta-m" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5 10h10M11 6l4 4-4 4"/></svg></span></a>
+        <p class="cta-note cta-m">Orçamento gratuito · resposta rápida no WhatsApp</p>
       </div>
       <!-- letreiro: a linha em contorno corre (transform) e a luz que passa é uma "janela" que desliza por cima com
            uma cópia acesa do texto dentro, andando ao contrário: tudo no compositor, sem redesenhar as letras -->
