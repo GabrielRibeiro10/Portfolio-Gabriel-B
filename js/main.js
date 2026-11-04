@@ -533,31 +533,16 @@ if (animate) {
   });
   // a onda do fundo só balança com a seção à vista (e fica parada para quem prefere menos movimento)
   const wave = faq && faq.querySelector('.faq-wave');
-  // e se abre numa faixa de ponta a ponta atrás da chamada final ("poça", #fw-pool, pintada com a mesma tinta
-  // da onda: as duas viram uma peça só), que depois se dissolve no creme antes do letreiro. No celular a onda
-  // some depois da coluna da esquerda (as perguntas ficam no claro) e volta suave em cima da chamada.
-  // Máscara em 6 pontos (--m1…--m6, px do topo do FAQ): cheio, some, vazio, volta, cheio, some.
+  // Onde a onda termina (máscara do .faq-bg). PC: vai inteira até a chamada final e para na borda de cima dela
+  // (a chamada é uma faixa escura própria). Celular: termina numa borda em ondas logo depois da coluna da esquerda,
+  // antes da primeira pergunta (--wy; a borda em ondas é a máscara no css). --m1…--m6: px do topo do FAQ.
   if (wave && 'ResizeObserver' in window) {
-    const side = faq.querySelector('.faq-side'), list = faq.querySelector('.faq-list'), mq = faq.querySelector('.faq-marquee'), cta = faq.querySelector('.about-cta'), pool = wave.querySelector('#fw-pool');
+    const side = faq.querySelector('.faq-side'), cta = faq.querySelector('.about-cta');
     const phone = matchMedia('(max-width: 860px)');
     const fit = () => {
-      const fr = faq.getBoundingClientRect(), wr = wave.getBoundingClientRect();
-      const k = Math.max(wr.width / 420, wr.height / 2400);       // px por unidade do SVG (preserveAspectRatio slice)
-      const top = cta.offsetTop, bot = top + cta.offsetHeight;
-      // celular: a faixa começa colada na linha de baixo da última pergunta
-      const lb = list.offsetTop + list.offsetHeight;
-      // embaixo o degradê some por dentro do letreiro (ele fica encostado na faixa, metade no laranja que apaga)
-      const fadeEnd = mq.offsetTop + mq.offsetHeight * 0.62;
-      const y0 = (phone.matches ? lb - 80 : top - 30) / k, y1 = (fadeEnd + 60) / k, R = (fr.right - wr.left) / k + 40;
-      // borda de cima: sai de dentro da onda numa curva (sem quina) e segue em ondas suaves até a borda direita
-      let d = `M-1600 ${(y0 - 170).toFixed(1)}H290C350 ${(y0 - 150).toFixed(1)} 380 ${y0.toFixed(1)} 520 ${y0.toFixed(1)}`;
-      for (let x = 520, i = 0; x < R; x += 360, i++) d += `S${(x + 300).toFixed(1)} ${(y0 + (i % 2 ? -14 : 14)).toFixed(1)} ${(x + 360).toFixed(1)} ${y0.toFixed(1)}`;
-      pool.setAttribute('d', d + `V${y1.toFixed(1)}H-1600Z`);
-      let m = phone.matches
-        // celular: a onda some depois da coluna da esquerda e não volta (a chamada final é um cartão escuro no creme)
-        ? [side.offsetTop + side.offsetHeight + 4, side.offsetTop + side.offsetHeight + 190, 1e6, 1e6, 1e6, 1e6]
-        : [0, 0, 0, 0, bot - 10, fadeEnd];
-      m.forEach((v, i) => faq.style.setProperty(`--m${i + 1}`, Math.round(v) + 'px'));
+      const top = cta.offsetTop;
+      [0, 0, 0, 0, top + 2, top + 3].forEach((v, i) => faq.style.setProperty(`--m${i + 1}`, Math.round(v) + 'px'));
+      faq.style.setProperty('--wy', Math.round(side.offsetTop + side.offsetHeight + 4) + 'px');
     };
     new ResizeObserver(fit).observe(faq);
     phone.addEventListener('change', fit);
