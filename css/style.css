@@ -1919,7 +1919,7 @@ html.leve .intro .btn-work, html.leve .intro .btn-work::before, html.leve .intro
 }
 .pj-bridge::before {   /* o laranja da hero em cima, dissolvendo para baixo */
   content: ''; position: absolute; inset: 0;
-  background: linear-gradient(90deg, #c5450b 0%, #d8611a 28%, #e46418 55%, #e05800 76%, #ef6500 100%);
+  background: var(--seam);
   -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 12%, rgba(0, 0, 0, .55) 46%, transparent 86%);
   mask-image: linear-gradient(180deg, #000 0%, #000 12%, rgba(0, 0, 0, .55) 46%, transparent 86%);
 }
@@ -1954,7 +1954,7 @@ html.leve .intro .btn-work, html.leve .intro .btn-work::before, html.leve .intro
 }
 @media (max-width: 860px) {   /* no celular o pé da hero é um laranja mais vivo e uniforme */
   .pj-bridge::before {
-    background: linear-gradient(90deg, #e65d00 0%, #ea6100 28%, #ed6400 55%, #f26700 100%);
+    background: var(--seam);
     -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 18%, rgba(0, 0, 0, .55) 50%, transparent 88%);
     mask-image: linear-gradient(180deg, #000 0%, #000 18%, rgba(0, 0, 0, .55) 50%, transparent 88%);
   }
@@ -2001,4 +2001,20 @@ html.leve .intro .btn-work, html.leve .intro .btn-work::before, html.leve .intro
   .nc-more::after { right: -40vw; bottom: -18%; width: 110vw; }
   .nc-go-end { margin-top: 24px; }
   .nichos + .about-areas { margin-top: 44px; }
+}
+
+/* ---------- Emenda hero -> Projetos sem quebra ----------
+   O pé da hero muda de cor (foto, brilhos, modo leve), então em vez de tentar acertar a cor, as duas seções
+   usam a mesma: --seam. O pé da hero se dissolve nela (por cima do fundo e da foto, por baixo dos cartões e
+   textos) e a ponte começa exatamente nela. Mesma largura, mesma cor no mesmo pixel: a emenda não existe. */
+:root { --seam: linear-gradient(90deg, #c84a0c 0%, #d65c14 28%, #e06012 55%, #e25a02 76%, #ec6400 100%); }
+.hero::after {
+  content: ''; position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; height: calc(36px + 1.6cqw); pointer-events: none;   /* até a borda de baixo do painel claro, sem pintar ele */
+  background: var(--seam);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, .55) 50%, #000 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, .55) 50%, #000 100%);
+}
+@media (max-width: 860px), (max-aspect-ratio: 4/5), (orientation: landscape) and (max-height: 500px) and (max-width: 1000px) {
+  :root { --seam: linear-gradient(90deg, #e45c00 0%, #e96000 30%, #ec6300 60%, #f06600 100%); }
+  .hero::after { height: 64px; }
 }
