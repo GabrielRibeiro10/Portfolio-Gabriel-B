@@ -533,7 +533,8 @@ if (animate) {
   });
   // a onda do fundo só balança com a seção à vista (e fica parada para quem prefere menos movimento)
   const wave = faq && faq.querySelector('.faq-wave');
-  // Onde a onda termina (máscara do .faq-bg). PC: vai inteira até a chamada final e para na borda de cima dela
+  // Onde a onda termina (máscara do .faq-bg). PC: vai inteira até a chamada final e desce um pouco por trás da borda
+  // em ondas dela (o laranja continua sem emenda no topo laranja da faixa)
   // (a chamada é uma faixa escura própria). Celular: termina numa borda em ondas logo depois da coluna da esquerda,
   // antes da primeira pergunta (--wy; a borda em ondas é a máscara no css). --m1…--m6: px do topo do FAQ.
   if (wave && 'ResizeObserver' in window) {
@@ -541,7 +542,7 @@ if (animate) {
     const phone = matchMedia('(max-width: 860px)');
     const fit = () => {
       const top = cta.offsetTop;
-      [0, 0, 0, 0, top + 2, top + 3].forEach((v, i) => faq.style.setProperty(`--m${i + 1}`, Math.round(v) + 'px'));
+      [0, 0, 0, 0, top + 90, top + 91].forEach((v, i) => faq.style.setProperty(`--m${i + 1}`, Math.round(v) + 'px'));
       faq.style.setProperty('--wy', Math.round(side.offsetTop + side.offsetHeight + 4) + 'px');
     };
     new ResizeObserver(fit).observe(faq);
