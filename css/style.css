@@ -648,6 +648,103 @@ a { color: inherit; text-decoration: none; }
    tem o texto do projeto e um notebook em CSS 3D: a tampa gira na dobradiça (fechada = -90°) e a
    tela mostra a captura da página inteira do site, que rola sozinha (animação lp-scroll).
    js/main.js troca o slide ativo (.is-active) e o que está saindo (.is-leaving, com --x = lado). */
+/* ---------- Segmentos: landing pages por tipo de negócio ----------
+   Título à esquerda, texto e chamada à direita; embaixo, cartões com uma miniatura de página nas cores de cada
+   segmento (--c1 fundo, --c2 destaque), feita só com CSS. Entrada (js/main.js põe .ni-live e depois .is-in):
+   título sobe linha a linha, cartões sobem em cascata e a miniatura "acende" (o fundo abre de baixo para cima). */
+.nichos { margin-top: clamp(80px, 9vw, 150px); scroll-margin-top: 24px; }
+.ni-top { display: grid; grid-template-columns: 1.15fr 1fr; gap: clamp(24px, 5vw, 96px); align-items: end; margin-top: clamp(22px, 2.6vw, 40px); }
+.ni-title { margin: 0; font-size: clamp(38px, 5.6vw, 92px); font-weight: 400; line-height: .98; letter-spacing: -.045em; max-width: 12ch; }
+.ni-intro p { margin: 0; font-size: clamp(15px, 1.15vw, 18px); line-height: 1.55; color: var(--muted); max-width: 44ch; }
+.ni-intro strong { font-weight: 600; color: var(--ink); }
+.ni-cta {
+  display: inline-flex; align-items: center; gap: .7em; margin-top: 22px; padding: .95em 1.5em; border-radius: 99px;
+  background: var(--ink); color: #fff; font-size: 15px; font-weight: 500; text-decoration: none;
+  transition: background .35s, transform .35s cubic-bezier(.2, .7, .2, 1), box-shadow .35s;
+}
+.ni-cta svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .35s; }
+@media (hover: hover) {
+  .ni-cta:hover { background: var(--orange); transform: translateY(-2px); box-shadow: 0 14px 30px -12px rgba(242, 107, 29, .7); }
+  .ni-cta:hover svg { transform: translateX(4px); }
+}
+.ni-cta:focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; }
+
+.ni-grid { list-style: none; margin: clamp(36px, 4.5vw, 64px) 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(12px, 1.4vw, 22px); }
+.ni-card {
+  position: relative; display: flex; flex-direction: column; border-radius: 18px; background: #fff;
+  border: 1px solid #e8e4df; box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
+  transition: transform .5s cubic-bezier(.2, .7, .2, 1), box-shadow .5s, border-color .5s;
+}
+/* miniatura da página: barra do navegador, menu, título, texto, botão e três blocos */
+.ni-mock {
+  position: relative; overflow: hidden; margin: 8px 8px 0; aspect-ratio: 16 / 10.5; border-radius: 12px;
+  display: flex; flex-direction: column; gap: 6%; padding: 0 9% 8%;
+  background: radial-gradient(120% 90% at 85% 0%, color-mix(in srgb, var(--c2) 38%, transparent), transparent 60%), var(--c1);
+  color: #fff; font-size: clamp(9px, .78vw, 12px);
+}
+.ni-bar { display: flex; gap: 4px; margin: 0 -11% 0; padding: 7px 9px; background: rgba(255, 255, 255, .08); }
+.ni-bar i { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, .35); }
+.ni-nav { display: flex; align-items: center; gap: 7%; }
+.ni-nav b { width: 18%; height: 5px; border-radius: 3px; background: var(--c2); }
+.ni-nav em { width: 9%; height: 3px; border-radius: 2px; background: rgba(255, 255, 255, .35); }
+.ni-nav b + em { margin-left: auto; }
+.ni-head { max-width: 13ch; font-size: 1.32em; font-weight: 600; line-height: 1.08; letter-spacing: -.02em; }
+.ni-lines { display: flex; flex-direction: column; gap: 4px; margin-top: -2%; }
+.ni-lines em { height: 3px; border-radius: 2px; background: rgba(255, 255, 255, .3); width: 70%; }
+.ni-lines em + em { width: 48%; }
+.ni-btn { align-self: flex-start; padding: .35em .9em; border-radius: 99px; background: var(--c2); color: var(--c1); font-size: .78em; font-weight: 700; }
+.ni-tiles { position: absolute; right: 7%; bottom: 9%; display: flex; gap: 5px; }
+.ni-tiles em { width: clamp(16px, 1.9vw, 30px); aspect-ratio: 1; border-radius: 6px; background: rgba(255, 255, 255, .12); border: 1px solid rgba(255, 255, 255, .14); }
+.ni-tiles em:nth-child(2) { background: color-mix(in srgb, var(--c2) 55%, transparent); }
+
+.ni-body { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 4px 12px; padding: 16px 18px 20px; }
+.ni-ico { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 11px; background: #f6f2ee; color: var(--orange); transition: background .4s, color .4s; }
+.ni-ico svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.ni-body h3 { margin: 0; font-size: clamp(17px, 1.35vw, 21px); font-weight: 500; letter-spacing: -.02em; }
+.ni-body p { grid-column: 1 / -1; margin: 8px 0 0; font-size: 14px; line-height: 1.5; color: #5a5a5a; }
+@media (hover: hover) {
+  .ni-card:hover { transform: translateY(-6px); border-color: transparent; box-shadow: 0 26px 50px -24px rgba(90, 28, 6, .35), 0 0 0 1px rgba(242, 107, 29, .35); }
+  .ni-card:hover .ni-ico { background: var(--orange); color: #fff; }
+  .ni-card .ni-head, .ni-card .ni-btn { transition: transform .6s cubic-bezier(.2, .7, .2, 1); }
+  .ni-card:hover .ni-head { transform: translateY(-2px); }
+  .ni-card:hover .ni-btn { transform: scale(1.06); }
+}
+.ni-more { margin: clamp(24px, 3vw, 40px) 0 0; font-size: 15px; line-height: 1.55; color: #5a5a5a; }
+.ni-more a { color: var(--orange); font-weight: 600; text-underline-offset: 3px; }
+
+/* entrada */
+@media (prefers-reduced-motion: no-preference) {
+  .ni-live :is(.ni-title, .ni-intro) { opacity: 0; transform: translateY(34px); }
+  .ni-live .ni-card { opacity: 0; transform: translateY(46px) scale(.97); }
+  .ni-live .ni-mock { clip-path: inset(100% 0 0 0 round 12px); }
+  .ni-live .ni-more { opacity: 0; }
+  .ni-live.is-in :is(.ni-title, .ni-intro, .ni-card, .ni-more) {
+    opacity: 1; transform: none;
+    transition: opacity .9s cubic-bezier(.2, .7, .2, 1), transform 1.1s cubic-bezier(.2, .7, .2, 1);
+  }
+  .ni-live.is-in .ni-intro { transition-delay: .12s; }
+  .ni-live.is-in .ni-card { transition-delay: calc(.2s + var(--i) * 70ms); }
+  .ni-live.is-in .ni-mock { clip-path: inset(0 0 0 0 round 12px); transition: clip-path 1.1s cubic-bezier(.7, 0, .2, 1) calc(.35s + var(--i) * 70ms); }
+  .ni-live.is-in .ni-more { transition-delay: .9s; }
+}
+
+@media (max-width: 1100px) { .ni-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 860px) {
+  .nichos { margin-top: 72px; }
+  .ni-top { grid-template-columns: 1fr; align-items: start; gap: 18px; }
+  .ni-title { font-size: clamp(34px, 10vw, 52px); }
+}
+@media (max-width: 520px) {
+  .ni-grid { gap: 10px; }
+  .ni-mock { margin: 5px 5px 0; border-radius: 10px; font-size: 8px; padding: 0 8% 8%; }
+  .ni-tiles { display: none; }
+  .ni-body { grid-template-columns: 1fr; padding: 12px 12px 14px; gap: 8px; }
+  .ni-ico { width: 32px; height: 32px; border-radius: 9px; }
+  .ni-ico svg { width: 17px; height: 17px; }
+  .ni-body h3 { font-size: 15.5px; }
+  .ni-body p { margin: 0; font-size: 12.5px; line-height: 1.45; }
+}
+
 .projects { margin-top: clamp(80px, 9vw, 150px); scroll-margin-top: 24px; }
 .pj {
   position: relative; overflow: hidden; border-radius: 20px; color: #fff;
@@ -1063,13 +1160,37 @@ html.leve .faq-wave { animation: none; }   /* em telas largas o laranja passa da
 @keyframes mq-cnt { from { transform: translateX(34vw); } to { transform: translateX(-100vw); } }
 @media (prefers-reduced-motion: reduce) { .mq-shine { display: none; } }
 
-/* entrada em cascata (só com JS e sem "reduzir movimento") */
+/* entrada (só com JS e sem "reduzir movimento"; js/main.js põe .faq-live na grade e .is-in na coluna e em cada
+   pergunta quando ela aparece): o título sobe linha a linha de trás de uma máscara, o texto sai de um desfoque,
+   o botão cresce; em cada pergunta o fio de baixo se desenha da esquerda para a direita, o texto sobe e o "+" gira */
+.faq-title .fl { display: block; overflow: hidden; padding-bottom: .1em; margin-bottom: -.1em; }
+.faq-title .fl > span { display: inline-block; }
 @media (prefers-reduced-motion: no-preference) {
-  .faq-live .faq-item, .faq-live .faq-side > * { opacity: 0; transform: translateY(28px); transition: opacity .9s, transform 1.1s cubic-bezier(.2, .7, .2, 1), border-color .5s; transition-delay: calc(var(--i, 0) * 70ms); }
-  .faq-live .faq-side > :nth-child(2) { --i: 1; }
-  .faq-live .faq-side > :nth-child(3) { --i: 2; }
-  .faq-live .faq-side > :nth-child(4) { --i: 3; }
-  .faq-live.is-in .faq-item, .faq-live.is-in .faq-side > * { opacity: 1; transform: none; }
+  .faq-live .faq-side .fl > span { transform: translateY(118%); }
+  .faq-live .faq-side :is(.faq-lead, .faq-wa, .faq-trust) { opacity: 0; }
+  .faq-live .faq-side .faq-lead { transform: translateY(18px); filter: blur(8px); }
+  .faq-live .faq-side .faq-wa { transform: translateY(14px) scale(.92); }
+  .faq-live .faq-side .faq-trust { transform: translateX(-16px); }
+  .faq-live .faq-side.is-in .fl > span { transform: none; transition: transform 1.2s cubic-bezier(.16, 1, .3, 1); }
+  .faq-live .faq-side.is-in .fl + .fl > span { transition-delay: .1s; }
+  .faq-live .faq-side.is-in :is(.faq-lead, .faq-wa, .faq-trust) { opacity: 1; transform: none; filter: none; transition: opacity .9s ease, transform 1.1s cubic-bezier(.16, 1, .3, 1), filter .9s ease; }
+  .faq-live .faq-side.is-in .faq-lead { transition-delay: .3s; }
+  .faq-live .faq-side.is-in .faq-wa { transition-delay: .45s; }
+  .faq-live .faq-side.is-in .faq-trust { transition-delay: .6s; }
+
+  .faq-live .faq-item { border-bottom-color: transparent; }
+  .faq-live .faq-item::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; background: var(--faq-line);
+    transform: scaleX(0); transform-origin: 0 50%;
+  }
+  .faq-live .faq-item :is(.faq-n, .faq-t) { display: inline-block; opacity: 0; transform: translateY(70%); }
+  .faq-live .faq-item .faq-ico { opacity: 0; transform: scale(.5) rotate(-90deg); }
+  .faq-live .faq-item.is-in::after { transform: none; transition: transform 1.1s cubic-bezier(.7, 0, .2, 1) var(--d, 0s); }
+  .faq-live .faq-item.is-in :is(.faq-n, .faq-t) { opacity: 1; transform: none; transition: opacity .7s ease calc(var(--d, 0s) + .25s), transform 1s cubic-bezier(.16, 1, .3, 1) calc(var(--d, 0s) + .25s); }
+  .faq-live .faq-item.is-in .faq-t { transition-delay: calc(var(--d, 0s) + .32s); }
+  .faq-live .faq-item.is-in .faq-ico { opacity: 1; transform: none; transition: opacity .6s ease calc(var(--d, 0s) + .4s), transform 1s cubic-bezier(.16, 1, .3, 1) calc(var(--d, 0s) + .4s); }
+  html.leve .faq-live .faq-side .faq-lead { filter: none; }   /* modo leve: sem desfoque */
+}
 }
 @media (prefers-reduced-motion: reduce) {
   .faq *, .faq *::before, .faq *::after { transition: none !important; }

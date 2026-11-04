@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Gabriel Ribeiro • Desenvolvedor Web Full Stack</title>
-  <meta name="description" content="Seu site pode estar perdendo clientes. Crio sites, lojas virtuais e sistemas rápidos, bonitos e feitos para vender. Peça seu orçamento.">
+  <meta name="description" content="Sites, landing pages e lojas virtuais para advogados, imobiliárias, dentistas e todo tipo de negócio. Rápidos, bonitos e feitos para vender. Peça seu orçamento.">
   <!-- prévia do link no WhatsApp, Instagram, LinkedIn, Facebook e X (imagem 1200×630) -->
   <meta property="og:type" content="website">
   <meta property="og:locale" content="pt_BR">
@@ -37,6 +37,8 @@
   <!-- primeiro de tudo: recarregar volta ao topo e o modo leve para aparelhos fracos -->
   <script src="js/desempenho.js"></script>
   <link rel="stylesheet" href="css/style.css">
+  <!-- ATENÇÃO: o vercel.json libera só este script embutido pela assinatura (sha256 no Content-Security-Policy).
+       Mudou uma vírgula aqui dentro? Gere a assinatura de novo, senão o navegador bloqueia o script. -->
   <script>
     // esconde a foto até o GSAP preparar a entrada (o js/main.js tira a classe)
     if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('gsap-loading');
@@ -191,8 +193,144 @@
 
     <!-- Projetos: um notebook 3D por site (CSS 3D, js/main.js). A tela mostra a captura da página
          inteira rolando sozinha (por cima, quando carrega, o vídeo do site com os efeitos); ao passar para o lado, o notebook fecha e sai, e o próximo entra e abre -->
+    <!-- Segmentos: landing pages pensadas para cada tipo de negócio. Cada cartão traz uma miniatura de página
+         nas cores do segmento (só CSS, sem imagem). Entram em cascata quando aparecem (js/main.js) -->
+    <div class="nichos" id="segmentos">
+      <p class="about-kicker" data-ab><span class="k-num">(02)</span><span class="k-name">Segmentos</span><span class="k-line" aria-hidden="true"></span><span class="k-sub">Landing pages para cada negócio</span></p>
+      <div class="ni-top">
+        <h2 class="ni-title">Uma página feita para o <em>seu</em> negócio.</h2>
+        <div class="ni-intro">
+          <p>Cada segmento convence de um jeito. O advogado precisa passar confiança, a imobiliária precisa mostrar imóveis e o dentista precisa encher a agenda. A página nasce do que o <strong>seu cliente</strong> procura.</p>
+          <a class="ni-cta" href="https://wa.me/5512991145851?text=Ol%C3%A1%2C%20Gabriel%21%20Vi%20seu%20portf%C3%B3lio%20e%20gostaria%20de%20pedir%20um%20or%C3%A7amento%20de%20landing%20page%20para%20o%20meu%20neg%C3%B3cio." target="_blank" rel="noopener">Quero uma landing page<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10M11 6l4 4-4 4"/></svg></a>
+        </div>
+      </div>
+      <ul class="ni-grid">
+        <li class="ni-card" style="--i:0;--c1:#1d2b45;--c2:#c9a45c">
+          <div class="ni-mock" aria-hidden="true">
+            <span class="ni-bar"><i></i><i></i><i></i></span>
+            <span class="ni-nav"><b></b><em></em><em></em><em></em></span>
+            <span class="ni-head">Defesa que você pode confiar</span>
+            <span class="ni-lines"><em></em><em></em></span>
+            <span class="ni-btn">Falar com advogado</span>
+            <span class="ni-tiles"><em></em><em></em><em></em></span>
+          </div>
+          <div class="ni-body">
+            <span class="ni-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v18M7 21h10M5 7h14M5 7l-3 7a3 3 0 006 0L5 7zM19 7l-3 7a3 3 0 006 0l-3-7z"/></svg></span>
+            <h3>Advocacia</h3>
+            <p>Áreas de atuação, equipe com OAB e consulta marcada pelo WhatsApp.</p>
+          </div>
+        </li>
+        <li class="ni-card" style="--i:1;--c1:#0f4c45;--c2:#5fd3b5">
+          <div class="ni-mock" aria-hidden="true">
+            <span class="ni-bar"><i></i><i></i><i></i></span>
+            <span class="ni-nav"><b></b><em></em><em></em><em></em></span>
+            <span class="ni-head">Encontre o imóvel certo</span>
+            <span class="ni-lines"><em></em><em></em></span>
+            <span class="ni-btn">Ver imóveis</span>
+            <span class="ni-tiles"><em></em><em></em><em></em></span>
+          </div>
+          <div class="ni-body">
+            <span class="ni-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7M5 9.5V20h14V9.5M10 20v-5h4v5"/></svg></span>
+            <h3>Imobiliária</h3>
+            <p>Vitrine de imóveis com filtros, fotos grandes e contato direto com o corretor.</p>
+          </div>
+        </li>
+        <li class="ni-card" style="--i:2;--c1:#0b4f75;--c2:#7cd3f7">
+          <div class="ni-mock" aria-hidden="true">
+            <span class="ni-bar"><i></i><i></i><i></i></span>
+            <span class="ni-nav"><b></b><em></em><em></em><em></em></span>
+            <span class="ni-head">Seu sorriso em boas mãos</span>
+            <span class="ni-lines"><em></em><em></em></span>
+            <span class="ni-btn">Agendar consulta</span>
+            <span class="ni-tiles"><em></em><em></em><em></em></span>
+          </div>
+          <div class="ni-body">
+            <span class="ni-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3c-2.5 0-4 2-4 4.5 0 3 1.5 4.5 2 7.5.4 2.6 1 6 2.6 6 1.5 0 1.6-3.5 2.4-5.5.4-1 1.6-1 2 0 .8 2 .9 5.5 2.4 5.5 1.6 0 2.2-3.4 2.6-6 .5-3 2-4.5 2-7.5C21 5 19.5 3 17 3c-2 0-3 1-5 1S9 3 7 3z"/></svg></span>
+            <h3>Odontologia</h3>
+            <p>Tratamentos, antes e depois, convênios e agenda cheia com um toque.</p>
+          </div>
+        </li>
+        <li class="ni-card" style="--i:3;--c1:#6b1d3f;--c2:#f4a3c4">
+          <div class="ni-mock" aria-hidden="true">
+            <span class="ni-bar"><i></i><i></i><i></i></span>
+            <span class="ni-nav"><b></b><em></em><em></em><em></em></span>
+            <span class="ni-head">Cuidado que aparece</span>
+            <span class="ni-lines"><em></em><em></em></span>
+            <span class="ni-btn">Agendar avaliação</span>
+            <span class="ni-tiles"><em></em><em></em><em></em></span>
+          </div>
+          <div class="ni-body">
+            <span class="ni-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s-8-5-8-11a4.5 4.5 0 018-2.8A4.5 4.5 0 0120 10c0 6-8 11-8 11z"/></svg></span>
+            <h3>Clínicas e estética</h3>
+            <p>Procedimentos, profissionais e avaliação agendada direto pelo site.</p>
+          </div>
+        </li>
+        <li class="ni-card" style="--i:4;--c1:#5c1a10;--c2:#ff8a4c">
+          <div class="ni-mock" aria-hidden="true">
+            <span class="ni-bar"><i></i><i></i><i></i></span>
+            <span class="ni-nav"><b></b><em></em><em></em><em></em></span>
+            <span class="ni-head">Hoje tem o seu prato favorito</span>
+            <span class="ni-lines"><em></em><em></em></span>
+            <span class="ni-btn">Ver cardápio</span>
+            <span class="ni-tiles"><em></em><em></em><em></em></span>
+          </div>
+          <div class="ni-body">
+            <span class="ni-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 3v8a2 2 0 002 2v8M10 3v8a2 2 0 01-2 2M8 3v6M17 21V3c-2 1.5-3 4-3 7s1 4 3 4"/></svg></span>
+            <h3>Restaurantes</h3>
+            <p>Cardápio digital, horários, localização e pedido pelo WhatsApp.</p>
+          </div>
+        </li>
+        <li class="ni-card" style="--i:5;--c1:#1c1c1c;--c2:#c6f432">
+          <div class="ni-mock" aria-hidden="true">
+            <span class="ni-bar"><i></i><i></i><i></i></span>
+            <span class="ni-nav"><b></b><em></em><em></em><em></em></span>
+            <span class="ni-head">Comece hoje o seu treino</span>
+            <span class="ni-lines"><em></em><em></em></span>
+            <span class="ni-btn">Aula grátis</span>
+            <span class="ni-tiles"><em></em><em></em><em></em></span>
+          </div>
+          <div class="ni-body">
+            <span class="ni-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 10v4M6 7v10M18 7v10M21 10v4M6 12h12"/></svg></span>
+            <h3>Academias</h3>
+            <p>Planos, modalidades, aula experimental e matrícula online.</p>
+          </div>
+        </li>
+        <li class="ni-card" style="--i:6;--c1:#3b3530;--c2:#e5cfb4">
+          <div class="ni-mock" aria-hidden="true">
+            <span class="ni-bar"><i></i><i></i><i></i></span>
+            <span class="ni-nav"><b></b><em></em><em></em><em></em></span>
+            <span class="ni-head">Espaços com identidade</span>
+            <span class="ni-lines"><em></em><em></em></span>
+            <span class="ni-btn">Ver projetos</span>
+            <span class="ni-tiles"><em></em><em></em><em></em></span>
+          </div>
+          <div class="ni-body">
+            <span class="ni-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6M9 11h6"/></svg></span>
+            <h3>Arquitetura</h3>
+            <p>Portfólio visual dos projetos, processo de trabalho e pedido de orçamento.</p>
+          </div>
+        </li>
+        <li class="ni-card" style="--i:7;--c1:#23205c;--c2:#9f9bff">
+          <div class="ni-mock" aria-hidden="true">
+            <span class="ni-bar"><i></i><i></i><i></i></span>
+            <span class="ni-nav"><b></b><em></em><em></em><em></em></span>
+            <span class="ni-head">Sua empresa em dia</span>
+            <span class="ni-lines"><em></em><em></em></span>
+            <span class="ni-btn">Abrir CNPJ</span>
+            <span class="ni-tiles"><em></em><em></em><em></em></span>
+          </div>
+          <div class="ni-body">
+            <span class="ni-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 3h14v18H5zM8 7h8M8 11h2M12 11h2M16 11h0M8 15h2M12 15h2M8 18h2M12 18h4v-3"/></svg></span>
+            <h3>Contabilidade</h3>
+            <p>Serviços para MEI e empresas, abertura de CNPJ e atendimento online.</p>
+          </div>
+        </li>
+      </ul>
+      <p class="ni-more">Não achou o seu segmento? Pet shop, salão, oficina, escola, igreja… <a href="https://wa.me/5512991145851?text=Ol%C3%A1%2C%20Gabriel%21%20Vi%20seu%20portf%C3%B3lio%20e%20gostaria%20de%20pedir%20um%20or%C3%A7amento%20de%20landing%20page%20para%20o%20meu%20neg%C3%B3cio." target="_blank" rel="noopener">Me chama</a> que eu monto a página certa para o seu negócio.</p>
+    </div>
+
     <div class="projects" id="projetos">
-      <p class="about-kicker pj-kicker" data-ab><span class="k-num">(02)</span><span class="k-name">Projetos</span><span class="k-line" aria-hidden="true"></span><span class="k-sub">Sites que já estão no ar</span></p>
+      <p class="about-kicker pj-kicker" data-ab><span class="k-num">(03)</span><span class="k-name">Projetos</span><span class="k-line" aria-hidden="true"></span><span class="k-sub">Sites que já estão no ar</span></p>
       <div class="pj" role="region" aria-roledescription="carrossel" aria-label="Projetos publicados">
         <!-- fundo grafite: grade de pontos e holofote laranja que segue o mouse (css + js/main.js) -->
         <div class="pj-bg" aria-hidden="true"></div>
@@ -268,7 +406,7 @@
     </div>
 
     <div class="about-areas" id="servicos">
-      <p class="about-kicker areas-kicker" data-ab><span class="k-num">(03)</span><span class="k-name">O que eu entrego</span><span class="k-line" aria-hidden="true"></span><span class="k-sub">Do primeiro esboço ao site no ar</span></p>
+      <p class="about-kicker areas-kicker" data-ab><span class="k-num">(04)</span><span class="k-name">O que eu entrego</span><span class="k-line" aria-hidden="true"></span><span class="k-sub">Do primeiro esboço ao site no ar</span></p>
       <ol>
         <li data-ab><span class="n">01</span><h3>Design e experiência</h3><p>Interfaces modernas, identidade visual digital, animações e experiências interativas.</p></li>
         <li data-ab><span class="n">02</span><h3>Desenvolvimento Full Stack</h3><p>Sites e sistemas que ligam frontend, lógica de aplicação, banco de dados e funcionalidades reais.</p></li>
@@ -287,9 +425,9 @@
             <span class="bonus-badge" aria-hidden="true">
               <span class="bonus-tag">Bônus</span>
               <span class="bonus-pin">
-                <img class="pin-shadow" src="img/alfinete-sombra.webp" alt="" width="48" height="60" decoding="async">
-                <img class="pin-needle" src="img/alfinete-agulha.webp" alt="" width="48" height="60" decoding="async">
-                <img class="pin-head" src="img/alfinete-cabeca.webp" alt="" width="48" height="60" decoding="async">
+                <img class="pin-shadow" src="img/alfinete-sombra.webp" alt="" width="48" height="60" loading="lazy" decoding="async">
+                <img class="pin-needle" src="img/alfinete-agulha.webp" alt="" width="48" height="60" loading="lazy" decoding="async">
+                <img class="pin-head" src="img/alfinete-cabeca.webp" alt="" width="48" height="60" loading="lazy" decoding="async">
               </span>
             </span>
             <h3>Todo site sai com <em>dois bônus</em></h3>
@@ -311,7 +449,7 @@
     <!-- Stack: só o que está no código dos projetos (PH Sports, Maria Festinha, este portfólio e o
          dashboard). Faixa de ponta a ponta com o fundo da hero. Ícones em img/stack.svg -->
     <div class="stack" id="stack">
-      <p class="about-kicker" data-ab><span class="k-num">(04)</span><span class="k-name">Stack</span><span class="k-line" aria-hidden="true"></span><span class="k-sub">O que uso em produção</span></p>
+      <p class="about-kicker" data-ab><span class="k-num">(05)</span><span class="k-name">Stack</span><span class="k-line" aria-hidden="true"></span><span class="k-sub">O que uso em produção</span></p>
       <div class="stack-top">
         <h2 class="stack-title">Do design<br>ao <em>deploy</em>.</h2>
         <div>
@@ -479,10 +617,10 @@
         <path class="cr-wide" d="M0 100C60 100 90 42 180 40C280 38 330 80 430 78C530 76 580 20 690 22C800 24 860 72 1000 54" fill="none" stroke="#ffd2a8" stroke-opacity=".45" stroke-width="2" vector-effect="non-scaling-stroke"/>
         <path class="cr-narrow" d="M0 100C150 100 280 36 560 34C800 32 920 62 1000 58" fill="none" stroke="#ffd2a8" stroke-opacity=".45" stroke-width="2" vector-effect="non-scaling-stroke"/>
       </svg>
-      <p class="about-kicker" data-ab><span class="k-dash" aria-hidden="true"></span><span class="k-num">(05)</span><span class="k-name">Perguntas frequentes</span><span class="k-line" aria-hidden="true"></span><span class="k-sub">Tudo antes de começar</span></p>
+      <p class="about-kicker" data-ab><span class="k-dash" aria-hidden="true"></span><span class="k-num">(06)</span><span class="k-name">Perguntas frequentes</span><span class="k-line" aria-hidden="true"></span><span class="k-sub">Tudo antes de começar</span></p>
       <div class="faq-grid">
         <div class="faq-side">
-          <h2 class="faq-title">Ficou com<br><em>dúvida</em>?</h2>
+          <h2 class="faq-title"><span class="fl"><span>Ficou com</span></span> <span class="fl"><span><em>dúvida</em>?</span></span></h2>
           <p class="faq-lead">Separei as perguntas que mais recebo. Não achou a sua? Me chama que eu respondo rapidinho.</p>
           <a class="faq-wa" href="https://wa.me/5512991145851?text=Ol%C3%A1%2C%20Gabriel%21%20Vi%20seu%20portf%C3%B3lio%2C%20tenho%20uma%20d%C3%BAvida%20e%20gostaria%20de%20pedir%20um%20or%C3%A7amento%20para%20um%20site." target="_blank" rel="noopener"><svg class="faq-wa-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2a8.8 8.8 0 00-7.6 13.2L3.2 20.8l4.5-1.2A8.8 8.8 0 1012 3.2z"/><path d="M9 8.6c.2-.4.4-.4.6-.4h.5c.2 0 .4 0 .5.4l.7 1.6c.1.2 0 .4-.1.6l-.5.6c-.1.1-.2.3 0 .5.6 1 1.4 1.8 2.5 2.4.2.1.4.1.5 0l.6-.7c.2-.2.3-.2.5-.1l1.6.8c.2.1.3.2.3.4 0 .5-.2 1.2-.7 1.5-.6.4-1.5.6-2.6.2a9.6 9.6 0 01-4.8-4.2c-.6-1-.6-1.9-.4-2.6.1-.4.3-.8.8-1z" class="fill"/></svg>Perguntar no WhatsApp<svg class="faq-wa-arrow" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10M11 6l4 4-4 4"/></svg></a>
           <p class="faq-trust"><span class="faq-trust-dash" aria-hidden="true"></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5.5c0 4.3-3 8.2-7 9.5-4-1.3-7-5.2-7-9.5V6l7-3z"/><path d="M8.8 12.2l2.2 2.2 4.2-4.4"/></svg><span>Tire suas dúvidas<br>com total segurança</span></p>
@@ -565,6 +703,7 @@
           <ul>
             <li><a class="ft-link" href="#"><span data-t="Início">Início</span></a></li>
             <li><a class="ft-link" href="#sobre"><span data-t="Sobre">Sobre</span></a></li>
+            <li><a class="ft-link" href="#segmentos"><span data-t="Segmentos">Segmentos</span></a></li>
             <li><a class="ft-link" href="#projetos"><span data-t="Projetos">Projetos</span></a></li>
             <li><a class="ft-link" href="#servicos"><span data-t="Serviços">Serviços</span></a></li>
             <li><a class="ft-link" href="#faq"><span data-t="Perguntas frequentes">Perguntas frequentes</span></a></li>
