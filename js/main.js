@@ -534,30 +534,40 @@ if (animate) {
   // a onda do fundo só balança com a seção à vista (e fica parada para quem prefere menos movimento)
   const wave = faq && faq.querySelector('.faq-wave');
   // Onde a onda termina (máscara do .faq-bg). PC: vai inteira até a chamada final e desce um pouco por trás da borda
-  // em ondas dela (o laranja continua sem emenda no topo laranja da faixa)
-  // (a chamada é uma faixa escura própria). Celular: termina numa borda em ondas logo depois da coluna da esquerda,
-  // antes da primeira pergunta (--wy; a borda em ondas é a máscara no css). --m1…--m6: px do topo do FAQ.
+  // em ondas dela (o laranja continua sem emenda no topo laranja da faixa). Celular: some num degradê logo depois da
+  // coluna da esquerda, antes da primeira pergunta (--wy).
+  // Desempenho: nada disso roda durante a animação de abrir uma resposta; tudo é refeito 150 ms depois que o tamanho
+  // do FAQ para de mudar (settle).
   if (wave && 'ResizeObserver' in window) {
-    const side = faq.querySelector('.faq-side'), cta = faq.querySelector('.about-cta');
+    const side = faq.querySelector('.faq-side'), cta = faq.querySelector('.about-cta'), bg = faq.querySelector('.faq-bg');
     const phone = matchMedia('(max-width: 860px)');
     const shape = wave.querySelector('#fw-shape');
-    const fit = () => {
-      const top = cta.offsetTop;
-      [0, 0, 0, 0, top + 90, top + 91].forEach((v, i) => faq.style.setProperty(`--m${i + 1}`, Math.round(v) + 'px'));
-      faq.style.setProperty('--wy', Math.round(side.offsetTop + side.offsetHeight + 4) + 'px');
-      // PC: a borda de cima da chamada final sai da onda laranja da esquerda. Acha onde a borda da onda cruza o topo
-      // da faixa (ponto do desenho da onda que ainda é laranja, vindo da direita) e desenha dali uma curva que desce
-      // arredondada e segue em ondas até a direita: as duas viram uma onda só, sem quina
+    const put = (el, k, v) => { if (el.style.getPropertyValue(k) !== v) el.style.setProperty(k, v); };
+    // fim da onda e --wy: gravados só no settle(). O fim fica 90 + 400 px abaixo do topo da chamada final (escondido
+    // atrás dela), então continua coberto mesmo quando uma resposta abre e a chamada desce, sem recalcular nada por quadro
+    const marks = () => {
+      const end = cta.offsetTop + 3 + 90 + 400;
+      ['0px', '0px', '0px', '0px', end + 'px', (end + 1) + 'px'].forEach((v, i) => put(bg, `--m${i + 1}`, v));
+      put(bg, '--wy', Math.round(side.offsetTop + side.offsetHeight + 4 + 3) + 'px');
+    };
+    // ponto da borda da onda (unidades do desenho) na altura uy: o primeiro ponto laranja vindo da direita
+    // (passo de 4 e depois refinamento de 1: ~4x menos testes)
+    const edgeAt = (uy, from) => {
+      let x = from;
+      for (; x > -200; x -= 4) if (shape.isPointInFill(new DOMPoint(x, uy))) break;
+      if (x <= -200) return -1;
+      for (let y = Math.min(from, x + 4); y >= x; y -= 1) if (shape.isPointInFill(new DOMPoint(y, uy))) return y;
+      return x;
+    };
+    // PC: a borda de cima da chamada final sai da onda laranja da esquerda. Acha onde a borda da onda cruza o topo
+    // da faixa e desenha dali uma curva que desce na mesma direção, arredonda e segue em ondas até a direita
+    const edge = () => {
       if (phone.matches || !shape || !shape.isPointInFill) { cta.style.removeProperty('--ctop'); cta.style.removeProperty('--ex'); return; }
       const wr = wave.getBoundingClientRect(), cr = cta.getBoundingClientRect();
       const k = Math.max(wr.width / 420, wr.height / 2400), uy = (cr.top - wr.top) / k;
-      let ux = -1;
-      for (let x = 420; x > -200; x -= 1) if (shape.isPointInFill(new DOMPoint(x, uy))) { ux = x; break; }
+      const ux = edgeAt(uy, 420);
       if (ux < 0) { cta.style.removeProperty('--ctop'); return; }
-      // inclinação da borda da onda logo acima do topo da faixa (px de x por px de y): a curva da faixa sai nessa
-      // mesma direção, desce um pouco e vira para a direita, e a borda fica contínua (sem ponta)
-      let ux2 = ux;
-      for (let x = ux + 40; x > -200; x -= 1) if (shape.isPointInFill(new DOMPoint(x, uy - 24 / k))) { ux2 = x; break; }
+      const ux2 = Math.max(ux, edgeAt(uy - 24 / k, ux + 40));
       const sl = Math.max(-2.5, Math.min(0, -(ux2 - ux) * k / 24));
       const W = Math.round(cr.width), H = Math.min(84, Math.max(56, innerWidth * 0.054));
       const ex = wr.left + ux * k - cr.left, yb = H * 0.82, bx = ex + sl * H * 0.5 + H * 1.6, x1 = bx + (W - bx) * 0.5;
@@ -566,11 +576,18 @@ if (animate) {
         + `C${f(bx + (x1 - bx) * 0.45)} ${f(yb)} ${f(x1 - (x1 - bx) * 0.45)} ${f(H * 0.2)} ${f(x1)} ${f(H * 0.22)}`
         + `C${f(x1 + (W - x1) * 0.4)} ${f(H * 0.24)} ${f(W - (W - x1) * 0.35)} ${f(H * 0.5)} ${f(W)} ${f(H * 0.36)}V${f(H)}H0Z`;
       const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${W} ${f(H)}' preserveAspectRatio='none'><path d='${d}'/></svg>`;
-      cta.style.setProperty('--ctop', `url("data:image/svg+xml,${encodeURIComponent(svg)}")`);
-      cta.style.setProperty('--ex', Math.round(ex) + 'px');
+      put(cta, '--ctop', `url("data:image/svg+xml,${encodeURIComponent(svg)}")`);
+      put(cta, '--ex', Math.round(ex) + 'px');
     };
+    // Altura do fundo da onda fixa em px (altura do FAQ + 400 px de folga), refeita só quando o tamanho para de mudar.
+    // Sem isso, abrir uma resposta mudava a altura do fundo a cada quadro e o navegador redesenhava a camada inteira
+    // (enorme, com máscara) em todos os quadros: era o que travava. A sobra abaixo do fim da onda é transparente.
+    const settle = () => { put(bg, 'height', (faq.offsetHeight + 400) + 'px'); marks(); edge(); };
+    let t = 0;
+    const fit = () => { clearTimeout(t); t = setTimeout(settle, 150); };
+    settle();
     new ResizeObserver(fit).observe(faq);
-    phone.addEventListener('change', fit);
+    phone.addEventListener('change', settle);
   }
   if (wave && (reduceMotion || !('IntersectionObserver' in window))) { if (reduceMotion) wave.pauseAnimations(); }
   else if (wave) {
