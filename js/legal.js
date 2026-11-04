@@ -1,5 +1,9 @@
-// Páginas legais: o índice da esquerda acende a seção que está sendo lida
-// (a última cujo topo já passou de 30% da altura da tela).
+// Páginas legais. O topo animado para de se mexer quando sai da tela (desempenho).
+(() => {
+  const hero = document.querySelector('.doc-hero');
+  if (hero && 'IntersectionObserver' in window) new IntersectionObserver(([e]) => hero.classList.toggle('is-off', !e.isIntersecting)).observe(hero);
+})();
+// O índice da esquerda acende a seção que está sendo lida (a última cujo topo já passou de 30% da tela).
 (() => {
   const links = [...document.querySelectorAll('.doc-toc a[href^="#"]')];
   const secs = links.map((a) => document.getElementById(a.hash.slice(1)));

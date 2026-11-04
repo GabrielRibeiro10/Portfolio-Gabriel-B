@@ -34,6 +34,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- foto da hero em 3 tamanhos (ampliada com IA, Real-ESRGAN): cada tela baixa só o que precisa; telas retina pegam a de 2048 px -->
   <link rel="preload" as="image" href="img/gabriel-recorte.webp" imagesrcset="img/gabriel-recorte.webp 1024w, img/gabriel-recorte-1536.webp 1536w, img/gabriel-recorte-2048.webp 2048w" imagesizes="(max-width: 860px) 100vw, 79vh" fetchpriority="high">
+  <!-- primeiro de tudo: recarregar volta ao topo e o modo leve para aparelhos fracos -->
+  <script src="js/desempenho.js"></script>
   <link rel="stylesheet" href="css/style.css">
   <script>
     // esconde a foto até o GSAP preparar a entrada (o js/main.js tira a classe)
