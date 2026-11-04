@@ -1451,3 +1451,42 @@ html.leve .lp-screen video { display: none; }
 html.leve .lp-screen img { visibility: visible !important; }
 html.leve .logo-mark { filter: drop-shadow(0 0 6px rgba(255, 149, 54, .55)); }
 html.leve .pj-bg::before { -webkit-mask-image: none; mask-image: none; opacity: .5; }
+
+/* ---------- Hero: glow branco no "Ver meus projetos" ----------
+   Halo branco suave em camadas que respira devagar, um fio de luz que percorre a borda da pílula
+   (degradê cônico girando, recortado só na borda) e um reflexo que atravessa o botão de tempos em tempos.
+   No hover o halo cresce e o botão sobe. Só no botão da hero; parado com "menos movimento" e no modo leve. */
+@property --bw-a { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+.intro .btn-work {
+  position: relative; isolation: isolate; overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .9), 0 0 18px 2px rgba(255, 255, 255, .42), 0 0 46px 8px rgba(255, 236, 214, .28), 0 14px 34px -14px rgba(60, 18, 5, .75);
+  animation: bw-breathe 3.4s ease-in-out infinite;
+  transition: transform .45s cubic-bezier(.2, .7, .2, 1), box-shadow .45s ease;
+}
+.intro .btn-work::before {   /* fio de luz que corre pela borda */
+  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; padding: 1.5px; pointer-events: none;
+  background: conic-gradient(from var(--bw-a), rgba(255, 210, 168, 0) 0deg, rgba(255, 149, 54, .95) 40deg, rgba(255, 210, 168, 0) 90deg, rgba(255, 210, 168, 0) 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+          mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  animation: bw-spin 4.5s linear infinite;
+}
+.intro .btn-work::after {    /* reflexo que atravessa */
+  content: ""; position: absolute; top: -20%; bottom: -20%; left: -40%; width: 34%; z-index: -1; pointer-events: none;
+  background: linear-gradient(100deg, rgba(255, 220, 190, 0), rgba(255, 196, 140, .55) 50%, rgba(255, 220, 190, 0));
+  transform: translateX(-120%) skewX(-18deg);
+  animation: bw-sweep 4.2s cubic-bezier(.55, 0, .25, 1) 1.8s infinite;
+}
+.intro .btn-work:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 0 0 1px #fff, 0 0 26px 5px rgba(255, 255, 255, .62), 0 0 72px 16px rgba(255, 236, 214, .42), 0 18px 40px -14px rgba(60, 18, 5, .8);
+  animation-play-state: paused;
+}
+.intro .btn-work:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+@keyframes bw-breathe {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(255, 255, 255, .9), 0 0 18px 2px rgba(255, 255, 255, .42), 0 0 46px 8px rgba(255, 236, 214, .28), 0 14px 34px -14px rgba(60, 18, 5, .75); }
+  50% { box-shadow: 0 0 0 1px rgba(255, 255, 255, .95), 0 0 24px 4px rgba(255, 255, 255, .56), 0 0 62px 12px rgba(255, 236, 214, .38), 0 14px 34px -14px rgba(60, 18, 5, .75); }
+}
+@keyframes bw-spin { to { --bw-a: 360deg; } }
+@keyframes bw-sweep { 0% { transform: translateX(-120%) skewX(-18deg); } 45%, 100% { transform: translateX(480%) skewX(-18deg); } }
+@media (prefers-reduced-motion: reduce) { .intro .btn-work, .intro .btn-work::before, .intro .btn-work::after { animation: none; } }
+html.leve .intro .btn-work, html.leve .intro .btn-work::before, html.leve .intro .btn-work::after { animation: none; }
