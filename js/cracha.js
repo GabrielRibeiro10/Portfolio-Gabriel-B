@@ -454,6 +454,8 @@ async function start() {
     if (visible && still < 0.5 && since < 7) requestAnimationFrame(frame); else running = false;
   }
   const kick = () => { still = 0; since = 0; if (!running && visible && shown) { running = true; last = performance.now(); acc = 0; requestAnimationFrame(frame); } };
+  // parallax do Sobre mim (js/main.js): o título anda com a rolagem e o "g" junto; o crachá acorda e acompanha
+  addEventListener('scroll', () => { if (visible && shown) kick(); }, { passive: true });
 
   layout(); hang(0); draw();
   about.classList.add('cracha-3d'); about.classList.remove('cracha-loading');
