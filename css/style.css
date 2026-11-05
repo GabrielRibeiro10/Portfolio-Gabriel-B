@@ -1890,8 +1890,8 @@ html.leve .intro .btn-work, html.leve .intro .btn-work::before, html.leve .intro
    No celular o menu do topo, a marca e os links do rodapé tinham ~16 px de altura (difícil acertar com o dedo).
    Uma área invisível em volta de cada um chega a ~40 px, sem mudar nada do visual. */
 @media (pointer: coarse) {
-  .nav a, .ft-link, .doc-brand { position: relative; }   /* a marca da hero (.logo) já tem posição própria */
-  .nav a::after, .logo::after, .doc-brand::after, .ft-link::after { content: ''; position: absolute; inset: -12px -6px; }
+  .nav a, .ft-link, .doc-brand, .ft-logo { position: relative; }   /* a marca da hero (.logo) já tem posição própria */
+  .nav a::after, .logo::after, .doc-brand::after, .ft-link::after, .ft-logo::after { content: ''; position: absolute; inset: -12px -6px; }
 }
 
 /* celular: o bloco de texto da hero (.intro) ocupa a primeira tela inteira e ficava por cima do menu do topo (o menu
