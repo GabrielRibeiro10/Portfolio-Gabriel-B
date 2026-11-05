@@ -2075,3 +2075,42 @@ html.nc-gal-on .nichos.ni-live .nc-shot, html.nc-gal-on .nichos.ni-live.is-in .n
   .faq .about-cta .cta-sun { top: clamp(-220px, -13vw, -130px); right: 6vw; width: clamp(340px, 30vw, 500px); height: clamp(340px, 30vw, 500px); outline-offset: 26px; box-shadow: 0 0 110px 10px rgba(255, 190, 80, .35); }
   .faq .about-cta .cta-orb { left: -200px; bottom: -560px; width: 700px; height: 700px; opacity: .5; }
 }
+
+/* ---------- Ajustes: setas de Segmentos, botão com luz branca, cantos do cartão café, galeria no celular, hero no celular ---------- */
+/* setas e contador mais perto dos cartões (por cima do espaço que sobra embaixo do arco) */
+html.nc-gal-on .nichos .nc-ctrl { position: relative; z-index: 5; margin-top: calc(-1 * clamp(56px, 7.6vw, 122px)); }
+@media (max-width: 860px) {
+  html.nc-gal-on .nichos .nc-grid { --cw: min(60vw, 250px); padding-bottom: 84px; }
+  html.nc-gal-on .nichos .nc-ctrl { margin-top: -50px; }
+}
+/* "Quero uma landing page": a mesma luz branca do botão da hero (halo branco fixo + reflexo que atravessa) */
+.nc-more-go { position: relative; overflow: hidden; isolation: isolate;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .55), 0 0 18px 2px rgba(255, 255, 255, .28), 0 0 42px 6px rgba(255, 236, 214, .18), 0 14px 30px -14px rgba(242, 107, 29, .8); }
+.nc-more-go::after {
+  content: ""; position: absolute; top: -20%; bottom: -20%; left: -40%; width: 34%; z-index: -1; pointer-events: none;
+  background: linear-gradient(100deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, .6) 50%, rgba(255, 255, 255, 0));
+  transform: translateX(-120%) skewX(-18deg); animation: bw-sweep 4.2s cubic-bezier(.55, 0, .25, 1) 1.2s infinite;
+}
+@media (hover: hover) { .nc-more-go:hover { box-shadow: 0 0 0 1px #fff, 0 0 26px 5px rgba(255, 255, 255, .45), 0 0 64px 14px rgba(255, 236, 214, .3), 0 18px 36px -12px rgba(242, 107, 29, .9); } }
+@media (prefers-reduced-motion: reduce) { .nc-more-go::after { animation: none; } }
+html.leve .nc-more-go::after { animation: none; }
+/* cartão café de ponta a ponta com os cantos arredondados (como a hero e a Stack) */
+.nc-more { border-radius: clamp(18px, 2vw, 32px); }
+@media (max-width: 860px) { .nc-more { border-radius: 20px; } }
+/* celular: a imagem da hero só na primeira tela; embaixo (atrás do painel claro) volta o laranja de antes */
+@media (max-width: 860px), (max-aspect-ratio: 4/5), (orientation: landscape) and (max-height: 500px) and (max-width: 1000px) {
+  .hero-bg, html.leve .hero-bg {
+    background:
+      linear-gradient(180deg, rgba(240, 122, 0, 0) calc(100svh - 220px), #f07a00 100svh),
+      url("../img/hero-fundo-960.webp") 30% 0 / auto 100svh no-repeat,
+      #f07a00;
+  }
+}
+@media (min-resolution: 2dppx) and (max-width: 860px) {
+  .hero-bg, html.leve .hero-bg {
+    background:
+      linear-gradient(180deg, rgba(240, 122, 0, 0) calc(100svh - 220px), #f07a00 100svh),
+      url("../img/hero-fundo.webp") 30% 0 / auto 100svh no-repeat,
+      #f07a00;
+  }
+}
