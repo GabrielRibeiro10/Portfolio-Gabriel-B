@@ -73,14 +73,20 @@ Scripts em `.claude/skills/auditoria-site/scripts/` (Playwright, já instalado n
    Tem que sair "responsividade ok". Olhe também algumas fotos (320, 390, 768, 1366, 2560) para problemas que regra
    nenhuma pega (espaço estranho, elemento desalinhado, imagem esticada).
 
-5b. **iPhone / Safari (obrigatório antes de entregar)**: o Chrome do teste NÃO mostra os defeitos do Safari. Rode o
-   site no motor do Safari (WebKit) como iPhone 13 Pro Max e iPhone SE e **olhe as fotos**:
-   `PLAYWRIGHT_BROWSERS_PATH=<scratchpad>/pw-webkit node .claude/skills/auditoria-site/scripts/iphone.js --fotos=<scratchpad>/iphone`
+5b. **Todos os iPhones e iPads (Safari) — obrigatório antes de entregar.** O Chrome do teste NÃO mostra os
+   defeitos do Safari, e no iPhone todo navegador (Chrome, Instagram, WhatsApp) usa o Safari por baixo.
+   `iphone.js` abre o site no motor do Safari em **todos os iPhones que o Playwright conhece** (iPhone 6 ao 17:
+   SE, Mini, Plus, Pro, Pro Max, Air), em pé e deitado, e nos iPads, e confere **sozinho**, medindo as cores na foto
+   da tela: erros, rolagem lateral, notebook mostrando o site (e não o retângulo cinza) e crachá com a foto.
+   `PLAYWRIGHT_BROWSERS_PATH=<scratchpad>/pw-webkit node .claude/skills/auditoria-site/scripts/iphone.js --deitado --fotos=<scratchpad>/iphone`
+   `PLAYWRIGHT_BROWSERS_PATH=<scratchpad>/pw-webkit node .claude/skills/auditoria-site/scripts/iphone.js --grupo=ipads --fotos=<scratchpad>/iphone`
+   Um modelo só: `--aparelhos="iPhone 13 Pro Max"`. Tem que terminar com "ok em todos". Olhe também algumas fotos
+   (`montagem.js`). Efeito novo em 3D, canvas ou vídeo: acrescente a checagem dele no `iphone.js`.
    Na primeira vez da sessão instale o WebKit (fora do repositório) e as bibliotecas que ele pedir:
    `PLAYWRIGHT_BROWSERS_PATH=<scratchpad>/pw-webkit node $(node -e "console.log(require.resolve('playwright').replace(/index.js$/,''))")cli.js install webkit`
    `apt-get install -y libgtk-4-1 libgraphene-1.0-0 libevent-2.1-7 libgstreamer-gl1.0-0 libgstreamer-plugins-bad1.0-0 libavif16 libwayland-server0 libmanette-0.2-0 libenchant-2-2 libsecret-1-0 libgles2`
-   Tem que aparecer o site dentro do notebook (não um retângulo cinza) e a foto no crachá. Mesmo passando, peça
-   ao dono para abrir num iPhone de verdade: o emulador não reproduz o limite de memória de canvas do iOS.
+   Limite: o simulador usa o motor do Safari mas não o limite de memória de canvas nem a placa de vídeo do iPhone;
+   peça ao dono para abrir num iPhone de verdade antes de entregar.
 
 6. **Corrigir, medir de novo, comparar** (antes/depois com números), rodar de novo 1, 4 e 5 para garantir que nada
    quebrou, e só então fazer commit e publicar (siga as regras de git da sessão).
