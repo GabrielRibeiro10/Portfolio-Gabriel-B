@@ -293,7 +293,9 @@ async function start() {
   function pin() {
     const { r } = anchor(), ar = about.getBoundingClientRect();
     P.x = r.left + r.width * tail.x - ar.left;
-    P.y = r.top + r.height * tail.y - ar.top;
+    // parallax do Sobre mim (js/main.js): o título e o crachá andam juntos (--ty no .about move o canvas); a física
+    // trabalha sem esse deslocamento, então rolar a página não puxa nem balança o crachá
+    P.y = r.top + r.height * tail.y - ar.top - (parseFloat(about.style.getPropertyValue('--ty')) || 0);
     placeA();
   }
   function placeA() {   // a fita fica presa na barra de baixo da argola, que gira junto com o gancho
@@ -457,8 +459,6 @@ async function start() {
     if (visible && still < 0.5 && since < 7) requestAnimationFrame(frame); else running = false;
   }
   const kick = () => { still = 0; since = 0; if (!running && visible && shown) { running = true; last = performance.now(); acc = 0; requestAnimationFrame(frame); } };
-  // parallax do Sobre mim (js/main.js): o título anda com a rolagem e o "g" junto; o crachá acorda e acompanha
-  addEventListener('scroll', () => { if (visible && shown) kick(); }, { passive: true });
 
   layout(); hang(0); draw();
   about.classList.add('cracha-3d'); about.classList.remove('cracha-loading');
