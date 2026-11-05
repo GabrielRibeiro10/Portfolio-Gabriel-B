@@ -2123,3 +2123,24 @@ html.leve .nc-more-go::after { animation: none; }
 /* abertura da hero (js/main.js): no celular o nome aparece ao lado do GR só durante a abertura */
 @media (max-width: 599px) { .logo.logo-intro .logo-sep, .logo.logo-intro .logo-word { display: flex; } .logo.logo-intro .logo-sep { display: block; } }
 .socials a { position: relative; }   /* para a entrada (uma bolinha sai de dentro da outra) */
+
+/* ---------- Letreiro estático (no lugar da faixa que corria) ----------
+   Frase grande, parada, no estilo editorial dos sites premiados: a fonte do site, fina e apertada, e a parte que
+   importa em itálico serifado (Instrument Serif) no laranja da marca. Entra com GSAP (js/main.js) e fica parada. */
+.faq-statement {
+  position: relative; z-index: 1; margin: clamp(40px, 5vw, 88px) 0 0; max-width: 16ch;
+  font-size: clamp(46px, 8.6vw, 156px); font-weight: 400; line-height: .95; letter-spacing: -.055em; color: var(--ink);
+  text-wrap: balance;
+}
+.faq-statement em {
+  font-family: "Instrument Serif", Georgia, "Times New Roman", serif; font-style: italic; font-weight: 400;
+  letter-spacing: -.02em; color: var(--orange);
+}
+.faq-statement .word-mask { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .08em; margin-bottom: -.08em; }
+.faq-statement .word { display: inline-block; }
+@media (max-width: 860px) { .faq-statement { margin-top: 36px; font-size: clamp(42px, 12.5vw, 64px); max-width: 12ch; } }
+/* frase da chamada separada em palavras (GSAP): o degradê do destaque não pode pegar as outras palavras (que também
+   viraram <span>); as do destaque recebem o degradê inline (js/main.js) */
+.faq .about-cta .cta-head .word-mask, .faq .about-cta .cta-head .word { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: inherit; }
+.faq .about-cta .cta-head > .word-mask, .faq .about-cta .cta-head > .word-mask .word { color: #fff; }
+.faq-statement { padding-bottom: clamp(20px, 3vw, 56px); }
