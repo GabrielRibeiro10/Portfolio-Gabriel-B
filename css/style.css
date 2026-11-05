@@ -1686,8 +1686,8 @@ html.leve .pj-bg::before { -webkit-mask-image: none; mask-image: none; opacity: 
 @property --bw-a { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
 .intro .btn-work {
   position: relative; isolation: isolate; overflow: hidden;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, .9), 0 0 18px 2px rgba(255, 255, 255, .42), 0 0 46px 8px rgba(255, 236, 214, .28), 0 14px 34px -14px rgba(60, 18, 5, .75);
-  animation: bw-breathe 3.4s ease-in-out infinite;
+  /* halo fixo (no meio do antigo "respirar"): animar uma sombra de 50-60 px repintava o botão a cada quadro, sem parar */
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .92), 0 0 21px 3px rgba(255, 255, 255, .49), 0 0 54px 10px rgba(255, 236, 214, .33), 0 14px 34px -14px rgba(60, 18, 5, .75);
   transition: transform .45s cubic-bezier(.2, .7, .2, 1), box-shadow .45s ease;
 }
 .intro .btn-work::before {   /* fio de luz que corre pela borda */
@@ -1725,6 +1725,7 @@ html.leve .intro .btn-work, html.leve .intro .btn-work::before, html.leve .intro
 .hero-art {
   position: absolute; z-index: -1; left: 48cqw; bottom: -10cqh; height: 117.5cqh; aspect-ratio: 1024 / 1536;
   transform: translateX(-50%); overflow: visible; pointer-events: none;
+  will-change: transform;   /* camada própria: o parallax só move o desenho, sem repintar degradês e máscara */
 }
 .gsap-loading .hero-art { opacity: 0; }
 .hero-bg, .hero-bg::after { animation: none !important; }
@@ -1884,5 +1885,19 @@ html.leve .intro .btn-work, html.leve .intro .btn-work::before, html.leve .intro
   .about-in > .projects:first-child .pj-kicker { top: calc(36px + 34px); }
 }
 
-/* parallax do Sobre mim: o crachá (canvas 3D ou o desenhado do modo leve) anda junto com o título (js/main.js) */
-.cracha-canvas, .lanyard { translate: 0 var(--ty, 0px); }
+
+/* ---------- Toque: área de clique maior nos links pequenos ----------
+   No celular o menu do topo, a marca e os links do rodapé tinham ~16 px de altura (difícil acertar com o dedo).
+   Uma área invisível em volta de cada um chega a ~40 px, sem mudar nada do visual. */
+@media (pointer: coarse) {
+  .nav a, .ft-link, .doc-brand { position: relative; }   /* a marca da hero (.logo) já tem posição própria */
+  .nav a::after, .logo::after, .doc-brand::after, .ft-link::after { content: ''; position: absolute; inset: -12px -6px; }
+}
+
+/* celular: o bloco de texto da hero (.intro) ocupa a primeira tela inteira e ficava por cima do menu do topo (o menu
+   mora no painel, que fica embaixo dele): tocar em "Projetos", "Sobre"... não fazia nada. O vazio do bloco deixa o
+   toque passar; o selo, o título, o botão e os cartões continuam clicáveis. */
+@media (max-width: 860px), (max-aspect-ratio: 4/5), (orientation: landscape) and (max-height: 500px) and (max-width: 1000px) {
+  .intro { pointer-events: none; }
+  .intro > * { pointer-events: auto; }
+}

@@ -165,6 +165,8 @@ if (animate) {
         .fromTo(shine, { xPercent: -70 }, { xPercent: 135 }, 0)   // a luz já aparece na borda esquerda no começo
         .fromTo(glow, { '--gx': '12%', '--gy': '10%', '--gc': 'rgba(255, 130, 50, .34)' },
           { '--gx': '100%', '--gy': '100%', '--gc': 'rgba(255, 196, 80, .38)' }, 0);
+      // modo leve ligado no meio do uso: para tudo e deixa o card no lugar, com a luz parada
+      document.addEventListener('gr:leve', () => { st.scrollTrigger.kill(); st.progress(0).kill(); gsap.set(card, { clearProps: 'transform' }); }, { once: true });
     }
     if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
     gsap.set(card, { transformPerspective: 900 });
@@ -726,8 +728,8 @@ if (animate) {
 
 // ---------- Sobre mim: parallax na seção toda ----------
 // Camadas em velocidades diferentes enquanto a seção atravessa a tela: o selo mais devagar, o texto no meio, o
-// título e os números mais rápido. O crachá anda junto com o título como um bloco só (--ty no .about move o canvas
-// e js/cracha.js desconta isso da física): rolar não puxa nem balança o crachá. Menor no celular; parado para quem
+// título e os números mais rápido. O crachá anda junto com o título como um bloco só (o mesmo translate no canvas;
+// js/cracha.js desconta isso da física): rolar não puxa nem balança o crachá. Menor no celular; parado para quem
 // prefere menos movimento e no modo leve.
 if (window.gsap && window.ScrollTrigger && !reduceMotion) {
   const me = document.querySelector('.about-me'), about = document.querySelector('.about');
@@ -749,11 +751,17 @@ if (window.gsap && window.ScrollTrigger && !reduceMotion) {
         const els = me.querySelectorAll(sel);
         if (els.length) tl.fromTo(els, { y: d * k }, { y: -d * k }, 0);
       }
+      // o deslocamento vai direto no título e no crachá (canvas 3D ou o desenhado). Antes ia numa variável no .about:
+      // mudar uma variável na seção a cada quadro fazia o navegador recalcular o estilo de ~850 elementos
+      let last = '';
       tl.fromTo(ty, { v: TITLE * k }, { v: -TITLE * k, onUpdate: () => {
-        title.style.translate = `0 ${ty.v.toFixed(2)}px`;
-        about.style.setProperty('--ty', ty.v.toFixed(2) + 'px');
+        const v = `0 ${ty.v.toFixed(1)}px`;
+        if (v === last) return;
+        last = v; title.style.translate = v;
+        for (const c of about.querySelectorAll(':scope > .cracha-canvas, :scope > .lanyard')) c.style.translate = v;
       } }, 0);
-      const off = () => { tl.scrollTrigger.kill(); tl.kill(); title.style.translate = ''; about.style.removeProperty('--ty');
+      const off = () => { tl.scrollTrigger.kill(); tl.kill(); title.style.translate = '';
+        for (const c of about.querySelectorAll(':scope > .cracha-canvas, :scope > .lanyard')) c.style.translate = '';
         gsap.set(me.querySelectorAll(layers.map((l) => l[0]).join(',')), { clearProps: 'transform' }); };
       document.addEventListener('gr:leve', off, { once: true });
       return off;
