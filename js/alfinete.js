@@ -12,7 +12,8 @@
 (() => {
   const li = document.querySelector('.about-areas ol.is-live > li.bonus');
   const badge = li && li.querySelector('.bonus-badge');
-  if (!badge || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // parado (estado final do css): sem fio vivo (modo leve ou "menos movimento", js/main.js) ou com "menos movimento"
+  if (!badge || matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('leve')) return;
   const tag = badge.querySelector('.bonus-tag');
   const pin = badge.querySelector('.bonus-pin');
   const head = pin.querySelector('.pin-head'), needle = pin.querySelector('.pin-needle'), shadow = pin.querySelector('.pin-shadow');
@@ -139,6 +140,13 @@
     sv = v; sy = scrollY; st = now;
   }, { passive: true });
 
+  // modo leve ligado no meio do uso: para a animação e volta para o estado final do css (preso e parado)
+  document.addEventListener('gr:leve', () => {
+    state = 'off'; cancelAnimationFrame(raf); raf = 0; clearTimeout(fading);
+    layers.forEach((el) => el.removeAttribute('style'));
+    badge.classList.remove('pin-live');
+  }, { once: true });
+
   // o fio chega / sai do item
   badge.classList.add('pin-live');
   start();
@@ -146,7 +154,7 @@
   if (on) play();
   new MutationObserver(() => {
     const now = li.classList.contains('is-on');
-    if (now === on) return;
+    if (now === on || state === 'off') return;
     on = now;
     if (on) play(); else hide();
   }).observe(li, { attributes: true, attributeFilter: ['class'] });
