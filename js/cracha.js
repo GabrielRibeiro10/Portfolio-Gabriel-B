@@ -72,9 +72,13 @@ if (slide) {
 
 if (fig && title) {
   about.classList.add('cracha-loading');
-  new IntersectionObserver((e, o) => {
-    if (!e[0].isIntersecting) return;
-    o.disconnect();
+  // Monta o crachá uma vez só: quando a seção chega perto OU antes, com o navegador parado depois de a página
+  // carregar (a pessoa ainda está lendo a hero). Montar o 3D (three.js, texturas, shaders) leva ~0,5 s num
+  // aparelho fraco; feito no meio da rolagem, travava a passagem pelos Projetos.
+  let booted = false;
+  const boot = () => {
+    if (booted) return;
+    booted = true;
     // modo leve (js/desempenho.js): fita e gancho desenhados sem 3D (lanyard()), sem baixar o three.js
     if (document.documentElement.classList.contains('leve')) { lanyard(); return; }
     start().catch((err) => {
@@ -82,7 +86,16 @@ if (fig && title) {
       about.classList.remove('cracha-3d');
       lanyard();
     });
+  };
+  new IntersectionObserver((e, o) => {
+    if (!e[0].isIntersecting) return;
+    o.disconnect(); boot();
   }, { rootMargin: '400px 0px' }).observe(slot);
+  const idle = (f) => ('requestIdleCallback' in window ? requestIdleCallback(f, { timeout: 4000 }) : setTimeout(f, 1500));
+  const early = () => setTimeout(() => idle(() => { if (!scrolling) boot(); else setTimeout(early, 600); }), 2500);   // depois da entrada da hero
+  let scrolling = false, st = 0;
+  addEventListener('scroll', () => { scrolling = true; clearTimeout(st); st = setTimeout(() => { scrolling = false; }, 250); }, { passive: true });
+  if (document.readyState === 'complete') early(); else addEventListener('load', early, { once: true });
 }
 
 // posição da letra onde o gancho prende (o título pode estar separado em palavras pelo GSAP):
@@ -293,9 +306,9 @@ async function start() {
   function pin() {
     const { r } = anchor(), ar = about.getBoundingClientRect();
     P.x = r.left + r.width * tail.x - ar.left;
-    // parallax do Sobre mim (js/main.js): o título e o crachá andam juntos (--ty no .about move o canvas); a física
+    // parallax do Sobre mim (js/main.js): o título e o crachá andam juntos (o mesmo translate nos dois); a física
     // trabalha sem esse deslocamento, então rolar a página não puxa nem balança o crachá
-    P.y = r.top + r.height * tail.y - ar.top - (parseFloat(about.style.getPropertyValue('--ty')) || 0);
+    P.y = r.top + r.height * tail.y - ar.top - (parseFloat((title.style.translate || '').split(' ')[1]) || 0);
     placeA();
   }
   function placeA() {   // a fita fica presa na barra de baixo da argola, que gira junto com o gancho
