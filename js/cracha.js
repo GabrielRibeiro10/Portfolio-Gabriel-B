@@ -199,8 +199,11 @@ async function start() {
   const THREE = await import('./vendor/three.module.min.js');
   await document.fonts.load('600 20px "Inter Tight"').catch(() => {});
   await document.fonts.load(getComputedStyle(title).font).catch(() => {});   // a do título, para medir o "g"
-  const img = fig.querySelector('img');
-  const photo = new Image(); photo.src = img.currentSrc || img.src; await photo.decode();
+  // foto já em preto e branco (img/gabriel-sobre-pb.webp): o Safari do iPhone bloqueia getImageData em canvas grande
+  // e o cartão saía sem foto. Se a foto não carregar, cai no crachá desenhado (que mostra a foto do <figure>).
+  const photo = new Image(); photo.decoding = 'async'; photo.src = 'img/gabriel-sobre-pb.webp';
+  await photo.decode();
+  if (!photo.naturalWidth) throw new Error('foto do crachá não carregou');
 
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const W = matchMedia('(max-width: 860px)').matches ? 150 : 180;   // largura do cartão (o antigo tinha 260 e ficava grande)
@@ -217,7 +220,10 @@ async function start() {
   canvas.setAttribute('aria-hidden', 'true');
   canvas.style.visibility = 'hidden';
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: devicePixelRatio < 1.5, alpha: true, powerPreference: 'high-performance' });   // tela de alta densidade não precisa de antisserrilhado (mais leve)
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));   // desempenho: até 1,5x
+  // desempenho e iPhone: até 1,5x no PC; no iPhone/iPad (Safari tem limite de memória de canvas e entrega o canvas em
+  // branco, sem erro, quando passa dele) até 1x
+  const ios = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  renderer.setPixelRatio(Math.min(devicePixelRatio, ios ? 1 : 1.5));
   about.appendChild(canvas);
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(30, 1, 1, 10);
@@ -563,14 +569,11 @@ async function start() {
   function hole(x, u, top) {
     x.fillStyle = '#e4e1dc'; x.beginPath(); x.roundRect((W - 46 * u) / 2, top, 46 * u, 8 * u, 4 * u); x.fill();
   }
-  function grayCover(w, h) {   // foto P&B cortada em 3:4 (object-fit: cover)
+  function grayCover(w, h) {   // foto P&B (arquivo já em P&B) cortada em 3:4 (object-fit: cover), sem ler pixels
     const c = document.createElement('canvas'); c.width = Math.round(w); c.height = Math.round(h);
     const x = c.getContext('2d'), s = Math.max(c.width / photo.naturalWidth, c.height / photo.naturalHeight);
     const dw = photo.naturalWidth * s, dh = photo.naturalHeight * s;
     x.drawImage(photo, (c.width - dw) / 2, (c.height - dh) / 2, dw, dh);
-    const d = x.getImageData(0, 0, c.width, c.height), a = d.data;
-    for (let i = 0; i < a.length; i += 4) a[i] = a[i + 1] = a[i + 2] = a[i] * 0.299 + a[i + 1] * 0.587 + a[i + 2] * 0.114;
-    x.putImageData(d, 0, 0);
     return c;
   }
   function drawGlint() {   // 3 cartões de largura; a faixa fica no do meio: borda nítida à direita, some aos poucos à esquerda

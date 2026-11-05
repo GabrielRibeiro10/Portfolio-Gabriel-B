@@ -2152,3 +2152,10 @@ html.leve .nc-more-go::after { animation: none; }
 .faq .about-cta .cta-head .word-mask, .faq .about-cta .cta-head .word { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: inherit; }
 .faq .about-cta .cta-head > .word-mask, .faq .about-cta .cta-head > .word-mask .word { color: #fff; }
 .faq-statement { padding-bottom: clamp(20px, 3vw, 56px); }
+
+/* Safari (iPhone/Mac): com transform-style: preserve-3d ele não respeita backface-visibility e desenhava a tampa por
+   fora (.lp-back, cinza) POR CIMA da tela com o notebook aberto: o vídeo e a captura do site sumiam. A tampa de fora
+   só aparece com o notebook fechado. */
+.lp-back { transition: visibility 0s linear .35s; }
+.pj-slide.is-active .lp-back { visibility: hidden; transition-delay: .8s; }   /* some quando a tampa já passou do meio (abre em .45s + .9s) */
+@media (prefers-reduced-motion: reduce) { .lp-back { visibility: hidden; } }
