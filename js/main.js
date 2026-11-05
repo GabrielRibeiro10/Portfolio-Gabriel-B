@@ -329,7 +329,7 @@ if ('IntersectionObserver' in window) {
     e.target.classList.toggle('is-off', !e.isIntersecting);
     if (logo && e.target.classList.contains('hero')) (e.isIntersecting && !leve() ? logo.unpauseAnimations() : logo.pauseAnimations());
   }), { rootMargin: '120px 0px' });
-  document.querySelectorAll('.hero, .about-title, .stack, .faq-bg, .faq-marquee, .site-footer, .doc-hero').forEach((el) => io.observe(el));
+  document.querySelectorAll('.hero, .about-title, .stack, .faq-bg, .site-footer, .doc-hero').forEach((el) => io.observe(el));
 }
 // modo leve: a marca GR fica parada (o degradê que corre redesenha o traço com sombra a cada quadro)
 const stopLogo = () => { const l = document.querySelector('.logo-mark'); if (l) l.pauseAnimations(); };
@@ -843,6 +843,29 @@ if (window.gsap && window.ScrollTrigger && !reduceMotion) {
   if (cta && sun && orb && btn) {
     gsap.registerPlugin(ScrollTrigger);
     const txt = btn.querySelector('span:not(.cta-go)'), go = btn.querySelector('.cta-go'), ico = btn.querySelector('.cta-wa');
+    // o resto da chamada: selo, frase palavra por palavra, etiquetas de bônus e a nota embaixo do botão
+    const shown = (el) => el && getComputedStyle(el).display !== 'none';
+    const status = cta.querySelector('.cta-status'), head = cta.querySelector('.cta-head');
+    const chips = [...cta.querySelectorAll('.cta-chips li')].filter(shown), note = cta.querySelector('.cta-note');
+    const headWords = head ? splitWords(head) : [];
+    // o destaque ("Bora tirar sua ideia do papel?") é um degradê recortado no texto: com as palavras separadas em
+    // camadas, o recorte do pai não pega mais as palavras. Cada palavra recebe o mesmo degradê, posicionado para
+    // continuar o do conjunto (um degradê só, como antes)
+    const hl = head && head.querySelector(':scope > span:not(.word-mask)');
+    const paintHl = () => {
+      if (!hl) return;
+      const words = hl.querySelectorAll('.word'), sr = hl.getBoundingClientRect(), bg = getComputedStyle(hl).backgroundImage;
+      words.forEach((w) => {
+        const wr = w.parentElement.getBoundingClientRect();   // a máscara não se mexe na animação
+        Object.assign(w.style, { backgroundImage: bg, backgroundSize: `${sr.width}px ${sr.height}px`, backgroundRepeat: 'no-repeat',
+          backgroundPosition: `${(sr.left - wr.left).toFixed(1)}px ${(sr.top - wr.top).toFixed(1)}px`,
+          webkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent' });
+      });
+    };
+    if (hl && hl.querySelector('.word')) {
+      paintHl();
+      if ('ResizeObserver' in window) new ResizeObserver(() => requestAnimationFrame(paintHl)).observe(head);
+    }
     gsap.set(btn, { x: 140, autoAlpha: 0, clipPath: 'inset(0% 0% 0% 100% round 999px)' });
     gsap.set(sun, { scale: 0.55, rotation: -50, autoAlpha: 0 });
     const orbOp = parseFloat(getComputedStyle(orb).opacity) || 0.5;   // a bola é meio transparente (café acinzentado): volta a isso
@@ -856,6 +879,10 @@ if (window.gsap && window.ScrollTrigger && !reduceMotion) {
         breathe = gsap.to(sun, { scale: 1.045, duration: 3.6, ease: 'sine.inOut', yoyo: true, repeat: -1 });
         ScrollTrigger.create({ trigger: cta, start: 'top bottom', end: 'bottom top', onToggle: (s) => (s.isActive ? breathe.play() : breathe.pause()) });
       } })
+      .from(shown(status) ? status : [], { clipPath: 'inset(0% 100% 0% 0% round 999px)', x: -16, duration: 1, ease: 'expo.inOut', clearProps: 'clipPath,transform' }, 0.05)
+      .from(headWords, { yPercent: 115, rotation: 5, transformOrigin: '0% 100%', duration: 1.1, stagger: 0.035 }, 0.15)
+      .from(chips, { y: 22, autoAlpha: 0, scale: 0.94, duration: 0.9, stagger: 0.09, clearProps: 'transform,opacity,visibility' }, 0.75)
+      .from(shown(note) ? note : [], { y: 12, autoAlpha: 0, duration: 0.9, clearProps: 'transform,opacity,visibility' }, 1.1)
       .to(sun, { scale: 1, rotation: 0, autoAlpha: 1, duration: 1.8 }, 0)
       .to(orb, { yPercent: 0, scale: 1, autoAlpha: orbOp, duration: 1.8 }, 0.1)
       .to(btn, { x: 0, autoAlpha: 1, duration: 1.3 }, 0.35)
@@ -875,5 +902,16 @@ if (window.gsap && window.ScrollTrigger && !reduceMotion) {
       mm.add('(max-width: 860px)', () => plx(95, 85));
       document.addEventListener('gr:leve', () => { mm.revert(); if (breathe) breathe.kill(); gsap.set([sun, orb], { y: 0, scale: 1 }); }, { once: true });
     }
+  }
+}
+
+// ---------- Letreiro estático ("Sites que vendem enquanto você dorme."): as palavras sobem quando ele aparece ----------
+if (window.gsap && window.ScrollTrigger && !reduceMotion) {
+  const st = document.querySelector('.faq-statement');
+  if (st) {
+    gsap.registerPlugin(ScrollTrigger);
+    const w = splitWords(st);
+    gsap.from(w, { yPercent: 118, rotation: 4, transformOrigin: '0% 100%', duration: 1.3, ease: 'expo.out', stagger: 0.06,
+      scrollTrigger: { trigger: st, start: 'top 85%', once: true } });
   }
 }
