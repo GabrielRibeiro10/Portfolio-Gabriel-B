@@ -88,6 +88,7 @@ Scripts em `.claude/skills/auditoria-site/scripts/` (Playwright, já instalado n
 | travada de 0,5-1,5 s ao chegar numa seção | biblioteca pesada (three.js) montando no meio da rolagem | montar quando o navegador estiver parado depois do carregamento (`requestIdleCallback`) |
 | toque não faz nada no celular | bloco grande e invisível por cima (z-index/contexto de empilhamento) | `pointer-events: none` no bloco e `auto` nos filhos; conferir com `cliente.js` |
 | tempo bom no teste, mas a seção trava num celular fraco de verdade | vidro fosco (`backdrop-filter`) em etiquetas/cartões que rolam com a página; a placa refaz o desfoque a cada quadro | fundo semitransparente (`rgba(255,255,255,.13)`) no lugar do vidro; achar com `pesados.js` |
+| CLS alto (página "pula") só em aparelho fraco | um script muda o layout de uma seção depois de carregar (ex.: liga um carrossel/galeria e a altura muda); no fraco o script roda ~2 s depois e empurra o resto | ligar o modo no `<head>` (classe no `<html>` antes da primeira pintura) e dar ao bloco altura natural pelo CSS, sem medir no JS |
 | alvo de toque < 24 px | link de texto pequeno | área invisível com `::after { position:absolute; inset:-12px -6px }` (o elemento precisa ter `position`; não sobrescreva `position: absolute` existente) |
 
 ## Regras

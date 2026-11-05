@@ -709,7 +709,7 @@ if (animate) {
 // está no centro (número e nome). Tudo segue a rolagem, então arrastar com o dedo também atualiza o contador.
 {
   const grid = document.querySelector('.nc-grid'), ctrl = document.querySelector('.nc-ctrl');
-  if (grid && ctrl) {
+  if (grid && ctrl && !document.documentElement.classList.contains('nc-gal-on')) {   // com a galeria em arco (js/segmentos.js) quem cuida é ela
     const cards = [...grid.querySelectorAll('.nc-card')], [prev, next] = ctrl.querySelectorAll('.nc-arrow');
     const num = ctrl.querySelector('.nc-count b'), name = ctrl.querySelector('.nc-count em');
     let cur = -1, raf = 0;
