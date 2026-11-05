@@ -19,6 +19,9 @@
 //    Quem precisa reagir escuta document 'gr:leve' (o evento vem quando ele liga no meio do uso).
 (() => {
   const html = document.documentElement;
+  // Segmentos em galeria (js/segmentos.js): o layout dela vale desde a primeira pintura, senão a seção mudava de altura
+  // quando o script rodasse e a página "pulava" (em celular fraco, ~1,7 s depois de abrir)
+  try { if (!matchMedia('(prefers-reduced-motion: reduce)').matches) html.classList.add('nc-gal-on'); } catch (e) { /* sem matchMedia */ }
 
   // ---------- 1) recarregar → topo ----------
   let reload = false;
