@@ -2114,3 +2114,12 @@ html.leve .nc-more-go::after { animation: none; }
       #f07a00;
   }
 }
+
+/* hero: volta o "sol" atrás da pessoa (disco dourado do ombro e as luzes amarelas do svg.hero-art) sobre a imagem de
+   fundo; só o círculo ferrugem do alto fica escondido (a imagem já tem os arcos dela) */
+.hero-art { display: block; }
+.hero-art g[mask] > circle:first-child { display: none; }
+
+/* abertura da hero (js/main.js): no celular o nome aparece ao lado do GR só durante a abertura */
+@media (max-width: 599px) { .logo.logo-intro .logo-sep, .logo.logo-intro .logo-word { display: flex; } .logo.logo-intro .logo-sep { display: block; } }
+.socials a { position: relative; }   /* para a entrada (uma bolinha sai de dentro da outra) */

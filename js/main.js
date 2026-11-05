@@ -108,22 +108,59 @@ if (animate) {
 
   // clearProps devolve o controle ao CSS no fim (efeitos de hover usam transform)
   const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
-  // marca: o G e o R se desenham igual ao hover (o cursor já pisca), depois o fio e o nome aparecem.
+
+  // ----- abertura com a marca (como no vídeo de referência) -----
+  // Só o fundo da hero à vista: o GR aparece pequeno no centro e cresce enquanto se desenha, o fio e o nome
+  // "Gabriel Ribeiro" se revelam ao lado, a marca segura um instante e então sobe encolhendo até o lugar dela no
+  // canto (é a própria .logo, movida por transform: termina exatamente onde já fica). A hero entra enquanto ela pousa.
+  // No celular o nome (que lá fica escondido) aparece só na abertura e some ao pousar.
+  const logo = $('.logo'), word = $('.logo-word'), sep = $('.logo-sep');
+  const D = 2.35;   // quando o resto da hero começa (a marca pousa em ~3,3 s)
+  const wordHidden = getComputedStyle(word).display === 'none';
+  if (wordHidden) logo.classList.add('logo-intro');
+  const hr = hero.getBoundingClientRect(), lr = logo.getBoundingClientRect();
+  const S = Math.min(isMobile ? 2.6 : 3.1, (hr.width * (isMobile ? 0.7 : 0.42)) / lr.width);
+  const dx = hr.left + hr.width / 2 - (lr.left + lr.width / 2), dy = hr.top + Math.min(hr.height, innerHeight) / 2 - (lr.top + lr.height / 2);
+  gsap.set(logo, { x: dx, y: dy, scale: S * 0.55, transformOrigin: '50% 50%', autoAlpha: 0 });
   // autoRound: false — sem ele o GSAP arredonda o px e o traço pulava de 1 para 0, sem desenhar
-  tl.from($$('.logo .lg-s'), { strokeDashoffset: 1.05, autoRound: false, duration: 0.8, stagger: 0.1, ease: 'power2.inOut', clearProps: 'strokeDashoffset' }, 0.3)
-    .from($('.logo-sep'), { scaleY: 0, duration: 0.8, clearProps: 'transform' }, 0.55)
-    .from($('.logo-word'), { clipPath: 'inset(0% 100% 0% 0%)', duration: 1.1, ease: 'expo.inOut', clearProps: 'clipPath' }, 0.55);
+  tl.to(logo, { autoAlpha: 1, duration: 0.5, ease: 'power2.out' }, 0.15)
+    .to(logo, { scale: S, duration: 1.6, ease: 'expo.out' }, 0.15)
+    .from($$('.logo .lg-s'), { strokeDashoffset: 1.05, autoRound: false, duration: 0.9, stagger: 0.1, ease: 'power2.inOut', clearProps: 'strokeDashoffset' }, 0.2)
+    .from(sep, { scaleY: 0, duration: 0.7, clearProps: 'transform' }, 0.85)
+    .from(word, { clipPath: 'inset(0% 100% 0% 0%)', duration: 1.0, ease: 'expo.inOut', clearProps: 'clipPath' }, 0.9)
+    .to(logo, { x: 0, y: 0, scale: 1, duration: 1.25, ease: 'expo.inOut', clearProps: 'transform' }, 2.05);
+  if (wordHidden) tl.to([sep, word], { autoAlpha: 0, duration: 0.35, ease: 'power1.out' }, 2.75)
+    .call(() => { logo.classList.remove('logo-intro'); gsap.set([sep, word], { clearProps: 'opacity,visibility' }); }, null, 3.35);
+
   // painel claro desenrola de cima para baixo (no celular ele fica mais abaixo: entra na rolagem)
   if (!isMobile) {
-    tl.from($('.panel'), { clipPath: 'inset(0% 0% 100% 0% round 16px)', duration: 1.25, ease: 'expo.inOut', clearProps: 'clipPath' }, 0.05);
+    tl.from($('.panel'), { clipPath: 'inset(0% 0% 100% 0% round 16px)', duration: 1.25, ease: 'expo.inOut', clearProps: 'clipPath' }, D + 0.05);
   }
-  tl.from(chars, { yPercent: 115, rotation: 8, transformOrigin: '0% 100%', duration: 1.25, stagger: 0.035 }, 0.3)
-    .from($('.tag'), { clipPath: 'inset(0% 100% 0% 0% round 999px)', duration: 1.1, ease: 'expo.inOut', clearProps: 'clipPath' }, 0.3)
-    .from($$('.nav a'), { yPercent: -120, autoAlpha: 0, duration: 0.9, stagger: 0.06, clearProps: 'transform,opacity,visibility' }, 0.6)
-    .from($('.btn-work'), { y: 30, scale: 0.9, autoAlpha: 0, duration: 1, clearProps: 'transform,opacity,visibility' }, 0.85)
-    .from($$('.stat'), { y: 50, autoAlpha: 0, duration: 1.1, stagger: 0.1, clearProps: 'transform,opacity,visibility' }, 0.95)
-    .call(() => nums.forEach(countUp), null, 1.05)
-    .from($$('.socials a'), { scale: 0.3, autoAlpha: 0, duration: 0.8, stagger: 0.08, ease: 'back.out(2)', clearProps: 'transform,opacity,visibility' }, 1.1);
+  tl.from(chars, { yPercent: 115, rotation: 8, transformOrigin: '0% 100%', duration: 1.25, stagger: 0.035 }, D + 0.3)
+    .from($('.tag'), { clipPath: 'inset(0% 100% 0% 0% round 999px)', duration: 1.1, ease: 'expo.inOut', clearProps: 'clipPath' }, D + 0.3)
+    .from($$('.nav a'), { yPercent: -120, autoAlpha: 0, duration: 0.9, stagger: 0.06, clearProps: 'transform,opacity,visibility' }, D + 0.6)
+    .from($('.btn-work'), { y: 30, scale: 0.9, autoAlpha: 0, duration: 1, clearProps: 'transform,opacity,visibility' }, D + 0.85);
+
+  // "Tecnologias" sai de dentro de "Sites no ar", e cada rede social sai de dentro da primeira bolinha: o primeiro
+  // chega, os outros nascem escondidos atrás dele e deslizam para o lugar, um depois do outro
+  const outOf = (els, at, firstFrom, firstDur, startAlpha) => {
+    els = [...els];
+    if (!els.length) return;
+    const r0 = els[0].getBoundingClientRect();
+    tl.from(els[0], { ...firstFrom, duration: firstDur, clearProps: 'transform,opacity,visibility' }, at);
+    els.slice(1).forEach((el, i) => {
+      const r = el.getBoundingClientRect();
+      gsap.set(el, { zIndex: 1, autoAlpha: 0 }); gsap.set(els[0], { zIndex: 2 });
+      // cartão opaco nasce inteiro escondido atrás do primeiro (startAlpha 1); bolinha translúcida vai aparecendo (0)
+      tl.fromTo(el, { x: r0.left - r.left, y: r0.top - r.top, scale: 0.86, autoAlpha: startAlpha },
+        { x: 0, y: 0, scale: 1, autoAlpha: 1, duration: 1.15, ease: 'expo.out', immediateRender: false,   // (no fromTo vai aqui)
+          clearProps: 'transform,opacity,visibility,zIndex' }, at + firstDur * 0.55 + i * 0.12);
+    });
+    tl.call(() => gsap.set(els[0], { clearProps: 'zIndex' }), null, at + firstDur + 1.4);
+  };
+  outOf($$('.stat'), D + 0.95, { y: 50, autoAlpha: 0 }, 1.0, 1);
+  tl.call(() => nums.forEach(countUp), null, D + 1.05);
+  outOf($$('.socials a'), D + 1.1, { scale: 0.3, autoAlpha: 0, ease: 'back.out(2)' }, 0.75, 0);
 
   // Foto: entra subindo e sendo descoberta de baixo para cima, sempre OPACA, e só depois de
   // baixada e decodificada inteira. Antes ela entrava esmaecendo (autoAlpha 0 → 1) no tempo
@@ -132,14 +169,14 @@ if (animate) {
   gsap.set(person, { autoAlpha: 0 });
   if (art.length) gsap.set(art, { autoAlpha: 0, scale: 0.94, transformOrigin: '50% 45%' });
   photoReady().then(() => requestAnimationFrame(() => requestAnimationFrame(() => {
-    gsap.fromTo(person,
-      // sobe de baixo da moldura, inteira e opaca (sem efeito de aparecer)
-      // começa inteira abaixo da moldura (nada à vista enquanto espera)
-      { autoAlpha: 1, yPercent: 100 },
-      { yPercent: 0, duration: 1.4, ease: 'expo.out',
-        delay: Math.max(0, 0.5 - tl.time()) });
+    // sobe de baixo da moldura, inteira e opaca (sem efeito de aparecer). Fica invisível até a hora (a abertura com a
+    // marca vem antes): o parallax da rolagem podia devolvê-la ao lugar antes, e ela aparecia durante a abertura
+    const wait = Math.max(0, D + 0.5 - tl.time());
+    gsap.fromTo(person, { yPercent: 100 },
+      { yPercent: 0, duration: 1.4, ease: 'expo.out', delay: wait, immediateRender: false,
+        onStart: () => gsap.set(person, { autoAlpha: 1 }) });
     // o desenho amarelo aparece atrás quando a foto está chegando
-    if (art.length) gsap.to(art, { autoAlpha: 1, scale: 1, duration: 1.3, ease: 'expo.out', delay: Math.max(0, 0.5 - tl.time()) + 0.55 });
+    if (art.length) gsap.to(art, { autoAlpha: 1, scale: 1, duration: 1.3, ease: 'expo.out', delay: Math.max(0, D + 0.5 - tl.time()) + 0.55 });
   })));
 
   // card da citação, depois da entrada: parallax e luz que acompanham a rolagem (ScrollTrigger com scrub) e, no PC
@@ -197,7 +234,7 @@ if (animate) {
     .from(quoteWords, { yPercent: 110, duration: 0.9, stagger: 0.03 }, at + 0.7)
     .call(cardAlive, null, at + 1.75);   // depois do fim da entrada (o clearProps dela apagaria o parallax)
   if (!isMobile) {
-    panelIn(tl, 0.7);
+    panelIn(tl, D + 0.7);
   } else {
     panelIn(gsap.timeline({
       defaults: { ease: 'expo.out' },

@@ -92,7 +92,7 @@ if (fig && title) {
     o.disconnect(); boot();
   }, { rootMargin: '400px 0px' }).observe(slot);
   const idle = (f) => ('requestIdleCallback' in window ? requestIdleCallback(f, { timeout: 4000 }) : setTimeout(f, 1500));
-  const early = () => setTimeout(() => idle(() => { if (!scrolling) boot(); else setTimeout(early, 600); }), 2500);   // depois da entrada da hero
+  const early = () => setTimeout(() => idle(() => { if (!scrolling) boot(); else setTimeout(early, 600); }), 3400);   // logo depois que a marca da abertura pousa (antes de a pessoa rolar)
   let scrolling = false, st = 0;
   addEventListener('scroll', () => { scrolling = true; clearTimeout(st); st = setTimeout(() => { scrolling = false; }, 250); }, { passive: true });
   if (document.readyState === 'complete') early(); else addEventListener('load', early, { once: true });
