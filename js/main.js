@@ -808,6 +808,7 @@ if (window.gsap && window.ScrollTrigger && !reduceMotion) {
     const txt = btn.querySelector('span:not(.cta-go)'), go = btn.querySelector('.cta-go'), ico = btn.querySelector('.cta-wa');
     gsap.set(btn, { x: 140, autoAlpha: 0, clipPath: 'inset(0% 0% 0% 100% round 999px)' });
     gsap.set(sun, { scale: 0.55, rotation: -50, autoAlpha: 0 });
+    const orbOp = parseFloat(getComputedStyle(orb).opacity) || 0.5;   // a bola é meio transparente (café acinzentado): volta a isso
     gsap.set(orb, { yPercent: 18, scale: 0.85, autoAlpha: 0 });
     const parts = [txt, go, ico].filter((el) => el && getComputedStyle(el).display !== 'none');
     let breathe = null;
@@ -819,7 +820,7 @@ if (window.gsap && window.ScrollTrigger && !reduceMotion) {
         ScrollTrigger.create({ trigger: cta, start: 'top bottom', end: 'bottom top', onToggle: (s) => (s.isActive ? breathe.play() : breathe.pause()) });
       } })
       .to(sun, { scale: 1, rotation: 0, autoAlpha: 1, duration: 1.8 }, 0)
-      .to(orb, { yPercent: 0, scale: 1, autoAlpha: 1, duration: 1.8 }, 0.1)
+      .to(orb, { yPercent: 0, scale: 1, autoAlpha: orbOp, duration: 1.8 }, 0.1)
       .to(btn, { x: 0, autoAlpha: 1, duration: 1.3 }, 0.35)
       .to(btn, { clipPath: 'inset(0% 0% 0% 0% round 999px)', duration: 1.1, ease: 'power4.out' }, 0.35)
       .from(parts.filter((el) => el !== go), { x: 36, autoAlpha: 0, duration: 0.9, stagger: 0.06, clearProps: 'transform,opacity,visibility' }, 0.6)
@@ -827,14 +828,14 @@ if (window.gsap && window.ScrollTrigger && !reduceMotion) {
     // parallax: sol desce, bola sobe (em camadas próprias; só no modo normal)
     if (!leve()) {
       const mm = gsap.matchMedia();
-      mm.add('(min-width: 861px)', () => {
-        gsap.to(sun, { y: 90, ease: 'none', scrollTrigger: { trigger: cta, start: 'top bottom', end: 'bottom top', scrub: 0.8 } });
-        gsap.to(orb, { y: -110, ease: 'none', scrollTrigger: { trigger: cta, start: 'top bottom', end: 'bottom top', scrub: 0.8 } });
-      });
-      mm.add('(max-width: 860px)', () => {
-        gsap.to(sun, { y: 40, ease: 'none', scrollTrigger: { trigger: cta, start: 'top bottom', end: 'bottom top', scrub: 0.8 } });
-        gsap.to(orb, { y: -50, ease: 'none', scrollTrigger: { trigger: cta, start: 'top bottom', end: 'bottom top', scrub: 0.8 } });
-      });
+      // simétrico: com a chamada no meio da tela as duas bolas estão no lugar original (mesmo tamanho de antes)
+      const plx = (sy, oy) => {
+        const st = { trigger: cta, start: 'top bottom', end: 'bottom top', scrub: 0.9 };
+        gsap.fromTo(sun, { y: -sy }, { y: sy, ease: 'none', scrollTrigger: st });
+        gsap.fromTo(orb, { y: -oy }, { y: oy, ease: 'none', scrollTrigger: { ...st } });
+      };
+      mm.add('(min-width: 861px)', () => plx(190, 170));
+      mm.add('(max-width: 860px)', () => plx(95, 85));
       document.addEventListener('gr:leve', () => { mm.revert(); if (breathe) breathe.kill(); gsap.set([sun, orb], { y: 0, scale: 1 }); }, { once: true });
     }
   }

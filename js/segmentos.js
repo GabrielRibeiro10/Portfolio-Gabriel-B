@@ -22,7 +22,10 @@
   grid.setAttribute('aria-roledescription', 'carrossel');
   grid.setAttribute('aria-label', 'Segmentos: arraste ou use as setas');
 
-  const BEND = 3, GAP = 0.12, EASE = 0.075, FADE = 0.12, INTRO = 1.4;
+  const BEND = 3, EASE = 0.075, INTRO = 1.4;
+  // celular: cartões mais juntos e pontas sumindo só bem na borda, para os vizinhos aparecerem dos dois lados
+  const small = () => matchMedia('(max-width: 860px)').matches;
+  let GAP = 0.12, FADE = 0.12;
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const wrap = (v, n) => ((v % n) + n) % n;
   const ease = (x) => x * x * (3 - 2 * x);
@@ -35,6 +38,7 @@
     vw = grid.clientWidth || innerWidth;
     cw = cards[0].offsetWidth;
     ch = Math.max(...cards.map((c) => c.offsetHeight));
+    GAP = small() ? 0.06 : 0.12; FADE = small() ? 0.03 : 0.12;
     sp = cw * (1 + GAP);
     // arco: desce "depth" px na borda da tela (como bend=3 do original), raio que passa por esse ponto
     half = Math.max(vw / 2, cw * 1.5);
@@ -87,7 +91,8 @@
       const reach = Math.min(Math.abs(x), half, R * 0.999);
       const y = R - Math.sqrt(R * R - reach * reach);
       const ang = Math.sign(x) * Math.asin(reach / R);
-      const u = (vw / 2 + x) / vw;
+      // degradê das pontas medido pela borda do cartão mais perto do centro: no celular o vizinho aparece pela beirada
+      const u = (vw / 2 + x - Math.sign(x) * Math.min(Math.abs(x), cw * 0.5)) / vw;
       const edge = smoother(u / FADE) * smoother((1 - u) / FADE);
       const order = Math.abs(k * sp - st.scroll) / sp;
       const shown = st.started ? ease(clamp(st.intro * 2.2 - Math.min(order, N - order) * 0.22, 0, 1)) : 0;
