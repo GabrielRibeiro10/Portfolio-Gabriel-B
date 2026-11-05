@@ -793,3 +793,49 @@ if (window.gsap && window.ScrollTrigger && !reduceMotion) {
     mm.add('(max-width: 860px)', () => build(0.55));
   }
 }
+
+// ---------- Chamada final ("Enquanto você pensa..."): entrada com GSAP ----------
+// Quando a chamada aparece: o sol amarelo nasce girando e crescendo, a bola laranja sobe de baixo, e o botão "Quero meu
+// site" entra da direita para a esquerda se revelando (recorte da direita), com o texto e a seta chegando atrás.
+// Depois, na rolagem, sol e bola andam em sentidos opostos (parallax) e o sol "respira" devagar enquanto está à vista.
+// Só transform/opacity/clip-path. Modo leve: só a entrada (sem parallax nem respiração); "menos movimento": parado.
+if (window.gsap && window.ScrollTrigger && !reduceMotion) {
+  const cta = document.querySelector('.faq .about-cta');
+  const sun = cta && cta.querySelector('.cta-sun'), orb = cta && cta.querySelector('.cta-orb');
+  const btn = cta && cta.querySelector('.btn-work');
+  if (cta && sun && orb && btn) {
+    gsap.registerPlugin(ScrollTrigger);
+    const txt = btn.querySelector('span:not(.cta-go)'), go = btn.querySelector('.cta-go'), ico = btn.querySelector('.cta-wa');
+    gsap.set(btn, { x: 140, autoAlpha: 0, clipPath: 'inset(0% 0% 0% 100% round 999px)' });
+    gsap.set(sun, { scale: 0.55, rotation: -50, autoAlpha: 0 });
+    gsap.set(orb, { yPercent: 18, scale: 0.85, autoAlpha: 0 });
+    const parts = [txt, go, ico].filter((el) => el && getComputedStyle(el).display !== 'none');
+    let breathe = null;
+    gsap.timeline({ defaults: { ease: 'expo.out' }, scrollTrigger: { trigger: cta, start: 'top 72%', once: true },
+      onComplete: () => {
+        gsap.set(btn, { clearProps: 'transform,clipPath,opacity,visibility' });   // volta o hover do CSS
+        if (leve()) return;
+        breathe = gsap.to(sun, { scale: 1.045, duration: 3.6, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+        ScrollTrigger.create({ trigger: cta, start: 'top bottom', end: 'bottom top', onToggle: (s) => (s.isActive ? breathe.play() : breathe.pause()) });
+      } })
+      .to(sun, { scale: 1, rotation: 0, autoAlpha: 1, duration: 1.8 }, 0)
+      .to(orb, { yPercent: 0, scale: 1, autoAlpha: 1, duration: 1.8 }, 0.1)
+      .to(btn, { x: 0, autoAlpha: 1, duration: 1.3 }, 0.35)
+      .to(btn, { clipPath: 'inset(0% 0% 0% 0% round 999px)', duration: 1.1, ease: 'power4.out' }, 0.35)
+      .from(parts.filter((el) => el !== go), { x: 36, autoAlpha: 0, duration: 0.9, stagger: 0.06, clearProps: 'transform,opacity,visibility' }, 0.6)
+      .from(go ? [go] : [], { scale: 0, rotation: -120, duration: 0.8, ease: 'back.out(2.2)', clearProps: 'transform' }, 0.8);
+    // parallax: sol desce, bola sobe (em camadas próprias; só no modo normal)
+    if (!leve()) {
+      const mm = gsap.matchMedia();
+      mm.add('(min-width: 861px)', () => {
+        gsap.to(sun, { y: 90, ease: 'none', scrollTrigger: { trigger: cta, start: 'top bottom', end: 'bottom top', scrub: 0.8 } });
+        gsap.to(orb, { y: -110, ease: 'none', scrollTrigger: { trigger: cta, start: 'top bottom', end: 'bottom top', scrub: 0.8 } });
+      });
+      mm.add('(max-width: 860px)', () => {
+        gsap.to(sun, { y: 40, ease: 'none', scrollTrigger: { trigger: cta, start: 'top bottom', end: 'bottom top', scrub: 0.8 } });
+        gsap.to(orb, { y: -50, ease: 'none', scrollTrigger: { trigger: cta, start: 'top bottom', end: 'bottom top', scrub: 0.8 } });
+      });
+      document.addEventListener('gr:leve', () => { mm.revert(); if (breathe) breathe.kill(); gsap.set([sun, orb], { y: 0, scale: 1 }); }, { once: true });
+    }
+  }
+}
