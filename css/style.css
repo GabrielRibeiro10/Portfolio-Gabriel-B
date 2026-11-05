@@ -2034,3 +2034,26 @@ html.nc-gal-on .nichos .nc-note { text-align: center; }
 }
 /* na galeria quem faz a entrada dos cartões é o js/segmentos.js: sem o recorte da foto da cascada antiga */
 html.nc-gal-on .nichos.ni-live .nc-shot, html.nc-gal-on .nichos.ni-live.is-in .nc-shot { clip-path: none; transition: none; }
+
+/* ---------- Hero: fundo em imagem (img/hero-fundo.webp, enviada pelo Gabriel) ----------
+   Substitui o degradê e o desenho de círculos (svg.hero-art fica escondido; a luz amarela em volta da pessoa continua).
+   Para voltar ao fundo anterior: apagar este bloco. */
+.hero-bg, html.leve .hero-bg {
+  background: #e05300 url("../img/hero-fundo.webp") center / cover no-repeat;
+}
+.hero-art { display: none; }
+@media (max-width: 860px), (max-aspect-ratio: 4/5), (orientation: landscape) and (max-height: 500px) and (max-width: 1000px) {
+  .hero-bg, html.leve .hero-bg { background-image: url("../img/hero-fundo-960.webp"); background-position: 30% 50%; }
+}
+@media (min-resolution: 2dppx) and (max-width: 860px) {
+  .hero-bg, html.leve .hero-bg { background-image: url("../img/hero-fundo.webp"); }
+}
+
+/* "E não para por aí": de ponta a ponta (encosta nos cantos da tela), cantos retos, conteúdo alinhado à coluna */
+.nc-more {
+  width: 100vw; margin-left: calc(50% - 50vw); border-radius: 0; border-left: 0; border-right: 0;
+  padding-left: max(24px, calc((100vw - 1320px) / 2)); padding-right: max(24px, calc((100vw - 1320px) / 2));
+}
+@media (max-width: 860px) {
+  .nc-more { border-radius: 0; padding-left: 20px; padding-right: 20px; }
+}
