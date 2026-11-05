@@ -306,7 +306,10 @@ document.addEventListener('gr:leve', stopLogo);
 let dropFrame = null, lineGo = () => {};
 document.querySelectorAll('.about-areas ol').forEach((list) => {
   const items = [...list.children];
-  if (reduceMotion) { list.style.setProperty('--p', 1); items.forEach((li) => li.classList.add('is-on')); }
+  // parado: fio inteiro aceso e todos os itens acesos. Vale para "menos movimento" e para o modo leve (aparelho
+  // fraco): sem o fio andando, sem a gota e sem o alfinete do Bônus (js/alfinete.js só anima com o fio vivo)
+  const still = () => { list.classList.remove('is-live'); list.style.setProperty('--p', 1); items.forEach((li) => li.classList.add('is-on')); };
+  if (reduceMotion || leve()) still();
   else {
     list.classList.add('is-live');
     let cur = 0, raf = 0, hgt = 0, tops = [];
@@ -348,6 +351,8 @@ document.querySelectorAll('.about-areas ol').forEach((list) => {
     addEventListener('scroll', lineGo, { passive: true });
     addEventListener('resize', lineGo);
     lineGo();
+    // modo leve ligado no meio do uso: para o fio e deixa tudo aceso (o alfinete para junto, js/alfinete.js)
+    document.addEventListener('gr:leve', () => { near = false; cancelAnimationFrame(raf); raf = 0; dropFrame = null; still(); }, { once: true });
   }
 });
 
