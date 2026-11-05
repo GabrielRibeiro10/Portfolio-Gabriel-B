@@ -183,12 +183,11 @@ async function lanyard() {
   const relayout = () => { measureTail(); place(); };
   relayout();
   markReady();
-  // o título pode estar entrando (GSAP move as palavras): acompanha o "g" por 3 s e depois para
-  let until = performance.now() + 3000;
+  // acompanha o "g" só enquanto o título desliza (antes ficava 3 s refazendo a posição a cada quadro logo ao montar,
+  // com a pessoa ainda na hero: travava a hero em aparelho fraco)
+  let until = 0;
   const follow = () => { place(); if (performance.now() < until) requestAnimationFrame(follow); };
-  requestAnimationFrame(follow);
-  // o título deslizando: acompanha até ele parar
-  whenTitleIn(() => { const go = performance.now() >= until; until = performance.now() + 2000; if (go) requestAnimationFrame(follow); });
+  whenTitleIn(() => { const go = performance.now() >= until; until = performance.now() + 2200; if (go) requestAnimationFrame(follow); });
   // só a largura importa (o "g" muda de lugar quando a largura muda). A altura da seção muda a cada quadro quando uma
   // resposta do FAQ abre (o FAQ fica dentro dela): reagir à altura redesenhava a letra num canvas a cada quadro e travava
   let lastW = about.clientWidth;

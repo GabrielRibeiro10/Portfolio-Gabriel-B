@@ -120,8 +120,11 @@
 
   // empurrões depois de preso: o mouse arrasta o selo pela velocidade de lado, um toque dá um peteleco,
   // e os trancos da rolagem (mudança brusca de velocidade) chacoalham de leve
+  let onScreen = false;
+  if ('IntersectionObserver' in window) new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; }).observe(badge);
+  else onScreen = true;
   const kick = (w) => {
-    if (state !== 'still' || performance.now() - t0 < HIT) return;
+    if (state !== 'still' || performance.now() - t0 < HIT || !onScreen) return;   // fora da tela não balança (nem gasta)
     om = clamp(om + w, -170, 170);
     if (!raf) { last = 0; raf = requestAnimationFrame(frame); }
   };
