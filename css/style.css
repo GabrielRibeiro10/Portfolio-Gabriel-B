@@ -1,3 +1,11 @@
+/* fonte reserva com a mesma largura da Inter Tight (Arial/Roboto ajustadas): enquanto a Inter Tight carrega, o texto
+   já ocupa o mesmo espaço e nada "pula" quando ela chega (antes o título das páginas legais quebrava numa linha a
+   mais e a página subia 100 px). size-adjust = mediana de 297 textos do site (Inter Tight / Arial); métricas verticais da Inter Tight. */
+@font-face {
+  font-family: "Inter Tight Fallback";
+  src: local("Arial"), local("Helvetica"), local("Liberation Sans"), local("Roboto");
+  size-adjust: 95.7%; ascent-override: 101.2%; descent-override: 25.3%; line-gap-override: 0%;
+}
 /* Hero B do portfólio do Gabriel: cópia do layout da referência
    (Downloads/02dc17bfa7e203ea4202aab6907b6a12.jpg). Medidas tiradas da referência
    como fração da largura/altura do hero, para o desenho se manter em qualquer tela. */
@@ -8,7 +16,7 @@
   --muted: #3b3b3b;
   --panel: #f7f6f4;
   --card: #f1efec;
-  --font: "Inter Tight", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font: "Inter Tight", "Inter Tight Fallback", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 *, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; }
