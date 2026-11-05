@@ -311,7 +311,7 @@ document.querySelectorAll('.about-areas ol').forEach((list) => {
     list.classList.add('is-live');
     let cur = 0, raf = 0, hgt = 0, tops = [];
     // medidas dos itens guardadas (mudam só quando a lista muda de tamanho): o quadro só lê a posição na tela
-    const measure = () => { hgt = list.offsetHeight; tops = items.map((li) => li.offsetTop + li.offsetHeight * 0.3); };
+    const measure = () => { hgt = list.offsetHeight; tops = items.map((li) => li.offsetTop + li.offsetHeight * 0.3); list.style.setProperty('--h', hgt + 'px'); };
     measure();
     if ('ResizeObserver' in window) new ResizeObserver(measure).observe(list);
     const tick = () => {
@@ -321,12 +321,30 @@ document.querySelectorAll('.about-areas ol').forEach((list) => {
       if (Math.abs(t - cur) < 0.0005) cur = t;
       const p = Number(cur.toFixed(4));
       if (dropFrame) dropFrame(p, r);   // antes de mexer no fio: a gota lê a tela sem forçar outro layout
-      list.style.setProperty('--p', p);
-      const tip = p * hgt;
-      items.forEach((li, i) => li.classList.toggle('is-on', tip >= tops[i]));
+      if (p !== lastP) {   // só escreve quando muda (cada escrita recalcula o estilo da lista)
+        lastP = p; list.style.setProperty('--p', p);
+        const tip = p * hgt;
+        items.forEach((li, i) => { const on = tip >= tops[i]; if (li.classList.contains('is-on') !== on) li.classList.toggle('is-on', on); });
+      }
       raf = cur === t ? 0 : requestAnimationFrame(tick);
     };
-    lineGo = () => { if (!raf) raf = requestAnimationFrame(tick); };
+    let lastP = -1, near = true;
+    lineGo = () => { if (near && !raf) raf = requestAnimationFrame(tick); };
+    // só trabalha com a lista ou a curva dos Projetos (a gota) perto da tela; longe, a rolagem não custa nada
+    if ('IntersectionObserver' in window) {
+      const seen = new Set();
+      const io = new IntersectionObserver((es) => {
+        es.forEach((e) => (e.isIntersecting ? seen.add(e.target) : seen.delete(e.target)));
+        const was = near; near = seen.size > 0;
+        if (!was && near) { if (!raf) raf = requestAnimationFrame(tick); }
+        else if (was && !near) {   // saiu: termina no lugar certo (topo = 0, passou = 1)
+          cancelAnimationFrame(raf); raf = 0;
+          const r = list.getBoundingClientRect(); cur = r.top > innerHeight ? 0 : 1; lastP = -1; tick(); cancelAnimationFrame(raf); raf = 0;
+        }
+      }, { rootMargin: '300px 0px' });
+      io.observe(list);
+      const cv = document.querySelector('.pj-curve'); if (cv) io.observe(cv);
+    }
     addEventListener('scroll', lineGo, { passive: true });
     addEventListener('resize', lineGo);
     lineGo();

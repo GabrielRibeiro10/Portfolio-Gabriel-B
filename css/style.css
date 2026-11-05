@@ -626,7 +626,7 @@ a { color: inherit; text-decoration: none; }
   background: linear-gradient(var(--orange-2), var(--orange)) 0 0 / 100% calc(var(--p) * 100%) no-repeat, var(--orange-2);
 }
 .about-areas ol::after {    /* ponta do fio */
-  top: calc(var(--p) * 100%); width: 9px; height: 9px; margin: -4.5px 0 0 -4px; border-radius: 50%;
+  top: 0; transform: translateY(calc(var(--p) * var(--h, 0px))); will-change: transform; width: 9px; height: 9px; margin: -4.5px 0 0 -4px; border-radius: 50%;   /* transform em camada própria: anda sem refazer layout nem repintar */
   background: var(--orange); box-shadow: 0 0 0 4px rgba(242, 107, 29, .16), 0 0 18px 2px rgba(242, 107, 29, .55);
   opacity: calc(min(var(--p) * 40, 1) * min((1 - var(--p)) * 40, 1));   /* some no começo e quando o fio chega ao fim */
 }
