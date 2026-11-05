@@ -18,8 +18,13 @@ com números e imagens. Não basta listar problemas: corrija, meça de novo e s�
 - No modo leve tudo que pesa desliga (fundos animados, onda do FAQ, crachá 3D vira desenhado, vídeos, parallax,
   desfoques, Lenis). **Todo efeito novo precisa** checar `leve()` ao começar **e** parar no evento `gr:leve` (o modo pode
   ligar no meio do uso) e respeitar `prefers-reduced-motion`.
-- O navegador de teste não tem placa de vídeo: com detecção automática ele cai no modo leve (`gpu`) - isso simula o
-  aparelho fraco de verdade. Para medir o modo normal use `--modo=normal`. Custo de WebGL (`GLES2::ReadPixels`) é
+- **Limite do teste (importante):** o navegador de teste não tem placa de vídeo. Os tempos medidos refletem o
+  processador, mas **não** o custo dos efeitos que rodam na placa de vídeo (vidro fosco `backdrop-filter`, desfoque
+  `filter: blur`, máscaras, `mix-blend-mode`). Num celular fraco de verdade são esses que travam a rolagem. Por isso o
+  passo 2b (`pesados.js`) é obrigatório: **uma seção só está "ok" se passar no tempo E não tiver efeito de GPU de risco
+  ligado no modo leve.** Já aconteceu: a faixa "Seu negócio tem uma história" passou no tempo (21-26 ms) e travava em
+  celular fraco por causa de 13 etiquetas com `backdrop-filter`.
+- Com detecção automática o navegador de teste cai no modo leve (`gpu`) - isso simula o aparelho fraco de verdade. Para medir o modo normal use `--modo=normal`. Custo de WebGL (`GLES2::ReadPixels`) é
   exagerado aqui; para avaliar o resto, esconda o canvas com `--css=".cracha-canvas{display:none!important}"`.
 
 ## Passo a passo
@@ -45,6 +50,13 @@ Scripts em `.claude/skills/auditoria-site/scripts/` (Playwright, já instalado n
    `node .claude/skills/auditoria-site/scripts/desempenho.js --modo=normal --aparelhos=celular-medio,pc-medio --css=".cracha-canvas{display:none!important}"`
    Metas: quadro médio ≤ ~22 ms nos bons/médios e ≤ ~35 ms nos fracos; nada marcado `!!`; travadas longas
    (soma) poucas e nenhuma > 150 ms fora do carregamento; CLS < 0,05.
+
+2b. **Efeitos de placa de vídeo** (o que o passo 2 não consegue medir), no celular e no PC:
+   `node .claude/skills/auditoria-site/scripts/pesados.js` e `node .claude/skills/auditoria-site/scripts/pesados.js --largura=1366`
+   Meta: **nenhuma linha `!! LEVE: liga` com risco ALTO** (vidro fosco em algo que rola com a página: troque por fundo
+   semitransparente, para todo mundo, o visual fica igual). Risco médio ligado no modo leve em área grande que se mexe
+   (anima, tem parallax, muda com a rolagem): desligue em `html.leve ...`. Efeito parado só custa na primeira pintura.
+   Olhe com atenção redobrada as seções que o usuário reclamar, mesmo que os números estejam bons.
 
 3. **Achar a causa** de cada seção marcada `!!` ou `~`:
    `node .claude/skills/auditoria-site/scripts/causas.js --secao=#id-da-secao --aparelho=celular-fraco`
@@ -75,6 +87,7 @@ Scripts em `.claude/skills/auditoria-site/scripts/` (Playwright, já instalado n
 | função JS rodando a cada quadro sem nada mudar | `getBoundingClientRect`/medições em loop "por garantia" | rodar só enquanto algo de fato se move; guardar medidas e refazer só no `resize` |
 | travada de 0,5-1,5 s ao chegar numa seção | biblioteca pesada (three.js) montando no meio da rolagem | montar quando o navegador estiver parado depois do carregamento (`requestIdleCallback`) |
 | toque não faz nada no celular | bloco grande e invisível por cima (z-index/contexto de empilhamento) | `pointer-events: none` no bloco e `auto` nos filhos; conferir com `cliente.js` |
+| tempo bom no teste, mas a seção trava num celular fraco de verdade | vidro fosco (`backdrop-filter`) em etiquetas/cartões que rolam com a página; a placa refaz o desfoque a cada quadro | fundo semitransparente (`rgba(255,255,255,.13)`) no lugar do vidro; achar com `pesados.js` |
 | alvo de toque < 24 px | link de texto pequeno | área invisível com `::after { position:absolute; inset:-12px -6px }` (o elemento precisa ter `position`; não sobrescreva `position: absolute` existente) |
 
 ## Regras
@@ -83,6 +96,9 @@ Scripts em `.claude/skills/auditoria-site/scripts/` (Playwright, já instalado n
 - Nunca resolva desligando a animação para todo mundo; desligue só no modo leve / `prefers-reduced-motion`, ou
   troque por uma técnica barata com o mesmo resultado.
 - Toda correção tem que ser **medida de novo** com o mesmo aparelho e mostrada em números.
+- Não declare "sem lag" só pelos tempos: rode `pesados.js` e diga no relatório o que depende de placa de vídeo.
+- Efeito novo criado no site: antes de publicar, rode `pesados.js` e, se usar vidro fosco, desfoque, máscara ou
+  mistura de cores, decida na hora como ele fica no modo leve.
 - Relatório final em linguagem simples para o dono do site: o que estava errado (sintoma que a pessoa sentiria),
   o que foi feito, números antes/depois, o que foi conferido (aparelhos, tamanhos, testes) e o que ainda depende de
   testar num aparelho de verdade (WebGL, vídeos, iOS Safari).

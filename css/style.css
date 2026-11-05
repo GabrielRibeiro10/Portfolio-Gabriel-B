@@ -1812,8 +1812,9 @@ html.leve .intro .btn-work, html.leve .intro .btn-work::before, html.leve .intro
 .nc-more-h em { color: #ffd2a8; font-style: italic; }
 .nc-more-txt p { color: rgba(255, 241, 230, .86); }
 .nc-more-list li {
-  border-color: rgba(255, 233, 216, .28); background: rgba(255, 255, 255, .1); color: #fff;
-  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  /* fundo semitransparente, sem vidro fosco: backdrop-filter numa etiqueta que rola com a página faz a placa de vídeo
+     refazer o desfoque a cada quadro (13 etiquetas = rolagem travando em celular fraco). Sobre o degradê, igual na tela. */
+  border-color: rgba(255, 233, 216, .3); background: rgba(255, 255, 255, .13); color: #fff;
 }
 .nc-more-list .nc-more-etc { border-style: solid; border-color: #fff; background: #fff; color: #c34015; font-weight: 600; }
 @media (hover: hover) { .nc-more-list li:not(.nc-more-etc):hover { background: rgba(255, 255, 255, .22); border-color: rgba(255, 255, 255, .6); color: #fff; } }
@@ -1909,3 +1910,8 @@ html.leve .intro .btn-work, html.leve .intro .btn-work::before, html.leve .intro
   .faq-bg { background: linear-gradient(180deg, #b9480f 0, #b9480f 40px, #c04f15 60px, #cd5816 150px, #e56b1e 250px, #e3823f 350px, #e3823f 100%); }
   .faq-crest { display: none; }
 }
+
+/* modo leve (aparelho fraco): a grade de pontos da faixa "E não para por aí" sem máscara (mais clara para compensar) e a
+   sombra do notebook dos Projetos sem desfoque (ela anima junto com o notebook) */
+html.leve .nc-more::before { -webkit-mask-image: none; mask-image: none; opacity: .45; }
+html.leve .laptop::before { filter: none; }
