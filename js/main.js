@@ -726,28 +726,39 @@ if (animate) {
 
 // ---------- Sobre mim: parallax na seção toda ----------
 // Camadas em velocidades diferentes enquanto a seção atravessa a tela: o selo mais devagar, o texto no meio, o
-// título e os números mais rápido. O crachá está preso no "g" do título e acompanha (js/cracha.js acorda a física
-// na rolagem). Menor no celular; parado para quem prefere menos movimento e no modo leve.
+// título e os números mais rápido. O crachá anda junto com o título como um bloco só (--ty no .about move o canvas
+// e js/cracha.js desconta isso da física): rolar não puxa nem balança o crachá. Menor no celular; parado para quem
+// prefere menos movimento e no modo leve.
 if (window.gsap && window.ScrollTrigger && !reduceMotion) {
-  const me = document.querySelector('.about-me');
-  if (me) {
+  const me = document.querySelector('.about-me'), about = document.querySelector('.about');
+  const title = me && me.querySelector('.about-title');
+  if (me && title) {
     gsap.registerPlugin(ScrollTrigger);
     const layers = [
-      ['.about-kicker', 36], ['.about-title', 90], ['.about-copy .about-lead', 60],
-      ['.about-copy p:not(.about-lead)', 44], ['.about-facts', 80],
+      ['.about-kicker', 70], ['.about-copy .about-lead', 120],
+      ['.about-copy p:not(.about-lead)', 90], ['.about-facts', 150],
     ];
+    const TITLE = 170;
     const mm = gsap.matchMedia();
     const build = (k) => {
       if (leve()) return;
+      const ty = { v: 0 };
       const tl = gsap.timeline({ defaults: { ease: 'none' },
         scrollTrigger: { trigger: me, start: 'top bottom', end: 'bottom top', scrub: 0.6, invalidateOnRefresh: true } });
       for (const [sel, d] of layers) {
         const els = me.querySelectorAll(sel);
         if (els.length) tl.fromTo(els, { y: d * k }, { y: -d * k }, 0);
       }
-      document.addEventListener('gr:leve', () => { tl.scrollTrigger.kill(); tl.progress(0.5).kill(); gsap.set(me.querySelectorAll(layers.map((l) => l[0]).join(',')), { clearProps: 'transform' }); }, { once: true });
+      tl.fromTo(ty, { v: TITLE * k }, { v: -TITLE * k, onUpdate: () => {
+        title.style.translate = `0 ${ty.v.toFixed(2)}px`;
+        about.style.setProperty('--ty', ty.v.toFixed(2) + 'px');
+      } }, 0);
+      const off = () => { tl.scrollTrigger.kill(); tl.kill(); title.style.translate = ''; about.style.removeProperty('--ty');
+        gsap.set(me.querySelectorAll(layers.map((l) => l[0]).join(',')), { clearProps: 'transform' }); };
+      document.addEventListener('gr:leve', off, { once: true });
+      return off;
     };
     mm.add('(min-width: 861px)', () => build(1));
-    mm.add('(max-width: 860px)', () => build(0.45));
+    mm.add('(max-width: 860px)', () => build(0.55));
   }
 }

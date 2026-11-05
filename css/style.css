@@ -1883,3 +1883,6 @@ html.leve .intro .btn-work, html.leve .intro .btn-work::before, html.leve .intro
   .about-in > .projects:first-child .pj { padding-top: calc(36px + 104px); }
   .about-in > .projects:first-child .pj-kicker { top: calc(36px + 34px); }
 }
+
+/* parallax do Sobre mim: o crachá (canvas 3D ou o desenhado do modo leve) anda junto com o título (js/main.js) */
+.cracha-canvas, .lanyard { translate: 0 var(--ty, 0px); }
