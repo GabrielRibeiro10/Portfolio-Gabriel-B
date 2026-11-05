@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Página não encontrada • Gabriel Ribeiro</title>
+  <meta name="description" content="Essa página não existe mais. Volte ao site de Gabriel Ribeiro, desenvolvedor web.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#c4520f">
+  <!-- caminhos absolutos (/css, /img): a Vercel mostra esta página em qualquer endereço que não existe, inclusive
+       em pastas (/blog/abc), e um caminho relativo quebraria lá -->
+  <link rel="icon" href="/img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="/img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/404.css">
+</head>
+<body>
+<!-- Página 404 no visual da hero: fundo da hero, marca GR no canto, "404" gigante em contorno atrás, frase editorial
+     (fonte do site + itálico serifado, como o letreiro do FAQ) e dois caminhos: voltar ao site ou falar no WhatsApp.
+     Sem JavaScript (a política de segurança do site só libera scripts próprios); a entrada é só CSS. -->
+<main class="nf">
+  <a class="nf-brand" href="/" aria-label="Gabriel Ribeiro, voltar ao início">
+    <svg class="nf-mark" viewBox="1 5 48 30" aria-hidden="true">
+      <path d="M21.9 10.2A12 12 0 1 0 27 20"/>
+      <path d="M27 32V8h5.5a6 6 0 0 1 0 12H17"/>
+      <path d="M31 20l7 12"/>
+      <rect class="nf-cursor" x="42" y="27" width="6" height="5" rx="1"/>
+    </svg>
+    <span class="nf-sep" aria-hidden="true"></span>
+    <span class="nf-word" aria-hidden="true">Gabriel<i>Ribeiro</i></span>
+  </a>
+
+  <p class="nf-big" aria-hidden="true">404</p>
+
+  <div class="nf-copy">
+    <p class="nf-kicker"><i aria-hidden="true"></i>Erro 404 · página não encontrada</p>
+    <h1 class="nf-title">Essa página saiu do ar. <em>O resto do site, não.</em></h1>
+    <p class="nf-text">O link pode ter mudado ou ter sido digitado errado. Volte ao início ou me chame no WhatsApp: respondo rápido.</p>
+    <div class="nf-actions">
+      <a class="nf-btn" href="/">Voltar ao início<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10M11 6l4 4-4 4"/></svg></a>
+      <a class="nf-btn nf-btn-ghost" href="https://wa.me/5512991145851?text=Ol%C3%A1%2C%20Gabriel%21%20Vi%20seu%20portf%C3%B3lio%20e%20gostaria%20de%20pedir%20um%20or%C3%A7amento." target="_blank" rel="noopener">Falar no WhatsApp</a>
+    </div>
+    <nav class="nf-links" aria-label="Partes do site">
+      <a href="/#projetos">Projetos</a>
+      <a href="/#sobre">Sobre</a>
+      <a href="/#segmentos">Segmentos</a>
+      <a href="/#servicos">Serviços</a>
+    </nav>
+  </div>
+</main>
+</body>
+</html>
