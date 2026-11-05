@@ -73,6 +73,15 @@ Scripts em `.claude/skills/auditoria-site/scripts/` (Playwright, já instalado n
    Tem que sair "responsividade ok". Olhe também algumas fotos (320, 390, 768, 1366, 2560) para problemas que regra
    nenhuma pega (espaço estranho, elemento desalinhado, imagem esticada).
 
+5b. **iPhone / Safari (obrigatório antes de entregar)**: o Chrome do teste NÃO mostra os defeitos do Safari. Rode o
+   site no motor do Safari (WebKit) como iPhone 13 Pro Max e iPhone SE e **olhe as fotos**:
+   `PLAYWRIGHT_BROWSERS_PATH=<scratchpad>/pw-webkit node .claude/skills/auditoria-site/scripts/iphone.js --fotos=<scratchpad>/iphone`
+   Na primeira vez da sessão instale o WebKit (fora do repositório) e as bibliotecas que ele pedir:
+   `PLAYWRIGHT_BROWSERS_PATH=<scratchpad>/pw-webkit node $(node -e "console.log(require.resolve('playwright').replace(/index.js$/,''))")cli.js install webkit`
+   `apt-get install -y libgtk-4-1 libgraphene-1.0-0 libevent-2.1-7 libgstreamer-gl1.0-0 libgstreamer-plugins-bad1.0-0 libavif16 libwayland-server0 libmanette-0.2-0 libenchant-2-2 libsecret-1-0 libgles2`
+   Tem que aparecer o site dentro do notebook (não um retângulo cinza) e a foto no crachá. Mesmo passando, peça
+   ao dono para abrir num iPhone de verdade: o emulador não reproduz o limite de memória de canvas do iOS.
+
 6. **Corrigir, medir de novo, comparar** (antes/depois com números), rodar de novo 1, 4 e 5 para garantir que nada
    quebrou, e só então fazer commit e publicar (siga as regras de git da sessão).
 
@@ -89,6 +98,8 @@ Scripts em `.claude/skills/auditoria-site/scripts/` (Playwright, já instalado n
 | toque não faz nada no celular | bloco grande e invisível por cima (z-index/contexto de empilhamento) | `pointer-events: none` no bloco e `auto` nos filhos; conferir com `cliente.js` |
 | tempo bom no teste, mas a seção trava num celular fraco de verdade | vidro fosco (`backdrop-filter`) em etiquetas/cartões que rolam com a página; a placa refaz o desfoque a cada quadro | fundo semitransparente (`rgba(255,255,255,.13)`) no lugar do vidro; achar com `pesados.js` |
 | CLS alto (página "pula") só em aparelho fraco | um script muda o layout de uma seção depois de carregar (ex.: liga um carrossel/galeria e a altura muda); no fraco o script roda ~2 s depois e empurra o resto | ligar o modo no `<head>` (classe no `<html>` antes da primeira pintura) e dar ao bloco altura natural pelo CSS, sem medir no JS |
+| **iPhone: vídeo/captura do projeto não aparece** (retângulo cinza no notebook), no Chrome tudo certo | Safari ignora `backface-visibility: hidden` dentro de `transform-style: preserve-3d` e desenha a face de trás (tampa por fora) por cima da tela aberta | esconder a face de trás com `visibility: hidden` quando o objeto está aberto/virado (não confiar em backface-visibility); conferir com `iphone.js` |
+| **iPhone: foto some do crachá 3D** (cartão branco) | Safari tem limite de memória de canvas e devolve canvas em branco sem erro; `getImageData` em canvas grande falha | não ler pixels em canvas (`getImageData`): usar a imagem já pronta (ex.: foto já em P&B em arquivo); `setPixelRatio` até 1 no iOS; se a foto não carregar, cair na versão sem 3D |
 | alvo de toque < 24 px | link de texto pequeno | área invisível com `::after { position:absolute; inset:-12px -6px }` (o elemento precisa ter `position`; não sobrescreva `position: absolute` existente) |
 
 ## Regras
@@ -97,6 +108,8 @@ Scripts em `.claude/skills/auditoria-site/scripts/` (Playwright, já instalado n
 - Nunca resolva desligando a animação para todo mundo; desligue só no modo leve / `prefers-reduced-motion`, ou
   troque por uma técnica barata com o mesmo resultado.
 - Toda correção tem que ser **medida de novo** com o mesmo aparelho e mostrada em números.
+- Não declare o site pronto sem o passo 5b (iPhone/Safari): ele já escondeu o vídeo dos projetos e a foto do crachá
+  num iPhone 13 Pro Max enquanto o Chrome mostrava tudo certo.
 - Não declare "sem lag" só pelos tempos: rode `pesados.js` e diga no relatório o que depende de placa de vídeo.
 - Efeito novo criado no site: antes de publicar, rode `pesados.js` e, se usar vidro fosco, desfoque, máscara ou
   mistura de cores, decida na hora como ele fica no modo leve.
