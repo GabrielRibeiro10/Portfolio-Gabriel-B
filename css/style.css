@@ -1901,3 +1901,11 @@ html.leve .intro .btn-work, html.leve .intro .btn-work::before, html.leve .intro
   .intro { pointer-events: none; }
   .intro > * { pointer-events: auto; }
 }
+
+/* celular: a onda do FAQ não cobre a tela até a borda direita e o creme do fundo aparecia ali como uma mancha.
+   O fundo vira o mesmo degradê laranja da onda (as cores dela medidas na tela) e continua sumindo no fim pela
+   máscara de baixo; a crista de creme, que só fazia sentido com a faixa clara, sai. */
+@media (max-width: 860px) {
+  .faq-bg { background: linear-gradient(180deg, #b9480f 0, #b9480f 40px, #c04f15 60px, #cd5816 150px, #e56b1e 250px, #e3823f 350px, #e3823f 100%); }
+  .faq-crest { display: none; }
+}
