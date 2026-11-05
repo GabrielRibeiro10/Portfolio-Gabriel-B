@@ -88,6 +88,17 @@ Scripts em `.claude/skills/auditoria-site/scripts/` (Playwright, já instalado n
    Limite: o simulador usa o motor do Safari mas não o limite de memória de canvas nem a placa de vídeo do iPhone;
    peça ao dono para abrir num iPhone de verdade antes de entregar.
 
+5c. **Como no ar: regras de segurança da Vercel + página 404 — obrigatório antes de publicar.** O `vercel.json`
+   manda ao navegador regras de segurança (a principal é a CSP, uma "lista de convidados": só carrega script,
+   estilo, fonte e imagem do próprio site e do Google Fonts). No teste local elas não existem: o que elas bloqueiam
+   funciona aqui e quebra no ar, sem aviso.
+   `PLAYWRIGHT_BROWSERS_PATH=<scratchpad>/pw-webkit node .claude/skills/auditoria-site/scripts/producao.js --fotos=<scratchpad>/producao`
+   Abre cada página no PC, no celular e no iPhone **com as regras do ar** e acusa bloqueios; confere se todo
+   `<script>` colado na página tem o hash liberado no `vercel.json` e se não há `<style>` na página; e testa a 404
+   num link quebrado na raiz e dentro de pasta (estilo carregando, `noindex`, botão para o início).
+   Tem que terminar com "ok". Ao mudar um script colado na página, recalcule o hash e atualize o `vercel.json`.
+   Fonte, imagem ou script de outro endereço: libere o endereço no `vercel.json` (o mínimo possível) antes de usar.
+
 6. **Corrigir, medir de novo, comparar** (antes/depois com números), rodar de novo 1, 4 e 5 para garantir que nada
    quebrou, e só então fazer commit e publicar (siga as regras de git da sessão).
 
@@ -106,6 +117,8 @@ Scripts em `.claude/skills/auditoria-site/scripts/` (Playwright, já instalado n
 | CLS alto (página "pula") só em aparelho fraco | um script muda o layout de uma seção depois de carregar (ex.: liga um carrossel/galeria e a altura muda); no fraco o script roda ~2 s depois e empurra o resto | ligar o modo no `<head>` (classe no `<html>` antes da primeira pintura) e dar ao bloco altura natural pelo CSS, sem medir no JS |
 | **iPhone: vídeo/captura do projeto não aparece** (retângulo cinza no notebook), no Chrome tudo certo | Safari ignora `backface-visibility: hidden` dentro de `transform-style: preserve-3d` e desenha a face de trás (tampa por fora) por cima da tela aberta | esconder a face de trás com `visibility: hidden` quando o objeto está aberto/virado (não confiar em backface-visibility); conferir com `iphone.js` |
 | **iPhone: foto some do crachá 3D** (cartão branco) | Safari tem limite de memória de canvas e devolve canvas em branco sem erro; `getImageData` em canvas grande falha | não ler pixels em canvas (`getImageData`): usar a imagem já pronta (ex.: foto já em P&B em arquivo); `setPixelRatio` até 1 no iOS; se a foto não carregar, cair na versão sem 3D |
+| funciona no teste e quebra no ar (efeito some, fonte não carrega, script não roda) | a CSP do `vercel.json` bloqueia: `<script>` colado na página sem hash, `<style>` na página, arquivo de outro endereço | mover para arquivo `.js`/`.css` do site, ou liberar o hash/endereço no `vercel.json`; conferir com `producao.js` |
+| link quebrado mostra página sem estilo | 404.html com caminho relativo (`css/...`): dentro de pasta ele procura `/pasta/css/...` | caminhos absolutos (`/css/...`, `/img/...`) na 404 |
 | alvo de toque < 24 px | link de texto pequeno | área invisível com `::after { position:absolute; inset:-12px -6px }` (o elemento precisa ter `position`; não sobrescreva `position: absolute` existente) |
 
 ## Regras
