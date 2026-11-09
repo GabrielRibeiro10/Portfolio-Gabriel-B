@@ -53,7 +53,7 @@ a { color: inherit; text-decoration: none; }
 
 /* ---------- Logo ---------- */
 /* GR ligado (traço branco) + cursor laranja piscando, fio fino e o nome em duas linhas.
-   Os traços têm pathLength=1: a entrada (js/main.js) e o hover redesenham pelo stroke-dashoffset
+   Os traços têm pathLength=1: a entrada (js/main.js) desenha pelo stroke-dashoffset (sem redesenhar no hover)
    (tracejado 1 2: com o deslocamento em 1.05 não sobra nem a ponta redonda aparecendo). */
 .logo {
   position: absolute; left: 2.9cqw; top: 3.4cqh; z-index: 5;
@@ -72,14 +72,8 @@ a { color: inherit; text-decoration: none; }
 }
 .logo-word i { font-style: normal; font-weight: 400; opacity: .75; }
 @keyframes lg-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
-@keyframes lg-draw { from { stroke-dashoffset: 1.05; } to { stroke-dashoffset: 0; } }
-@media (hover: hover) {
-  .logo:hover .lg-s { animation: lg-draw .8s cubic-bezier(.65, 0, .35, 1) both; }
-  .logo:hover .lg-s:nth-child(2) { animation-delay: .1s; }
-  .logo:hover .lg-s:nth-child(3) { animation-delay: .2s; }
-}
 .logo:focus-visible { outline: 2px solid #fff; outline-offset: 6px; border-radius: 6px; }
-@media (prefers-reduced-motion: reduce) { .lg-cursor, .logo:hover .lg-s { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .lg-cursor { animation: none; } }
 @media (max-width: 599px) { .logo-sep, .logo-word { display: none; } }   /* celular: só o GR (o menu fica ao lado) */
 
 /* ---------- Textos da esquerda ---------- */
