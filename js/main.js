@@ -129,6 +129,23 @@ if (animate) {
     .from(sep, { scaleY: 0, duration: 0.7, clearProps: 'transform' }, 0.85)
     .from(word, { clipPath: 'inset(0% 100% 0% 0%)', duration: 1.0, ease: 'expo.inOut', clearProps: 'clipPath' }, 0.9)
     .to(logo, { x: 0, y: 0, scale: 1, duration: 1.25, ease: 'expo.inOut', clearProps: 'transform' }, 2.05);
+  // a página fica parada até a marca pousar no canto (roda, toque e teclado; o Lenis para junto, lá embaixo).
+  // Sem mexer no overflow: a barra de rolagem não some, então nada pula de lugar ao soltar.
+  {
+    const keys = ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' ', 'Spacebar'];
+    const block = (e) => { if (e.type !== 'keydown' || keys.includes(e.key)) e.preventDefault(); };
+    const evs = ['wheel', 'touchmove', 'keydown'];
+    evs.forEach((t) => addEventListener(t, block, { passive: false }));
+    window.grIntroLock = true;
+    let freed = false;
+    const free = () => {
+      if (freed) return; freed = true; window.grIntroLock = false;
+      evs.forEach((t) => removeEventListener(t, block, { passive: false }));
+      document.dispatchEvent(new Event('gr:intro-fim'));
+    };
+    tl.call(free, null, 3.3);
+    setTimeout(free, 6000);   // trava de segurança: nunca fica preso (aba em segundo plano, erro na animação)
+  }
   if (wordHidden) tl.to([sep, word], { autoAlpha: 0, duration: 0.35, ease: 'power1.out' }, 2.75)
     .call(() => { logo.classList.remove('logo-intro'); gsap.set([sep, word], { clearProps: 'opacity,visibility' }); }, null, 3.35);
 
@@ -309,6 +326,7 @@ if (window.Lenis && !reduceMotion && !leve() && matchMedia('(hover: hover) and (
     gsap.ticker.add(raf);
   }
   if (window.grReload) lenis.scrollTo(0, { immediate: true, force: true });
+  if (window.grIntroLock) { lenis.stop(); document.addEventListener('gr:intro-fim', () => lenis.start(), { once: true }); }   // abertura da marca
   // Barra de rolagem do navegador ou teclado no meio de uma rolagem animada (ex.: "Ver meus projetos" leva ~1,7 s
   // descendo): o Lenis ignorava a barra e continuava puxando a página para o destino, e ela parecia travada.
   // Agora qualquer um dos dois cancela a animação na hora e a rolagem volta a ser da pessoa.
