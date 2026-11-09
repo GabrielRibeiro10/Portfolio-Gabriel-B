@@ -1,8 +1,10 @@
 // 4b) Teste de hover como cliente: passa a seta por cima de cada elemento que reage ao mouse e procura o que
 //     PARECE bug para quem usa, mesmo funcionando como foi escrito:
-//  - SOME/PISCA: ao entrar, o elemento passa por um quadro muito diferente do normal E do estado com hover
-//    (ex.: a marca GR sumia e se redesenhava a cada hover);
-//  - REINICIA: entrando e saindo rápido (seta passando de leve), o elemento sai do caminho normal → hover;
+//  - SOME: ao entrar ou com a seta passando de leve (entra e sai rápido), boa parte do desenho desaparece
+//    (ex.: a marca GR sumia e se redesenhava a cada hover; passando de leve parecia reiniciar);
+//  - FLASH: ao entrar, aparece de repente bem mais desenho do que no normal e no hover (clarão, piscada);
+//  Transições suaves (cor que muda, texto que sobe e troca, círculo que preenche) NÃO são acusadas: os quadros do
+//  meio delas ficam longe do início e do fim, mas o desenho não some nem acende do nada.
 //  - NÃO VOLTA: depois de tirar a seta, não volta a ficar como estava;
 //  - TREME: parado em cima, continua mudando bem mais que sem a seta (loop que só existe no hover).
 // Elementos testados: todo seletor com :hover nas folhas de estilo (o dono do hover, ex. ".logo" em
@@ -130,8 +132,10 @@ const LIMIAR = 0.15;   // fração da "tinta" do elemento que mudou para contar 
       const achados = [];
       if (some(E) > limSome) achados.push(`SOME ao entrar (${Math.round(some(E) * 100)}% do desenho desaparece)`);
       if (some(L) > limSome) achados.push(`SOME passando de leve (${Math.round(some(L) * 100)}% do desenho desaparece)`);
-      const pe = pior(E); if (fora_(pe) > lim && !achados.length) achados.push(`SOME/PISCA ao entrar (${Math.round(fora_(pe) * 100)}% fora do normal e do hover)`);
-      const pl = pior(L); if (fora_(pl) > lim && achados.length < 2) achados.push(`REINICIA passando de leve (${Math.round(fora_(pl) * 100)}%)`);
+      const pe = pior(E), pl = pior(L);   // só informativo (--tudo): quanto o quadro do meio se afasta dos dois estados
+      const topo = Math.max(...B.map((x) => tinta[x]), ...H.map((x) => tinta[x]));
+      const flash = Math.max(...[...E, ...L].map((x) => tinta[x] / Math.max(1e-4, topo) - 1));
+      if (flash > Math.max(0.6, vari + 0.4)) achados.push(`FLASH: acende do nada ao passar a seta (${Math.round(flash * 100)}% mais desenho)`);
       if (minPara(D, B) > lim) achados.push(`NÃO VOLTA ao normal depois de tirar a seta (${Math.round(minPara(D, B) * 100)}%)`);
       if (ruidoH > Math.max(LIMIAR * 2, ruido * 2 + 0.08)) achados.push(`TREME parado em cima (${Math.round(ruidoH * 100)}% x ${Math.round(ruido * 100)}% sem a seta)`);
       const info = mudanca > lim ? `muda ${Math.round(mudanca * 100)}%` : (mudanca > ruido + 0.01 ? 'muda pouco' : 'sem efeito visível');
@@ -142,7 +146,7 @@ const LIMIAR = 0.15;   // fração da "tinta" do elemento que mudou para contar 
           const nomeArq = `${pagina.replace('.html', '')}-${nome}-${String(al.i).padStart(3, '0')}`;
           [base[0], ...entrada, ...leve, depois].forEach((f, k) => fs.writeFileSync(path.join(a.fotos, `${nomeArq}-${String(k).padStart(2, '0')}.png`), Buffer.from(f, 'base64')));
         }
-      } else if (a.tudo) linhas.push(`   ${al.nome}: ok [${info}; entrada ${Math.round(fora_(pe) * 100)}%, leve ${Math.round(fora_(pl) * 100)}%, ruído ${Math.round(ruido * 100)}%, some ${Math.round(Math.max(some(E), some(L)) * 100)}%/${Math.round(limSome * 100)}%]`);
+      } else if (a.tudo) linhas.push(`   ${al.nome}: ok [${info}; entrada ${Math.round(fora_(pe) * 100)}%, leve ${Math.round(fora_(pl) * 100)}%, ruído ${Math.round(ruido * 100)}%, flash ${Math.round(flash * 100)}%, some ${Math.round(Math.max(some(E), some(L)) * 100)}%/${Math.round(limSome * 100)}%]`);
     }
     console.log(`\n== ${pagina} @ ${nome} (${await modoAtual(page)})${erros.length ? ' | ERROS: ' + erros.join(' || ') : ''}`);
     console.log(`   elementos com a seta testados: ${linhas.length || !a.tudo ? total : linhas.length}`);
