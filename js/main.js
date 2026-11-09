@@ -335,6 +335,14 @@ if ('IntersectionObserver' in window) {
 const stopLogo = () => { const l = document.querySelector('.logo-mark'); if (l) l.pauseAnimations(); };
 if (leve()) stopLogo();
 document.addEventListener('gr:leve', stopLogo);
+// marca: passar o mouse desenha o GR uma vez até o fim; entrar e sair de novo no meio não recomeça
+{
+  const logo = document.querySelector('.logo'), last = logo && logo.querySelector('.lg-s:last-of-type');
+  if (logo && matchMedia('(hover: hover)').matches) {
+    logo.addEventListener('mouseenter', () => logo.classList.add('is-drawing'));
+    logo.addEventListener('animationend', (e) => { if (e.target === last) logo.classList.remove('is-drawing'); });
+  }
+}
 
 // "O que eu entrego": o fio laranja desce junto com a rolagem (a ponta fica a 60% da altura da tela),
 // com um leve atraso para ficar macio; o item acende quando o fio passa do começo dele. No mesmo quadro
