@@ -1,6 +1,6 @@
 ---
 name: auditoria-site
-description: Auditoria completa do site antes de entregar ou publicar - desempenho em aparelhos bons, médios e fracos (celular, tablet, PC, monitor), varredura de bugs e erros, teste como cliente (tocar, clicar, rolar, girar a tela) e responsividade em todos os tamanhos, corrigindo o que achar. Use quando pedirem para revisar o site, tirar bugs, travadas ou lag, deixar mais rápido/fluido, testar em celular fraco ou PC fraco, conferir responsividade, ou "deixar pronto para o cliente".
+description: Auditoria completa do site antes de entregar ou publicar - desempenho em aparelhos bons, médios e fracos (celular, tablet, PC, monitor), varredura de bugs e erros, teste como cliente (tocar, clicar, passar o mouse, rolar, girar a tela) e responsividade em todos os tamanhos, corrigindo o que achar. Use quando pedirem para revisar o site, tirar bugs, travadas ou lag, deixar mais rápido/fluido, testar em celular fraco ou PC fraco, conferir responsividade, ou "deixar pronto para o cliente".
 ---
 
 # Auditoria do site (desempenho, bugs, cliente, responsividade)
@@ -68,6 +68,26 @@ Scripts em `.claude/skills/auditoria-site/scripts/` (Playwright, já instalado n
    **Olhe as pranchas** (Read nas imagens): animação pela metade, elemento sumido, sobreposto, piscando, crachá solto do
    título, texto por cima de texto, faixa de cor errada, emenda entre seções. Repita com `--aparelhos=celular-fraco,pc-fraco`.
 
+4b. **Passar o mouse como cliente (hover) — obrigatório.** O passo 4 só clica e toca; efeito que só aparece com a
+   seta por cima nunca roda nele, e foto parada não mostra animação. `hover.js` passa a seta em cada elemento que
+   reage ao mouse (todo seletor com `:hover` no CSS + links e botões), em todas as páginas, entrando devagar, passando
+   de leve (entra e sai rápido 5 vezes), parado em cima e saindo, e mede as fotos do elemento:
+   `node .claude/skills/auditoria-site/scripts/hover.js --fotos=<scratchpad>/hover`
+   Acusa `!!` quando o elemento **SOME** (o desenho desaparece ao entrar ou passando de leve), **PISCA/REINICIA**
+   (passa por um quadro longe do normal e do estado com hover), **NÃO VOLTA** ao normal ou **TREME** parado em cima.
+   Tem que terminar com "hover ok". Um elemento só: `--so=".logo"`; ver todos com os números: `--tudo`.
+   Olhe os quadros dos acusados (`montagem.js <scratchpad>/hover`). Não tire o efeito por conta própria se ele for
+   de propósito: mostre ao dono e deixe ele decidir.
+   Para conferir que o teste ainda funciona, recoloque um bug conhecido só no teste com `--css=` (ex.: o GR que se
+   redesenhava: `--so=".logo" --css="@keyframes x{from{stroke-dashoffset:1.05}} .logo:hover .lg-s{animation:x .8s both}"`
+   tem que dar `!! ... SOME`).
+
+4c. **Sensação de uso: parece bug também é bug.** Os testes acima conferem se funciona; aqui é se *fica bom* para
+   quem usa. Grave um vídeo curto (Playwright `recordVideo`) no PC e no celular, rolando o site e passando o mouse
+   pelos elementos principais, e olhe alguns quadros como cliente: algo que some e volta, pisca, reinicia, pula,
+   anima de novo sem motivo, demora para responder, ou um efeito "bonito" que parece travamento. Entra no relatório
+   mesmo que o código esteja certo.
+
 5. **Responsividade** (15 tamanhos de 320 a 2560 px, celular deitado incluso, todas as páginas):
    `node .claude/skills/auditoria-site/scripts/responsivo.js --fotos=<scratchpad>/resp`
    Tem que sair "responsividade ok". Olhe também algumas fotos (320, 390, 768, 1366, 2560) para problemas que regra
@@ -99,7 +119,7 @@ Scripts em `.claude/skills/auditoria-site/scripts/` (Playwright, já instalado n
    Tem que terminar com "ok". Ao mudar um script colado na página, recalcule o hash e atualize o `vercel.json`.
    Fonte, imagem ou script de outro endereço: libere o endereço no `vercel.json` (o mínimo possível) antes de usar.
 
-6. **Corrigir, medir de novo, comparar** (antes/depois com números), rodar de novo 1, 4 e 5 para garantir que nada
+6. **Corrigir, medir de novo, comparar** (antes/depois com números), rodar de novo 1, 4, 4b e 5 para garantir que nada
    quebrou, e só então fazer commit e publicar (siga as regras de git da sessão).
 
 ## Causas que já apareceram neste site (e a correção)
@@ -119,6 +139,7 @@ Scripts em `.claude/skills/auditoria-site/scripts/` (Playwright, já instalado n
 | **iPhone: foto some do crachá 3D** (cartão branco) | Safari tem limite de memória de canvas e devolve canvas em branco sem erro; `getImageData` em canvas grande falha | não ler pixels em canvas (`getImageData`): usar a imagem já pronta (ex.: foto já em P&B em arquivo); `setPixelRatio` até 1 no iOS; se a foto não carregar, cair na versão sem 3D |
 | funciona no teste e quebra no ar (efeito some, fonte não carrega, script não roda) | a CSP do `vercel.json` bloqueia: `<script>` colado na página sem hash, `<style>` na página, arquivo de outro endereço | mover para arquivo `.js`/`.css` do site, ou liberar o hash/endereço no `vercel.json`; conferir com `producao.js` |
 | link quebrado mostra página sem estilo | 404.html com caminho relativo (`css/...`): dentro de pasta ele procura `/pasta/css/...` | caminhos absolutos (`/css/...`, `/img/...`) na 404 |
+| **parece que trava/reinicia ao passar o mouse** (a marca GR sumia e se redesenhava a cada hover) | animação de hover que começa do invisível (`stroke-dashoffset`, `opacity: 0`, `scale(0)`): cada vez que a seta entra, o elemento some e volta | não começar do invisível no hover: usar só realce (brilho, cor, leve deslocamento) que parte do estado atual; desenho completo só na entrada da página; conferir com `hover.js` |
 | alvo de toque < 24 px | link de texto pequeno | área invisível com `::after { position:absolute; inset:-12px -6px }` (o elemento precisa ter `position`; não sobrescreva `position: absolute` existente) |
 
 ## Regras
@@ -132,6 +153,9 @@ Scripts em `.claude/skills/auditoria-site/scripts/` (Playwright, já instalado n
 - Não declare "sem lag" só pelos tempos: rode `pesados.js` e diga no relatório o que depende de placa de vídeo.
 - Efeito novo criado no site: antes de publicar, rode `pesados.js` e, se usar vidro fosco, desfoque, máscara ou
   mistura de cores, decida na hora como ele fica no modo leve.
+- **Efeitos que você criar precisam de aprovação do dono.** Todo efeito novo (hover, animação, transição, efeito
+  de rolagem) que você inventar, e que o dono não pediu exatamente, vai numa lista no fim do trabalho: onde fica, o
+  que acontece e quando ("ao passar o mouse no GR, ele se redesenha"). Nada de enfeite entrando sem ele saber.
 - Relatório final em linguagem simples para o dono do site: o que estava errado (sintoma que a pessoa sentiria),
-  o que foi feito, números antes/depois, o que foi conferido (aparelhos, tamanhos, testes) e o que ainda depende de
+  o que foi feito, números antes/depois, o que foi conferido (aparelhos, tamanhos, testes, hover), uma parte "sensação de uso" (o que parece bug mesmo funcionando) e o que ainda depende de
   testar num aparelho de verdade (WebGL, vídeos, iOS Safari).
