@@ -147,7 +147,7 @@ const LIMIAR = 0.15;   // fração da "tinta" do elemento que mudou para contar 
       if (flash > Math.max(0.6, vari + 0.4)) achados.push(`FLASH: acende do nada ao passar a seta (${Math.round(flash * 100)}% mais desenho)`);
       // "não volta" = ficou preso no estado do hover (mais perto dele que do normal). Diferente dos dois = algo que se
       // mexe sozinho ali (faixa que corre, cursor piscando, brilho pulsando), não é culpa da seta
-      if (voltaD > lim && presoH < voltaD * 0.5) achados.push(`NÃO VOLTA: fica preso no hover depois de tirar a seta (${Math.round(voltaD * 100)}%)`);
+      if (mudanca > lim && voltaD > lim && presoH < voltaD * 0.5) achados.push(`NÃO VOLTA: fica preso no hover depois de tirar a seta (${Math.round(voltaD * 100)}%)`);
       const treme = ruidoHs > Math.max(LIMIAR * 2, ruido * 2 + 0.08);   // informativo: efeito que pulsa com a seta em cima (costuma ser de propósito)
       const info = mudanca > lim ? `muda ${Math.round(mudanca * 100)}%` : (mudanca > ruido + 0.01 ? 'muda pouco' : 'sem efeito visível');
       if (achados.length) {
