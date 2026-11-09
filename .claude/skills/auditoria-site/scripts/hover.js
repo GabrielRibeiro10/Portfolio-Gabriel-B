@@ -26,11 +26,11 @@ const LIMIAR = 0.15;   // fração da "tinta" do elemento que mudou para contar 
   // página à parte só para comparar fotos (não mexe no site)
   const cmp = await (await b.newContext()).newPage();
   await cmp.setContent('<body></body>');
-  const diffs = (fotos) => cmp.evaluate(async (fotos) => {
+  const diffs = (fotos, pares) => cmp.evaluate(async ({ fotos, pares }) => {
     const img = await Promise.all(fotos.map(async (b64) => {
       const bm = await createImageBitmap(await (await fetch('data:image/png;base64,' + b64)).blob());
       const c = new OffscreenCanvas(bm.width, bm.height), x = c.getContext('2d'); x.drawImage(bm, 0, 0);
-      return x.getImageData(0, 0, bm.width, bm.height).data;
+      const im = x.getImageData(0, 0, bm.width, bm.height); im.data.w = bm.width; return im.data;
     }));
     // "tinta": pixels diferentes do fundo (cor do canto). A mudança é medida em relação à tinta, e não à área da foto:
     // um traço fino (como o da marca GR) sumindo é pouca área, mas é quase toda a tinta do elemento.
@@ -38,8 +38,15 @@ const LIMIAR = 0.15;   // fração da "tinta" do elemento que mudou para contar 
     const tinta = img.map((p) => { let n = 0; for (let i = 0; i < p.length; i += 4) if (dif(p, i, p, 0) > 60) n++; return n / (p.length / 4); });
     const d = (a, b) => { const p = img[a], q = img[b]; if (p.length !== q.length) return 1; let n = 0; for (let i = 0; i < p.length; i += 4)
       if (dif(p, i, q, i) > 60) n++; return n / (p.length / 4) / Math.max(tinta[a], tinta[b], 0.02); };
-    return { m: img.map((p, a) => img.map((q, b) => Math.min(1, d(a, b)))), tinta };
-  }, fotos);
+    // igual, mas tolera o elemento ter andado até 8 px (faixa que corre sozinha, botão com leve movimento,
+    // rolagem suave assentando): sem isso, "não volta ao normal" e "treme" davam alarme falso
+    const ds = (a, b) => { const p = img[a], q = img[b], w = p.w, h = p.length / 4 / w; if (p.length !== q.length) return 1; let melhor = 1;
+      for (let dy = -8; dy <= 8; dy++) for (let dx = -8; dx <= 8; dx++) { let n = 0, t = 0;
+        for (let y = 8; y < h - 8; y++) for (let x = 8; x < w - 8; x++) { const i = (y * w + x) * 4, j = ((y + dy) * w + x + dx) * 4; t++; if (dif(p, i, q, j) > 60) n++; }
+        melhor = Math.min(melhor, t ? n / t / Math.max(tinta[a], tinta[b], 0.02) : 1); }
+      return melhor; };
+    return { m: img.map((p, a) => img.map((q, b) => Math.min(1, d(a, b)))), tinta, s: pares.map(([a, b]) => Math.min(1, ds(a, b))) };
+  }, { fotos, pares });
 
   let problemas = 0, total = 0;
   for (const pagina of paginas) for (const nome of aparelhos) {
@@ -113,7 +120,9 @@ const LIMIAR = 0.15;   // fração da "tinta" do elemento que mudou para contar 
       const depois = await foto();
 
       const todas = [...base, ...hov, ...entrada, ...leve, depois];
-      const { m, tinta } = await diffs(todas);
+      const pares = [[23, 0], [23, 1], [23, 2], [23, 3], [4, 5], [4, 6], [4, 7], [5, 6], [5, 7], [6, 7]];
+      const { m, tinta, s: sm } = await diffs(todas, pares);
+      const voltaD = Math.min(...sm.slice(0, 4)), ruidoHs = Math.max(...sm.slice(4));
       const B = [0, 1, 2, 3], H = [4, 5, 6, 7], E = [...Array(10).keys()].map((k) => 8 + k), L = [...Array(5).keys()].map((k) => 18 + k), D = 23;
       const maxEntre = (xs, ys) => Math.max(...xs.flatMap((x) => ys.map((y) => m[x][y])));
       const minPara = (x, ys) => Math.min(...ys.map((y) => m[x][y]));
@@ -136,8 +145,8 @@ const LIMIAR = 0.15;   // fração da "tinta" do elemento que mudou para contar 
       const topo = Math.max(...B.map((x) => tinta[x]), ...H.map((x) => tinta[x]));
       const flash = Math.max(...[...E, ...L].map((x) => tinta[x] / Math.max(1e-4, topo) - 1));
       if (flash > Math.max(0.6, vari + 0.4)) achados.push(`FLASH: acende do nada ao passar a seta (${Math.round(flash * 100)}% mais desenho)`);
-      if (minPara(D, B) > lim) achados.push(`NÃO VOLTA ao normal depois de tirar a seta (${Math.round(minPara(D, B) * 100)}%)`);
-      if (ruidoH > Math.max(LIMIAR * 2, ruido * 2 + 0.08)) achados.push(`TREME parado em cima (${Math.round(ruidoH * 100)}% x ${Math.round(ruido * 100)}% sem a seta)`);
+      if (voltaD > lim) achados.push(`NÃO VOLTA ao normal depois de tirar a seta (${Math.round(voltaD * 100)}%)`);
+      if (ruidoHs > Math.max(LIMIAR * 2, ruido * 2 + 0.08)) achados.push(`TREME parado em cima (${Math.round(ruidoHs * 100)}% x ${Math.round(ruido * 100)}% sem a seta)`);
       const info = mudanca > lim ? `muda ${Math.round(mudanca * 100)}%` : (mudanca > ruido + 0.01 ? 'muda pouco' : 'sem efeito visível');
       if (achados.length) {
         problemas++;
