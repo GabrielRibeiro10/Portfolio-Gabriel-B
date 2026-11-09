@@ -2159,3 +2159,23 @@ html.leve .nc-more-go::after { animation: none; }
 .lp-back { transition: visibility 0s linear .35s; }
 .pj-slide.is-active .lp-back { visibility: hidden; transition-delay: .8s; }   /* some quando a tampa já passou do meio (abre em .45s + .9s) */
 @media (prefers-reduced-motion: reduce) { .lp-back { visibility: hidden; } }
+
+/* selo de acessibilidade em destaque no rodapé (Lei 13.146/2015, art. 63, § 1º): símbolo internacional num círculo
+   azul (a cor do símbolo), em pílula no fim da faixa legal */
+.ft-a11y {
+  display: inline-flex; align-items: center; gap: 9px; height: 42px; padding: 0 18px 0 6px;
+  border: 1px solid rgba(17, 17, 17, .14); border-radius: 999px; background: rgba(255, 255, 255, .7);
+  font: 500 14px var(--font); color: var(--ink); text-decoration: none;
+  transition: border-color .3s, color .3s, background .3s;
+}
+.ft-a11y .a11y-sym { width: 30px; height: 30px; padding: 3px; border-radius: 50%; background: #1f5fbf; color: #fff; transition: transform .6s cubic-bezier(.3, 1.4, .5, 1); }
+.ft-a11y:hover { border-color: #1f5fbf; color: #1f5fbf; background: #fff; }
+.ft-a11y:hover .a11y-sym { transform: rotate(-12deg) scale(1.06); }
+.ft-a11y:focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; }
+.a11y-sym { flex: none; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.a11y-sym .fill { fill: currentColor; stroke: none; }
+.a11y-sym-sm { width: 1.15em; height: 1.15em; }
+@media (max-width: 860px) {
+  .ft-a11y { height: 38px; font-size: 13px; }
+  .ft-a11y .a11y-sym { width: 27px; height: 27px; }
+}
