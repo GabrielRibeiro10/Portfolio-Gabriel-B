@@ -339,7 +339,8 @@ document.addEventListener('gr:leve', stopLogo);
 {
   const logo = document.querySelector('.logo'), last = logo && logo.querySelector('.lg-s:last-of-type');
   if (logo && matchMedia('(hover: hover)').matches) {
-    logo.addEventListener('mouseenter', () => logo.classList.add('is-drawing'));
+    // na abertura a marca cresce e voa até o canto por baixo da seta: ignora até ela pousar
+    logo.addEventListener('mouseenter', () => { if (!(window.gsap && gsap.isTweening(logo))) logo.classList.add('is-drawing'); });
     logo.addEventListener('animationend', (e) => { if (e.target === last) logo.classList.remove('is-drawing'); });
   }
 }
