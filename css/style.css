@@ -74,12 +74,14 @@ a { color: inherit; text-decoration: none; }
 @keyframes lg-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
 @keyframes lg-draw { from { stroke-dashoffset: 1.05; } to { stroke-dashoffset: 0; } }
 @media (hover: hover) {
-  .logo:hover .lg-s { animation: lg-draw .8s cubic-bezier(.65, 0, .35, 1) both; }
-  .logo:hover .lg-s:nth-child(2) { animation-delay: .1s; }
-  .logo:hover .lg-s:nth-child(3) { animation-delay: .2s; }
+  /* .is-drawing: posta pelo js/main.js ao passar o mouse e tirada só quando o desenho termina
+     (com :hover o GR recomeçava do zero a cada entrada e saída da seta) */
+  .logo.is-drawing .lg-s { animation: lg-draw .8s cubic-bezier(.65, 0, .35, 1) both; }
+  .logo.is-drawing .lg-s:nth-child(2) { animation-delay: .1s; }
+  .logo.is-drawing .lg-s:nth-child(3) { animation-delay: .2s; }
 }
 .logo:focus-visible { outline: 2px solid #fff; outline-offset: 6px; border-radius: 6px; }
-@media (prefers-reduced-motion: reduce) { .lg-cursor, .logo:hover .lg-s { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .lg-cursor, .logo.is-drawing .lg-s { animation: none; } }
 @media (max-width: 599px) { .logo-sep, .logo-word { display: none; } }   /* celular: só o GR (o menu fica ao lado) */
 
 /* ---------- Textos da esquerda ---------- */
