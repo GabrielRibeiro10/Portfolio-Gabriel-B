@@ -73,8 +73,9 @@ Scripts em `.claude/skills/auditoria-site/scripts/` (Playwright, já instalado n
    reage ao mouse (todo seletor com `:hover` no CSS + links e botões), em todas as páginas, entrando devagar, passando
    de leve (entra e sai rápido 5 vezes), parado em cima e saindo, e mede as fotos do elemento:
    `node .claude/skills/auditoria-site/scripts/hover.js --fotos=<scratchpad>/hover`
-   Acusa `!!` quando o elemento **SOME** (o desenho desaparece ao entrar ou passando de leve), **PISCA/REINICIA**
-   (passa por um quadro longe do normal e do estado com hover), **NÃO VOLTA** ao normal ou **TREME** parado em cima.
+   Acusa `!!` quando o elemento **SOME** (o desenho desaparece ao entrar ou passando de leve, como o GR que parecia reiniciar),
+   **FLASH** (acende do nada) ou **NÃO VOLTA** (fica preso no estado do hover depois de tirar a seta). Coisas que se mexem sozinhas
+   (faixa que corre, cursor piscando, brilho pulsando) e transições suaves não são acusadas.
    Tem que terminar com "hover ok". Um elemento só: `--so=".logo"`; ver todos com os números: `--tudo`.
    Olhe os quadros dos acusados (`montagem.js <scratchpad>/hover`). Não tire o efeito por conta própria se ele for
    de propósito: mostre ao dono e deixe ele decidir.

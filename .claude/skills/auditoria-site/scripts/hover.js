@@ -5,8 +5,8 @@
 //  - FLASH: ao entrar, aparece de repente bem mais desenho do que no normal e no hover (clarão, piscada);
 //  Transições suaves (cor que muda, texto que sobe e troca, círculo que preenche) NÃO são acusadas: os quadros do
 //  meio delas ficam longe do início e do fim, mas o desenho não some nem acende do nada.
-//  - NÃO VOLTA: depois de tirar a seta, não volta a ficar como estava;
-//  - TREME: parado em cima, continua mudando bem mais que sem a seta (loop que só existe no hover).
+//  - NÃO VOLTA: depois de tirar a seta, fica preso no estado do hover;
+//  (com --tudo também mostra, só como informação, o que PULSA parado em cima: costuma ser de propósito).
 // Elementos testados: todo seletor com :hover nas folhas de estilo (o dono do hover, ex. ".logo" em
 // ".logo:hover .lg-s") + links e botões. Mede pixels (fotos do elemento), então pega efeito de CSS e de JS.
 // Uso: node hover.js [--paginas=index.html,404.html] [--aparelhos=pc-bom] [--modo=normal] [--fotos=pasta]
@@ -120,9 +120,9 @@ const LIMIAR = 0.15;   // fração da "tinta" do elemento que mudou para contar 
       const depois = await foto();
 
       const todas = [...base, ...hov, ...entrada, ...leve, depois];
-      const pares = [[23, 0], [23, 1], [23, 2], [23, 3], [4, 5], [4, 6], [4, 7], [5, 6], [5, 7], [6, 7]];
+      const pares = [[23, 0], [23, 1], [23, 2], [23, 3], [4, 5], [4, 6], [4, 7], [5, 6], [5, 7], [6, 7], [23, 4], [23, 5], [23, 6], [23, 7]];
       const { m, tinta, s: sm } = await diffs(todas, pares);
-      const voltaD = Math.min(...sm.slice(0, 4)), ruidoHs = Math.max(...sm.slice(4));
+      const voltaD = Math.min(...sm.slice(0, 4)), ruidoHs = Math.max(...sm.slice(4, 10)), presoH = Math.min(...sm.slice(10, 14));
       const B = [0, 1, 2, 3], H = [4, 5, 6, 7], E = [...Array(10).keys()].map((k) => 8 + k), L = [...Array(5).keys()].map((k) => 18 + k), D = 23;
       const maxEntre = (xs, ys) => Math.max(...xs.flatMap((x) => ys.map((y) => m[x][y])));
       const minPara = (x, ys) => Math.min(...ys.map((y) => m[x][y]));
@@ -142,11 +142,13 @@ const LIMIAR = 0.15;   // fração da "tinta" do elemento que mudou para contar 
       if (some(E) > limSome) achados.push(`SOME ao entrar (${Math.round(some(E) * 100)}% do desenho desaparece)`);
       if (some(L) > limSome) achados.push(`SOME passando de leve (${Math.round(some(L) * 100)}% do desenho desaparece)`);
       const pe = pior(E), pl = pior(L);   // só informativo (--tudo): quanto o quadro do meio se afasta dos dois estados
-      const topo = Math.max(...B.map((x) => tinta[x]), ...H.map((x) => tinta[x]));
+      const topo = Math.max(...B.map((x) => tinta[x]), ...H.map((x) => tinta[x]), tinta[23]);
       const flash = Math.max(...[...E, ...L].map((x) => tinta[x] / Math.max(1e-4, topo) - 1));
       if (flash > Math.max(0.6, vari + 0.4)) achados.push(`FLASH: acende do nada ao passar a seta (${Math.round(flash * 100)}% mais desenho)`);
-      if (voltaD > lim) achados.push(`NÃO VOLTA ao normal depois de tirar a seta (${Math.round(voltaD * 100)}%)`);
-      if (ruidoHs > Math.max(LIMIAR * 2, ruido * 2 + 0.08)) achados.push(`TREME parado em cima (${Math.round(ruidoHs * 100)}% x ${Math.round(ruido * 100)}% sem a seta)`);
+      // "não volta" = ficou preso no estado do hover (mais perto dele que do normal). Diferente dos dois = algo que se
+      // mexe sozinho ali (faixa que corre, cursor piscando, brilho pulsando), não é culpa da seta
+      if (voltaD > lim && presoH < voltaD * 0.5) achados.push(`NÃO VOLTA: fica preso no hover depois de tirar a seta (${Math.round(voltaD * 100)}%)`);
+      const treme = ruidoHs > Math.max(LIMIAR * 2, ruido * 2 + 0.08);   // informativo: efeito que pulsa com a seta em cima (costuma ser de propósito)
       const info = mudanca > lim ? `muda ${Math.round(mudanca * 100)}%` : (mudanca > ruido + 0.01 ? 'muda pouco' : 'sem efeito visível');
       if (achados.length) {
         problemas++;
@@ -155,7 +157,7 @@ const LIMIAR = 0.15;   // fração da "tinta" do elemento que mudou para contar 
           const nomeArq = `${pagina.replace('.html', '')}-${nome}-${String(al.i).padStart(3, '0')}`;
           [base[0], ...entrada, ...leve, depois].forEach((f, k) => fs.writeFileSync(path.join(a.fotos, `${nomeArq}-${String(k).padStart(2, '0')}.png`), Buffer.from(f, 'base64')));
         }
-      } else if (a.tudo) linhas.push(`   ${al.nome}: ok [${info}; entrada ${Math.round(fora_(pe) * 100)}%, leve ${Math.round(fora_(pl) * 100)}%, ruído ${Math.round(ruido * 100)}%, flash ${Math.round(flash * 100)}%, some ${Math.round(Math.max(some(E), some(L)) * 100)}%/${Math.round(limSome * 100)}%]`);
+      } else if (a.tudo) linhas.push(`   ${al.nome}: ok [${info}; entrada ${Math.round(fora_(pe) * 100)}%, leve ${Math.round(fora_(pl) * 100)}%, ruído ${Math.round(ruido * 100)}%${treme ? ', pulsa com a seta' : ''}, flash ${Math.round(flash * 100)}%, some ${Math.round(Math.max(some(E), some(L)) * 100)}%/${Math.round(limSome * 100)}%]`);
     }
     console.log(`\n== ${pagina} @ ${nome} (${await modoAtual(page)})${erros.length ? ' | ERROS: ' + erros.join(' || ') : ''}`);
     console.log(`   elementos com a seta testados: ${linhas.length || !a.tudo ? total : linhas.length}`);
