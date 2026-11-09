@@ -209,3 +209,6 @@
   .doc-table td:first-child { padding-bottom: 8px; margin-bottom: 4px; border-bottom: 1px solid #ece8e2; font-size: 15.5px; }
   .doc-table td:first-child::before { display: none; }
 }
+
+/* teclas citadas na página de acessibilidade */
+.doc kbd { display: inline-block; padding: .05em .45em; border: 1px solid #d9d3cc; border-bottom-width: 2px; border-radius: 6px; background: #fff; font: 600 .85em var(--font); color: var(--ink); }
