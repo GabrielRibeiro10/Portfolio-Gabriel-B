@@ -1684,8 +1684,7 @@ html.leve .mq-shine { display: none; }
 html.leve :is(.socials a, .doc-tabs) { backdrop-filter: none; -webkit-backdrop-filter: none; }
 html.leve .socials a { background: rgba(20, 8, 4, .32); }
 html.leve .doc-tabs { background: rgba(36, 10, 3, .3); }
-html.leve .lp-screen video { display: none; }
-html.leve .lp-screen img { visibility: visible !important; }
+/* vídeos dos projetos: continuam no modo leve (versão 720px, ver js/main.js) */
 html.leve .logo-mark { filter: drop-shadow(0 0 6px rgba(255, 149, 54, .55)); }
 html.leve .pj-bg::before { -webkit-mask-image: none; mask-image: none; opacity: .5; }
 
