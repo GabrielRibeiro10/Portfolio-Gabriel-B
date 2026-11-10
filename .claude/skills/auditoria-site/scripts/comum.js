@@ -31,7 +31,46 @@ const args = () => {
 
 const lista = (v, padrao) => (v ? String(v).split(',').map((s) => s.trim()).filter(Boolean) : padrao);
 
-// Abre um aparelho. modo: 'auto' (o site decide sozinho), 'normal' (?leve=0) ou 'leve' (?leve=1).
+// ---------- Modo leve de QUALQUER site ----------
+// Cada site liga o "modo leve" (efeitos desligados em aparelho fraco) do seu jeito: classe no <html> com nomes
+// diferentes ("leve" no portfólio, "lite" em outros), com ou sem parâmetro na URL para forçar. Os scripts não
+// dependem disso: forçam o modo fingindo o aparelho (as mesmas pistas que os sites usam para decidir) e também
+// mandam ?leve=0/1 (sites que não conhecem o parâmetro só ignoram). Classe com outro nome: --classe-leve=nome
+// ou AUD_CLASSE_LEVE=nome. Descubra qual é com descobrir.js.
+const CLASSES_LEVE = ['leve', 'lite', 'low-power', 'perf-lite', 'reduced-effects', 'is-lite', 'is-low-end'];
+const classesLeve = () => {
+  const extra = process.env.AUD_CLASSE_LEVE || (process.argv.find((x) => x.startsWith('--classe-leve=')) || '').split('=')[1];
+  return extra ? [extra, ...CLASSES_LEVE] : CLASSES_LEVE;
+};
+
+// Script que roda antes do site, fingindo o aparelho. 'normal': placa de vídeo de verdade (o navegador de teste
+// não tem e todo site que olha a placa cairia no leve), memória e núcleos de sobra, sem economia de dados nem
+// bateria baixa. 'leve': pouca memória, 2 núcleos, economia de dados.
+function fingirAparelho(modo) {
+  return (m) => {
+    const def = (o, k, v) => { try { Object.defineProperty(o, k, { get: () => v, configurable: true }); } catch (e) {} };
+    if (m === 'normal') {
+      for (const C of [window.WebGLRenderingContext, window.WebGL2RenderingContext]) {
+        if (!C) continue; const g = C.prototype.getParameter;
+        C.prototype.getParameter = function (k) { return (k === 0x9246 || k === 0x1F01) ? 'ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 Direct3D11)' : (k === 0x9245 || k === 0x1F00) ? 'Google Inc. (NVIDIA)' : g.call(this, k); };
+      }
+      // "placa de vídeo de verdade?" (failIfMajorPerformanceCaveat): sem placa, o navegador de teste diria que não
+      const gc = HTMLCanvasElement.prototype.getContext;
+      HTMLCanvasElement.prototype.getContext = function (t, o) { if (o && o.failIfMajorPerformanceCaveat) o = Object.assign({}, o, { failIfMajorPerformanceCaveat: false }); return gc.call(this, t, o); };
+      def(Navigator.prototype, 'deviceMemory', 8); def(Navigator.prototype, 'hardwareConcurrency', 8);
+      def(Navigator.prototype, 'getBattery', undefined);
+      if (navigator.connection) { def(navigator.connection, 'saveData', false); def(navigator.connection, 'effectiveType', '4g'); }
+    } else if (m === 'leve') {
+      def(Navigator.prototype, 'deviceMemory', 1); def(Navigator.prototype, 'hardwareConcurrency', 2);
+      if (navigator.connection) def(navigator.connection, 'saveData', true);
+    }
+  };
+}
+async function prepararModo(page, modo) { if (modo === 'normal' || modo === 'leve') await page.addInitScript(fingirAparelho(modo), modo); }
+const urlModo = (url, modo) => { const q = modo === 'normal' ? 'leve=0' : modo === 'leve' ? 'leve=1' : ''; return q ? url + (url.includes('?') ? '&' : '?') + q : url; };
+
+// Abre um aparelho. modo: 'auto' (o site decide sozinho), 'normal' (força todos os efeitos) ou 'leve' (força o
+// modo leve). Veja fingirAparelho acima.
 async function abrir(browser, nome, url, { modo = 'auto', espera = 2500, init } = {}) {
   const ap = APARELHOS[nome];
   if (!ap) throw new Error('aparelho desconhecido: ' + nome + ' (use: ' + Object.keys(APARELHOS).join(', ') + ')');
@@ -46,10 +85,10 @@ async function abrir(browser, nome, url, { modo = 'auto', espera = 2500, init } 
     if (/ERR_ABORTED/.test(t) && /\.(mp4|webm)(\?|$)/.test(r.url())) return;
     falhas.push(r.url().split('/').slice(3).join('/') + ' ' + t);
   });
+  await prepararModo(page, modo);
   if (init) await page.addInitScript(init);
   if (ap.cpu > 1) { const cdp = await ctx.newCDPSession(page); await cdp.send('Emulation.setCPUThrottlingRate', { rate: ap.cpu }); }
-  const q = modo === 'normal' ? '?leve=0' : modo === 'leve' ? '?leve=1' : '';
-  await page.goto(url + (url.includes('?') ? q.replace('?', '&') : q), { waitUntil: 'networkidle', timeout: 90000 });
+  await page.goto(urlModo(url, modo), { waitUntil: 'networkidle', timeout: 90000 });
   await page.waitForTimeout(espera);
   return { ctx, page, ap, erros, falhas };
 }
@@ -61,7 +100,12 @@ async function rolarTudo(page, ap, { passo = 40, pausa = 16 } = {}) {
   for (let y = 0; y < H - ap.h; y += passo) { await page.mouse.wheel(0, passo); await page.waitForTimeout(pausa); }
 }
 
-const modoAtual = (page) => page.evaluate(() => (document.documentElement.classList.contains('leve')
-  ? 'leve(' + (document.documentElement.dataset.leve || '?') + ')' : 'normal'));
+// Em que modo o site ficou: "leve(motivo)" com o nome da classe que ele usa, ou "normal".
+const modoAtual = (page) => page.evaluate((cls) => {
+  const h = document.documentElement, c = cls.find((x) => h.classList.contains(x));
+  if (!c) return 'normal';
+  const motivo = h.dataset.leve || h.dataset.lite || h.getAttribute('data-' + c) || '?';
+  return (c === 'leve' ? 'leve' : 'leve[.' + c + ']') + '(' + motivo + ')';
+}, classesLeve());
 
-module.exports = { chromium, APARELHOS, TAMANHOS, args, lista, abrir, rolarTudo, modoAtual };
+module.exports = { chromium, APARELHOS, TAMANHOS, CLASSES_LEVE, classesLeve, args, lista, abrir, rolarTudo, modoAtual, prepararModo, urlModo, fingirAparelho };

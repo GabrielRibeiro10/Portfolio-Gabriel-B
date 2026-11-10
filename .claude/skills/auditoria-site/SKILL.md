@@ -1,147 +1,229 @@
 ---
 name: auditoria-site
-description: Auditoria completa do site antes de entregar ou publicar - desempenho em aparelhos bons, médios e fracos (celular, tablet, PC, monitor), varredura de bugs e erros, teste como cliente (tocar, clicar, rolar, girar a tela) e responsividade em todos os tamanhos, corrigindo o que achar. Use quando pedirem para revisar o site, tirar bugs, travadas ou lag, deixar mais rápido/fluido, testar em celular fraco ou PC fraco, conferir responsividade, checar o site contra as leis (LGPD, CDC, acessibilidade, direitos autorais), ou "deixar pronto para o cliente".
+description: Auditoria completa de QUALQUER site antes de entregar ou publicar - desempenho em aparelhos bons, médios e fracos (celular, tablet, PC, monitor), simplificação dos efeitos no modo leve até o aparelho fraco ficar liso, varredura de bugs e erros, teste como cliente (tocar, clicar, rolar, girar a tela), responsividade, iPhone/Safari, regras de segurança do ar e checagem jurídica, corrigindo o que achar e aprendendo a cada site (base de conhecimento própria). Use quando pedirem para revisar o site, tirar bugs, travadas ou lag, deixar mais rápido/fluido, testar em celular fraco ou PC fraco, conferir responsividade, checar o site contra as leis (LGPD, CDC, acessibilidade, direitos autorais), ou "deixar pronto para o cliente".
 ---
 
-# Auditoria do site (desempenho, bugs, cliente, responsividade)
+# Auditoria do site (qualquer site)
 
 Objetivo: o site abre e roda liso em **qualquer aparelho** (celular, tablet, PC, monitor; bom, médio e fraco), sem erro,
 sem travada, sem nada quebrado na tela, e tudo funciona do jeito que um cliente usaria. Encontrar, **corrigir** e provar
 com números e imagens. Não basta listar problemas: corrija, meça de novo e só então dê por resolvido.
 
-## Como o site trata aparelhos fracos (ler antes de mexer)
+A skill serve para qualquer site (HTML/CSS/JS, com ou sem GSAP, three.js, vídeo, canvas...). Nada aqui supõe um site
+específico: o passo 0 descobre como o site funciona, e a base `conhecimento/` guarda o que já se aprendeu em sites
+anteriores (efeitos, causas de travada, defeitos do Safari, armadilhas do próprio teste). **Leia a base antes de
+mexer e grave nela o que aprender (seção "Aprendizado").**
 
-- `js/desempenho.js` liga o **modo leve** (`<html class="leve">`, motivo em `data-leve`) antes da primeira pintura,
-  igual para celular e PC: placa de vídeo fraca ou sem aceleração (`gpu`), processador lento (`cpu`), pouca memória ou
-  poucos núcleos (`aparelho`), economia de dados (`dados`) e, durante o uso, mediana abaixo de ~25 fps por 4 s (`fps`,
-  dispara o evento `gr:leve`). `?leve=0` força o normal, `?leve=1` força o leve.
-- No modo leve tudo que pesa desliga (fundos animados, onda do FAQ, crachá 3D vira desenhado, vídeos, parallax,
-  desfoques, Lenis). **Todo efeito novo precisa** checar `leve()` ao começar **e** parar no evento `gr:leve` (o modo pode
-  ligar no meio do uso) e respeitar `prefers-reduced-motion`.
-- **Limite do teste (importante):** o navegador de teste não tem placa de vídeo. Os tempos medidos refletem o
-  processador, mas **não** o custo dos efeitos que rodam na placa de vídeo (vidro fosco `backdrop-filter`, desfoque
-  `filter: blur`, máscaras, `mix-blend-mode`). Num celular fraco de verdade são esses que travam a rolagem. Por isso o
-  passo 2b (`pesados.js`) é obrigatório: **uma seção só está "ok" se passar no tempo E não tiver efeito de GPU de risco
-  ligado no modo leve.** Já aconteceu: a faixa "Seu negócio tem uma história" passou no tempo (21-26 ms) e travava em
-  celular fraco por causa de 13 etiquetas com `backdrop-filter`.
-- Com detecção automática o navegador de teste cai no modo leve (`gpu`) - isso simula o aparelho fraco de verdade. Para medir o modo normal use `--modo=normal`. Custo de WebGL (`GLES2::ReadPixels`) é
-  exagerado aqui; para avaliar o resto, esconda o canvas com `--css=".cracha-canvas{display:none!important}"`.
+## Antes de começar
 
-## Passo a passo
-
-Rode a partir da raiz do repositório. Suba um servidor local se não houver um:
+1. Leia `conhecimento/README.md` e `conhecimento/indice.md`. Depois do passo 0, leia as fichas de `efeitos.md` dos
+   efeitos que o site usa e as entradas de `causas.md`, `safari-iphone.md` e `ambiente-de-teste.md` que se aplicam.
+2. Diga ao usuário onde está a skill que está usando (caminho) e se a base é a principal ou uma cópia (ver
+   "Onde a skill mora").
+3. Suba um servidor local na raiz do site, se não houver um:
 
 ```bash
 curl -s -o /dev/null localhost:8123 || (nohup python3 -m http.server 8123 >/dev/null 2>&1 &)
 ```
 
-Scripts em `.claude/skills/auditoria-site/scripts/` (Playwright, já instalado no ambiente). Todos aceitam
-`--base=` (padrão `http://localhost:8123`). Aparelhos: `celular-bom`, `celular-medio`, `celular-fraco`,
-`celular-deitado`, `tablet-bom`, `tablet-fraco`, `pc-bom`, `pc-medio`, `pc-fraco`, `monitor-grande`
-(fraco = processador 6x mais lento, médio = 3x). Comandos longos: rode em segundo plano ou com timeout alto.
+Scripts em `.claude/skills/auditoria-site/scripts/` (Playwright, já instalado no ambiente). Rode **a partir da raiz do
+site**. Todos aceitam `--base=` (padrão `http://localhost:8123`) e `--classe-leve=` (nome da classe de modo leve, se o
+passo 0 disser que é fora do padrão). Aparelhos: `celular-bom`, `celular-medio`, `celular-fraco`, `celular-deitado`,
+`tablet-bom`, `tablet-fraco`, `pc-bom`, `pc-medio`, `pc-fraco`, `monitor-grande` (fraco = processador 6x mais lento,
+médio = 3x). Comandos longos: rode em segundo plano ou com timeout alto. **Não rode duas medições de desempenho ao
+mesmo tempo**: uma atrapalha a outra.
 
-1. **Erros e rede** (todas as páginas `*.html`):
-   `node .claude/skills/auditoria-site/scripts/erros.js`
+## Metas
+
+| Aparelho | Quadro médio por seção | Travadas longas (> 50 ms) na rolagem inteira | Página pulando (CLS) |
+|---|---|---|---|
+| bom e médio | ≤ ~22 ms | poucas, nenhuma > 150 ms fora do carregamento | < 0,05 |
+| fraco | ≤ ~35 ms | soma ≤ 1 s | < 0,05 |
+
+E, em todos: **nenhum efeito de placa de vídeo de risco ALTO ligado no modo leve** (`pesados.js`). O `desempenho.js`
+termina cada aparelho com `META ok` ou `META NÃO`. **Aparelho fraco com `META NÃO` não é pendência para o dono
+decidir: é trabalho da auditoria (passos 3 e 3b).**
+
+## Modo leve (obrigatório em todo site — ler antes de mexer)
+
+O site tem que perceber **sozinho** que o celular ou o PC é fraco e, nesse caso, entrar no **modo leve**: classe
+`leve` no `<html>`, ligada antes da primeira pintura, e tudo que pesa desliga ou fica parado. Quem tem aparelho bom
+vê o site igual. **A auditoria garante isso em todo site, sem perguntar.**
+
+- **Detecção = o modelo da skill**, `modelos/modo-leve.js` (a mesma detecção do portfólio): placa de vídeo fraca ou
+  sem aceleração (inclui lista de placas fracas de celular), teste de processador de ~12 ms, até 2 núcleos/2 GB,
+  economia de dados/2G, perfil guardado 30 dias e rede de segurança de fluidez (abaixo de ~25 fps por 4 s, liga no
+  meio do uso). Tem `?leve=1`, `?leve=0` e `?leve=info` (caixinha com o que foi detectado no aparelho).
+- **Passo 0b (obrigatório):** se o site não carrega `js/modo-leve.js` no `<head>` (o `descobrir.js` diz), **instale**:
+  copie `modelos/modo-leve.js` para `js/modo-leve.js`, ponha `<script src="/js/modo-leve.js"></script>` no `<head>` de
+  todas as páginas que têm efeitos, **sem `defer`/`async`** (de preferência antes do CSS), e ligue os efeitos a ele (abaixo). Se o site já tiver uma
+  detecção própria, **troque pelo modelo** (detecção própria mais fraca já deixou celular fraco sem modo leve) e faça
+  o código do site seguir a classe `leve` e o evento `leve:liga`. Se o site usava outro nome de classe, troque para
+  `leve` no CSS e no JS. Detecção nova melhor que o modelo: melhore o **modelo** (e o portfólio), não só o site.
+- **VÍDEO NUNCA SAI NEM CONGELA NO MODO LEVE** (regra do dono): vídeo de fundo, vídeo dentro do site e "vídeo" feito
+  de quadros que anda com a rolagem (GSAP ScrollTrigger/sequência de quadros em canvas) continuam aparecendo e se
+  mexendo no celular e no PC fraco. No modo leve eles ficam **mais leves**, não parados: arquivo de resolução menor
+  (ex.: 720p), canvas em resolução menor (ex.: 60%), 1 a cada N quadros (o ritmo do vídeo original quando os quadros
+  foram interpolados), menos quadros na memória e decodificações ao mesmo tempo, sem pré-download de tudo (só o que a
+  rolagem pede), tocar só com a seção na tela e pausar fora dela. Para bater a meta, amenize **os outros efeitos**.
+- **Todo efeito** precisa: checar `document.documentElement.classList.contains('leve')` ao começar, **parar quando o
+  modo ligar no meio do uso** (`document.addEventListener('leve:liga', ...)`) e respeitar `prefers-reduced-motion`.
+  CSS: regras `.leve ...`. O passo 3b decide o que fica parado.
+- **Confira a detecção, não só os efeitos:** os testes forçam o modo leve, então não provam que ele liga num aparelho
+  de verdade. Rode o teste de detecção (ficha `modo-leve` em `conhecimento/efeitos.md`) e **entregue ao dono o link
+  `?leve=info`** para ele abrir no próprio celular.
+- **Limite do teste:** o navegador de teste não tem placa de vídeo. Os tempos refletem o processador, mas não o custo
+  de vidro fosco, desfoque, máscara e mistura de cores, que são os que travam um celular fraco de verdade. Por isso o
+  `pesados.js` é obrigatório. E WebGL/3D sai exagerado aqui (ver `conhecimento/ambiente-de-teste.md`).
+
+## Passo a passo
+
+0. **Descobrir o site:** `node .claude/skills/auditoria-site/scripts/descobrir.js`
+   Mostra páginas, hospedagem, 404, **classe do modo leve** (ou que não existe), se `?leve=1` funciona e a lista de
+   **efeitos** que o site usa. Efeito marcado **NOVO** não tem ficha na base: meça-o nos passos 2/2b, decida como ele
+   fica no modo leve (passo 3b) e **grave a ficha** em `conhecimento/efeitos.md`.
+
+0b. **Modo leve automático (obrigatório):** se o `descobrir.js` disser que o site não usa o modelo `js/modo-leve.js`,
+   instale agora (seção "Modo leve" acima) e só depois siga para as medições.
+
+1. **Erros e rede** (todas as páginas `*.html`): `node .claude/skills/auditoria-site/scripts/erros.js`
    Tem que sair "sem erros, falhas ou rolagem lateral". Vídeo em `ERR_ABORTED` é download em pedaços (já ignorado).
+   Olhe também o peso: arquivo grande demais no celular é problema mesmo sem erro.
 
-2. **Desempenho por seção** em todos os aparelhos, detecção automática:
+2. **Desempenho por seção**, detecção automática (o teste cai no modo leve sozinho, como um aparelho fraco):
    `node .claude/skills/auditoria-site/scripts/desempenho.js`
-   e o modo normal em aparelhos médios (os que rodam todos os efeitos):
-   `node .claude/skills/auditoria-site/scripts/desempenho.js --modo=normal --aparelhos=celular-medio,pc-medio --css=".cracha-canvas{display:none!important}"`
-   Metas: quadro médio ≤ ~22 ms nos bons/médios e ≤ ~35 ms nos fracos; nada marcado `!!`; travadas longas
-   (soma) poucas e nenhuma > 150 ms fora do carregamento; CLS < 0,05.
+   e o modo normal nos aparelhos médios: `... desempenho.js --modo=normal --aparelhos=celular-medio,pc-medio`
+   (se o site tiver WebGL, esconda o canvas para medir o resto: `--css="canvas.x{display:none!important}"`).
+   Confira em cada resultado o modo em que o site ficou (linha `==`): o teste pode cair no leve no meio.
 
-2b. **Efeitos de placa de vídeo** (o que o passo 2 não consegue medir), no celular e no PC:
-   `node .claude/skills/auditoria-site/scripts/pesados.js` e `node .claude/skills/auditoria-site/scripts/pesados.js --largura=1366`
-   Meta: **nenhuma linha `!! LEVE: liga` com risco ALTO** (vidro fosco em algo que rola com a página: troque por fundo
-   semitransparente, para todo mundo, o visual fica igual). Risco médio ligado no modo leve em área grande que se mexe
-   (anima, tem parallax, muda com a rolagem): desligue em `html.leve ...`. Efeito parado só custa na primeira pintura.
-   Olhe com atenção redobrada as seções que o usuário reclamar, mesmo que os números estejam bons.
+2b. **Efeitos de placa de vídeo:** `node .claude/skills/auditoria-site/scripts/pesados.js` e `... --largura=1366`.
+   Leia a lista **inteira** (não corte com `head`: os pequenos vêm no fim e também contam). Meta: nenhuma linha
+   `!! LEVE: liga` com risco **ALTO** (vidro fosco em algo que rola com a página: troque por fundo semitransparente,
+   para todo mundo, o visual fica igual). Risco médio ligado no modo leve em área grande que se mexe: desligue no modo
+   leve. Efeito parado só custa na primeira pintura.
 
-3. **Achar a causa** de cada seção marcada `!!` ou `~`:
-   `node .claude/skills/auditoria-site/scripts/causas.js --secao=#id-da-secao --aparelho=celular-fraco`
-   Confirme a causa desligando a suspeita (`desempenho.js --css="..."`) antes de mexer no código.
+3. **Achar a causa** de cada seção marcada `!!`/`~` ou aparelho com `META NÃO`:
+   `node .claude/skills/auditoria-site/scripts/causas.js --secao=#id --aparelho=celular-fraco`
+   Compare com `conhecimento/causas.md` (sintoma → causa → correção). **Confirme a causa** antes de mexer: desligue a
+   suspeita (`desempenho.js --css="..."`, ou bloqueando um arquivo) e meça de novo. Se o rastro mostrar
+   `getBoundingClientRect`/`offsetHeight`/`scrollTo` caros, procure quem lê medidas depois que algo escreveu estilos
+   (perfil de JS com chamadores: ver `causas.md`).
+
+3b. **Aparelho fraco continua fora da meta: simplificar no modo leve (faça, não pergunte).**
+   Se depois do passo 3 algum aparelho fraco ainda está com `META NÃO` e não há uma causa única para corrigir, o peso
+   vem do conjunto de efeitos. Simplifique os efeitos **só no modo leve**, sem pedir licença, até bater a meta.
+   1. Pegue a lista de efeitos do passo 0 e a ficha de cada um em `efeitos.md` (ela diz como medir e como fica no
+      modo leve).
+   2. Meça cada um desligado no aparelho fraco (`--css` para CSS; para JS, uma flag temporária ou bloqueando o
+      arquivo) e todos de uma vez, para saber o teto de ganho. Mexa primeiro no que mais pesa.
+   3. No modo leve, troque cada efeito pela versão parada mais próxima do visual final, nesta ordem (do menos
+      perceptível ao mais):
+      - animação presa à rolagem (`scrub`) → estado final direto, ou entrada simples só com `opacity`/`transform`
+        disparada uma vez;
+      - parallax → posição fixa;
+      - letras/palavras animadas uma a uma → texto inteiro de uma vez;
+      - brilhos, partículas, neon, máscaras, desfoques, mistura de cores, animações infinitas → parados ou desligados;
+      - vídeo e sequência de quadros presa à rolagem → **continua andando**, em versão leve (ver "Modo leve": menos
+        quadros, resolução menor, sem pré-download). Nunca parado nem trocado por imagem;
+      - rolagem suave (Lenis) → rolagem nativa;
+      - 3D/WebGL (que não seja vídeo) → versão desenhada/imagem parada.
+      Pare quando o aparelho fraco bater a meta. Não mexa no que não fez diferença na medição.
+   4. Cada efeito simplificado: checa o modo leve ao começar **e** para se ele ligar no meio do uso; respeita
+      `prefers-reduced-motion`.
+   5. **Pergunte antes** só se: a única saída for mudar o visual também para aparelhos bons; for remover conteúdo (texto,
+      foto, seção, botão) e não só movimento. (Site sem modo leve não é pergunta: instale o modelo, passo 0b.)
+   6. Mostre no relatório, por aparelho fraco, números antes/depois e o que ficou parado no modo leve, em linguagem
+      simples ("no celular fraco, as letras do título aparecem inteiras em vez de uma a uma").
 
 4. **Teste como cliente** (tocar/clicar em tudo, links internos, rolar gravando, girar a tela, voltar/avançar):
    `node .claude/skills/auditoria-site/scripts/cliente.js --fotos=<scratchpad>/cliente`
    `node .claude/skills/auditoria-site/scripts/montagem.js <scratchpad>/cliente`
-   **Olhe as pranchas** (Read nas imagens): animação pela metade, elemento sumido, sobreposto, piscando, crachá solto do
-   título, texto por cima de texto, faixa de cor errada, emenda entre seções. Repita com `--aparelhos=celular-fraco,pc-fraco`.
+   **Carrosséis com imã (`scroll-snap`) no celular:** meça o `scrollLeft` de cada um do carregamento até a entrada
+   terminar; tem que ficar 0 e o 1º card centralizado (ver `causas.md`).
+   **Olhe as pranchas** (Read nas imagens): animação pela metade, elemento sumido, sobreposto, piscando, texto por cima
+   de texto, faixa de cor errada, emenda entre seções. Repita com `--aparelhos=celular-fraco,pc-fraco`. Aviso do script
+   que pareça falso: confirme no navegador antes de descartar (ver `ambiente-de-teste.md`).
 
 5. **Responsividade** (15 tamanhos de 320 a 2560 px, celular deitado incluso, todas as páginas):
    `node .claude/skills/auditoria-site/scripts/responsivo.js --fotos=<scratchpad>/resp`
-   Tem que sair "responsividade ok". Olhe também algumas fotos (320, 390, 768, 1366, 2560) para problemas que regra
-   nenhuma pega (espaço estranho, elemento desalinhado, imagem esticada).
+   Tem que sair "responsividade ok". Olhe algumas fotos (320, 390, 768, 1366, 2560).
 
-5b. **Todos os iPhones e iPads (Safari) — obrigatório antes de entregar.** O Chrome do teste NÃO mostra os
-   defeitos do Safari, e no iPhone todo navegador (Chrome, Instagram, WhatsApp) usa o Safari por baixo.
-   `iphone.js` abre o site no motor do Safari em **todos os iPhones que o Playwright conhece** (iPhone 6 ao 17:
-   SE, Mini, Plus, Pro, Pro Max, Air), em pé e deitado, e nos iPads, e confere **sozinho**, medindo as cores na foto
-   da tela: erros, rolagem lateral, notebook mostrando o site (e não o retângulo cinza) e crachá com a foto.
+5b. **Todos os iPhones e iPads (Safari) — obrigatório antes de entregar.** O Chrome do teste não mostra os defeitos
+   do Safari, e no iPhone todo navegador usa o Safari por baixo. `iphone.js` abre o site no motor do Safari em todos os
+   iPhones (6 ao 17) em pé e deitado e nos iPads, e confere sozinho: erros, rolagem lateral e **todo canvas/vídeo
+   grande aparecendo com conteúdo** (não em branco), além das checagens de efeitos conhecidos.
    `PLAYWRIGHT_BROWSERS_PATH=<scratchpad>/pw-webkit node .claude/skills/auditoria-site/scripts/iphone.js --deitado --fotos=<scratchpad>/iphone`
    `PLAYWRIGHT_BROWSERS_PATH=<scratchpad>/pw-webkit node .claude/skills/auditoria-site/scripts/iphone.js --grupo=ipads --fotos=<scratchpad>/iphone`
-   Um modelo só: `--aparelhos="iPhone 13 Pro Max"`. Tem que terminar com "ok em todos". Olhe também algumas fotos
-   (`montagem.js`). Efeito novo em 3D, canvas ou vídeo: acrescente a checagem dele no `iphone.js`.
-   Na primeira vez da sessão instale o WebKit (fora do repositório) e as bibliotecas que ele pedir:
-   `PLAYWRIGHT_BROWSERS_PATH=<scratchpad>/pw-webkit node $(node -e "console.log(require.resolve('playwright').replace(/index.js$/,''))")cli.js install webkit`
-   `apt-get install -y libgtk-4-1 libgraphene-1.0-0 libevent-2.1-7 libgstreamer-gl1.0-0 libgstreamer-plugins-bad1.0-0 libavif16 libwayland-server0 libmanette-0.2-0 libenchant-2-2 libsecret-1-0 libgles2`
-   Limite: o simulador usa o motor do Safari mas não o limite de memória de canvas nem a placa de vídeo do iPhone;
-   peça ao dono para abrir num iPhone de verdade antes de entregar.
+   Tem que terminar com "ok em todos". Efeito novo em 3D, canvas ou vídeo com defeito próprio: acrescente a checagem no
+   `iphone.js` e a entrada em `safari-iphone.md`. Instalação do WebKit na 1ª vez da sessão (os três comandos, inclusive
+   o `install-deps`): `conhecimento/ambiente-de-teste.md`. Peça ao dono para abrir num iPhone de verdade antes de
+   entregar (o simulador não tem a placa de vídeo nem o limite de memória do iPhone).
 
-5c. **Como no ar: regras de segurança da Vercel + página 404 — obrigatório antes de publicar.** O `vercel.json`
-   manda ao navegador regras de segurança (a principal é a CSP, uma "lista de convidados": só carrega script,
-   estilo, fonte e imagem do próprio site e do Google Fonts). No teste local elas não existem: o que elas bloqueiam
-   funciona aqui e quebra no ar, sem aviso.
+5c. **Como no ar: regras de segurança + página 404 — obrigatório antes de publicar.**
    `PLAYWRIGHT_BROWSERS_PATH=<scratchpad>/pw-webkit node .claude/skills/auditoria-site/scripts/producao.js --fotos=<scratchpad>/producao`
-   Abre cada página no PC, no celular e no iPhone **com as regras do ar** e acusa bloqueios; confere se todo
-   `<script>` colado na página tem o hash liberado no `vercel.json` e se não há `<style>` na página; e testa a 404
-   num link quebrado na raiz e dentro de pasta (estilo carregando, `noindex`, botão para o início).
-   Tem que terminar com "ok". Ao mudar um script colado na página, recalcule o hash e atualize o `vercel.json`.
-   Fonte, imagem ou script de outro endereço: libere o endereço no `vercel.json` (o mínimo possível) antes de usar.
+   Abre cada página no PC, no celular e no iPhone **com as regras do ar** (CSP do `vercel.json`) e acusa bloqueios;
+   confere se todo `<script>` executável colado na página tem o hash liberado; testa a 404. Tem que terminar com "ok".
+   Outra hospedagem (sem `vercel.json`): o script avisa; confira as regras do servidor real.
 
 5d. **Auditoria jurídica** (depois das etapas técnicas), com a skill `juridico` (`.claude/skills/juridico/`):
-   1. Leia `.claude/skills/juridico/CHECKLIST.md` inteiro (é curto).
-   2. Responda a tabela "Primeiro: classifique o site" e aplique só os blocos que valem para ele.
-   3. Cheque cada item no código e no site publicado.
-   4. Só se um item ficar em dúvida, abra o artigo citado em `.claude/skills/juridico/leis/` (busque por `**Art. N`).
-      Nunca leia uma lei inteira.
-   5. Escreva o relatório no formato da seção 2 do checklist, separando ALTA e MÉDIA.
-   6. Deixe claro no relatório que é uma checagem técnica de conformidade, não parecer jurídico.
-   Para atualizar as leis: `.claude/skills/juridico/ATUALIZAR.md`.
+   leia `CHECKLIST.md` inteiro, classifique o site, aplique só os blocos que valem, cheque no código e no site
+   publicado, abra o artigo em `leis/` só em caso de dúvida e escreva o relatório no formato do checklist, deixando
+   claro que é checagem técnica, não parecer jurídico.
 
-6. **Corrigir, medir de novo, comparar** (antes/depois com números), rodar de novo 1, 4 e 5 para garantir que nada
-   quebrou, e só então fazer commit e publicar (siga as regras de git da sessão).
+6. **Corrigir, medir de novo, comparar** (antes/depois com números, mesmo aparelho), rodar de novo 1, 4 e 5 para
+   garantir que nada quebrou, e só então fazer commit (regras de git da sessão). Antes de publicar, teste na prévia da
+   hospedagem quando houver (deploy de branch).
 
-## Causas que já apareceram neste site (e a correção)
+7. **Aprender** (obrigatório, seção abaixo) e **relatar**.
 
-| Sintoma no `causas.js` | Causa | Correção |
-|---|---|---|
-| `UpdateLayoutTree` alto e um elemento com centenas de filhos mudando `style` a cada quadro | variável CSS (`--x`) mudada no pai de uma seção inteira (herda para todos os filhos) | aplicar o valor direto no elemento que se move (`translate`/`transform`), ou `@property` com `inherits: false` |
-| `Layout` alto, elemento mudando `style` a cada quadro | animar `top/left/width/height` | `transform: translate...` + `will-change: transform` |
-| `Paint` alto com algo parado na tela | `box-shadow`/`filter`/degradê animado em loop infinito | deixar fixo, ou animar `opacity` de uma camada com a sombra |
-| elemento animando em seção que já saiu da tela | loop de `requestAnimationFrame` ou ouvinte de `scroll` global sem limite | `IntersectionObserver`: só anima/escuta perto da tela; parar o loop quando assenta |
-| função JS rodando a cada quadro sem nada mudar | `getBoundingClientRect`/medições em loop "por garantia" | rodar só enquanto algo de fato se move; guardar medidas e refazer só no `resize` |
-| travada de 0,5-1,5 s ao chegar numa seção | biblioteca pesada (three.js) montando no meio da rolagem | montar quando o navegador estiver parado depois do carregamento (`requestIdleCallback`) |
-| toque não faz nada no celular | bloco grande e invisível por cima (z-index/contexto de empilhamento) | `pointer-events: none` no bloco e `auto` nos filhos; conferir com `cliente.js` |
-| tempo bom no teste, mas a seção trava num celular fraco de verdade | vidro fosco (`backdrop-filter`) em etiquetas/cartões que rolam com a página; a placa refaz o desfoque a cada quadro | fundo semitransparente (`rgba(255,255,255,.13)`) no lugar do vidro; achar com `pesados.js` |
-| CLS alto (página "pula") só em aparelho fraco | um script muda o layout de uma seção depois de carregar (ex.: liga um carrossel/galeria e a altura muda); no fraco o script roda ~2 s depois e empurra o resto | ligar o modo no `<head>` (classe no `<html>` antes da primeira pintura) e dar ao bloco altura natural pelo CSS, sem medir no JS |
-| **iPhone: vídeo/captura do projeto não aparece** (retângulo cinza no notebook), no Chrome tudo certo | Safari ignora `backface-visibility: hidden` dentro de `transform-style: preserve-3d` e desenha a face de trás (tampa por fora) por cima da tela aberta | esconder a face de trás com `visibility: hidden` quando o objeto está aberto/virado (não confiar em backface-visibility); conferir com `iphone.js` |
-| **iPhone: foto some do crachá 3D** (cartão branco) | Safari tem limite de memória de canvas e devolve canvas em branco sem erro; `getImageData` em canvas grande falha | não ler pixels em canvas (`getImageData`): usar a imagem já pronta (ex.: foto já em P&B em arquivo); `setPixelRatio` até 1 no iOS; se a foto não carregar, cair na versão sem 3D |
-| funciona no teste e quebra no ar (efeito some, fonte não carrega, script não roda) | a CSP do `vercel.json` bloqueia: `<script>` colado na página sem hash, `<style>` na página, arquivo de outro endereço | mover para arquivo `.js`/`.css` do site, ou liberar o hash/endereço no `vercel.json`; conferir com `producao.js` |
-| link quebrado mostra página sem estilo | 404.html com caminho relativo (`css/...`): dentro de pasta ele procura `/pasta/css/...` | caminhos absolutos (`/css/...`, `/img/...`) na 404 |
-| alvo de toque < 24 px | link de texto pequeno | área invisível com `::after { position:absolute; inset:-12px -6px }` (o elemento precisa ter `position`; não sobrescreva `position: absolute` existente) |
+## Aprendizado (obrigatório em toda auditoria)
+
+A skill aprende junto com o dono. **Grave automaticamente** na base `conhecimento/` tudo que for reutilizável em
+outro site, e conte no relatório o que gravou.
+
+O que gravar:
+- **Efeito novo** (marcado NOVO no passo 0, ou que você criou no site): ficha em `efeitos.md` com o marcador
+  `<!-- efeito: id -->` (o mesmo id do `descobrir.js`; efeito que o script ainda não detecta: acrescente a detecção
+  em `NOMES`/`inventario` do `descobrir.js`).
+- **Causa de travada** confirmada por medição: entrada em `causas.md`.
+- **Defeito do Safari/iPhone**: entrada em `safari-iphone.md` (e a checagem no `iphone.js`).
+- **Armadilha do teste** (alarme falso, dependência faltando, medição enganosa): entrada em `ambiente-de-teste.md`.
+- Melhoria num script que serviria para todo site: faça no script e anote em `ambiente-de-teste.md`.
+
+Como gravar:
+1. Leia o arquivo antes; se já existe entrada para o mesmo assunto, **atualize** em vez de duplicar.
+2. Cada entrada tem: título e data; onde se aplica; sintoma (o que a pessoa sente ou o que o teste mostra); causa;
+   como medir/confirmar; correção ou como fica no modo leve; números antes/depois; limitações. Marque
+   `confirmado (medido)` ou `observação (não medida)`.
+3. Escreva de forma **genérica**: o caso concreto vira regra para qualquer site. Pode citar o site como exemplo
+   ("visto em: portfólio"), mas sem dados pessoais, senhas, chaves ou dados de clientes.
+4. Atualize `conhecimento/indice.md`.
+5. Não grave alarme falso como problema (grave como armadilha do teste), nem regra tirada de um palpite.
+6. Não reescreva as regras centrais deste SKILL.md por causa de um único site; se uma regra daqui se mostrar errada,
+   anote em `ambiente-de-teste.md` e avise o dono.
+
+No relatório, seção **"Aprendizado"**: o que foi gravado (arquivo e título) ou "nenhum aprendizado novo", e onde fica
+a base (principal ou cópia).
+
+## Onde a skill mora
+
+- A **versão principal** (scripts + base `conhecimento/`) fica no repositório do portfólio:
+  `Portfolio-Gabriel-B/.claude/skills/auditoria-site/`.
+- Ao auditar outro site, copie a skill para o repositório dele (`.claude/skills/auditoria-site/`) se não estiver lá ou
+  estiver mais velha que a principal. Ao terminar, **leve o que foi aprendido de volta para a principal** (mesmos
+  arquivos de `conhecimento/` e scripts) e diga ao dono que fez isso.
+- `.claude/` não vai para o ar (confira o `.vercelignore` do site).
 
 ## Regras
 
-- Não mude o visual sem necessidade: a correção de desempenho deve ficar igual na tela (compare fotos antes/depois).
-- Nunca resolva desligando a animação para todo mundo; desligue só no modo leve / `prefers-reduced-motion`, ou
-  troque por uma técnica barata com o mesmo resultado.
-- Toda correção tem que ser **medida de novo** com o mesmo aparelho e mostrada em números.
-- Não declare o site pronto sem o passo 5b (iPhone/Safari): ele já escondeu o vídeo dos projetos e a foto do crachá
-  num iPhone 13 Pro Max enquanto o Chrome mostrava tudo certo.
-- Não declare "sem lag" só pelos tempos: rode `pesados.js` e diga no relatório o que depende de placa de vídeo.
-- Efeito novo criado no site: antes de publicar, rode `pesados.js` e, se usar vidro fosco, desfoque, máscara ou
-  mistura de cores, decida na hora como ele fica no modo leve.
-- Relatório final em linguagem simples para o dono do site: o que estava errado (sintoma que a pessoa sentiria),
-  o que foi feito, números antes/depois, o que foi conferido (aparelhos, tamanhos, testes) e o que ainda depende de
-  testar num aparelho de verdade (WebGL, vídeos, iOS Safari).
+- Não mude o visual sem necessidade: a correção deve ficar igual na tela para quem tem aparelho bom (compare fotos).
+- Nunca resolva desligando a animação para todo mundo; desligue só no modo leve / `prefers-reduced-motion`, ou troque
+  por uma técnica barata com o mesmo resultado.
+- Toda correção é **medida de novo** com o mesmo aparelho e mostrada em números.
+- Aparelho fraco fora da meta é trabalho da auditoria (3b), não pendência. Só vira pergunta nos casos do 3b.5.
+- Não declare o site pronto sem o passo 5b (iPhone/Safari) nem sem `pesados.js`; diga no relatório o que depende de
+  placa de vídeo.
+- Efeito novo criado no site: antes de publicar, rode `pesados.js`, decida como ele fica no modo leve e grave a ficha.
+- Relatório final em linguagem simples para o dono: o que estava errado (sintoma que a pessoa sentiria), o que foi
+  feito, números antes/depois, o que foi conferido (aparelhos, tamanhos, testes), o que ficou parado no modo leve, o
+  que foi aprendido e o que ainda depende de um aparelho de verdade (WebGL, vídeos, iOS Safari).

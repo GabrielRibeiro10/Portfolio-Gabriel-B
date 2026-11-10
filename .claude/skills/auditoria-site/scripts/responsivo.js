@@ -3,7 +3,7 @@
 // botões/links pequenos demais para o dedo (< 24 px). Tira uma foto de cada tamanho para olhar.
 // Uso: node responsivo.js [--paginas=index.html] [--fotos=pasta] [--tamanhos=390x844,1440x900]
 const fs = require('fs'), path = require('path');
-const { chromium, TAMANHOS, args, lista } = require('./comum');
+const { chromium, TAMANHOS, args, lista, prepararModo, urlModo } = require('./comum');
 (async () => {
   const a = args(); const raiz = a.raiz || process.cwd();
   const paginas = lista(a.paginas, fs.readdirSync(raiz).filter((f) => f.endsWith('.html')).sort());
@@ -14,7 +14,8 @@ const { chromium, TAMANHOS, args, lista } = require('./comum');
     const toque = w < 1024 || h < 500;
     const ctx = await b.newContext({ viewport: { width: w, height: h }, ...(toque ? { isMobile: true, hasTouch: true } : {}) });
     const p = await ctx.newPage();
-    await p.goto(a.base + '/' + pg + '?leve=0', { waitUntil: 'networkidle', timeout: 90000 });
+    await prepararModo(p, 'normal');
+    await p.goto(urlModo(a.base + '/' + pg, 'normal'), { waitUntil: 'networkidle', timeout: 90000 });
     const H = await p.evaluate(() => document.documentElement.scrollHeight);
     for (let y = 0; y < H; y += h) { await p.evaluate((y) => scrollTo(0, y), y); await p.waitForTimeout(60); }   // faz as entradas acontecerem
     await p.waitForTimeout(2500); await p.evaluate(() => scrollTo(0, 0)); await p.waitForTimeout(400);

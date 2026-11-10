@@ -3,17 +3,20 @@
 // travam a rolagem. Lista cada elemento visível com: backdrop-filter, filter com blur, mask-image, mix-blend-mode,
 // box-shadow com desfoque grande, e se ele continua ligado no modo leve.
 // Uso: node pesados.js [--pagina=index.html] [--largura=390]
-const { chromium, args } = require('./comum');
+const { chromium, args, prepararModo, urlModo, classesLeve } = require('./comum');
 (async () => {
   const a = args(); const w = +(a.largura || 390), h = 844;
   const b = await chromium.launch();
   const coleta = async (modo) => {
     const ctx = await b.newContext({ viewport: { width: w, height: h }, ...(w < 1024 ? { isMobile: true, hasTouch: true } : {}) });
     const p = await ctx.newPage();
-    await p.goto(a.base + '/' + (a.pagina || 'index.html') + '?leve=' + modo, { waitUntil: 'networkidle', timeout: 90000 });
+    await prepararModo(p, modo);
+    await p.goto(urlModo(a.base + '/' + (a.pagina || 'index.html'), modo), { waitUntil: 'networkidle', timeout: 90000 });
     const H = await p.evaluate(() => document.documentElement.scrollHeight);
     for (let y = 0; y < H; y += h) { await p.evaluate((y) => scrollTo(0, y), y); await p.waitForTimeout(80); }
     await p.waitForTimeout(1500);
+    const cls = await p.evaluate((c) => c.find((x) => document.documentElement.classList.contains(x)) || '', classesLeve());
+    if ((modo === 'leve') !== !!cls) console.log(`?? pedi o modo ${modo} e o site ficou ${cls ? 'leve (.' + cls + ')' : 'normal'}: veja descobrir.js / --classe-leve`);
     const r = await p.evaluate(() => {
       const out = [];
       const nome = (el, ps) => {
@@ -42,7 +45,7 @@ const { chromium, args } = require('./comum');
     });
     await ctx.close(); return r;
   };
-  const normal = await coleta(0), leve = await coleta(1);
+  const normal = await coleta('normal'), leve = await coleta('leve');
   const noLeve = new Set(leve.map((x) => x.n + '|' + x.t));
   // agrupa elementos iguais (mesmo nome e efeito): "13x span.tag ..."
   const ag = new Map();
@@ -56,6 +59,6 @@ const { chromium, args } = require('./comum');
   }
   console.log('\nLeitura: backdrop-filter (vidro fosco) em algo que rola junto com a página é o pior caso: a placa refaz o'
     + '\ndesfoque a cada quadro. Troque por fundo semitransparente (visual quase igual). mask/blur/mix-blend grandes:'
-    + '\ndesligue no modo leve (html.leve ...). Sombras grandes paradas custam só na primeira pintura.');
+    + '\ndesligue no modo leve (classe de modo leve do site no <html>). Sombras grandes paradas custam só na primeira pintura.');
   await b.close();
 })();
