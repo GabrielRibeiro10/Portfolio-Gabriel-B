@@ -1,6 +1,6 @@
 ---
 name: auditoria-site
-description: Auditoria completa do site antes de entregar ou publicar - desempenho em aparelhos bons, médios e fracos (celular, tablet, PC, monitor), varredura de bugs e erros, teste como cliente (tocar, clicar, rolar, girar a tela) e responsividade em todos os tamanhos, corrigindo o que achar. Use quando pedirem para revisar o site, tirar bugs, travadas ou lag, deixar mais rápido/fluido, testar em celular fraco ou PC fraco, conferir responsividade, ou "deixar pronto para o cliente".
+description: Auditoria completa do site antes de entregar ou publicar - desempenho em aparelhos bons, médios e fracos (celular, tablet, PC, monitor), varredura de bugs e erros, teste como cliente (tocar, clicar, rolar, girar a tela) e responsividade em todos os tamanhos, corrigindo o que achar. Use quando pedirem para revisar o site, tirar bugs, travadas ou lag, deixar mais rápido/fluido, testar em celular fraco ou PC fraco, conferir responsividade, checar o site contra as leis (LGPD, CDC, acessibilidade, direitos autorais), ou "deixar pronto para o cliente".
 ---
 
 # Auditoria do site (desempenho, bugs, cliente, responsividade)
@@ -98,6 +98,16 @@ Scripts em `.claude/skills/auditoria-site/scripts/` (Playwright, já instalado n
    num link quebrado na raiz e dentro de pasta (estilo carregando, `noindex`, botão para o início).
    Tem que terminar com "ok". Ao mudar um script colado na página, recalcule o hash e atualize o `vercel.json`.
    Fonte, imagem ou script de outro endereço: libere o endereço no `vercel.json` (o mínimo possível) antes de usar.
+
+5d. **Auditoria jurídica** (depois das etapas técnicas), com a skill `juridico` (`.claude/skills/juridico/`):
+   1. Leia `.claude/skills/juridico/CHECKLIST.md` inteiro (é curto).
+   2. Responda a tabela "Primeiro: classifique o site" e aplique só os blocos que valem para ele.
+   3. Cheque cada item no código e no site publicado.
+   4. Só se um item ficar em dúvida, abra o artigo citado em `.claude/skills/juridico/leis/` (busque por `**Art. N`).
+      Nunca leia uma lei inteira.
+   5. Escreva o relatório no formato da seção 2 do checklist, separando ALTA e MÉDIA.
+   6. Deixe claro no relatório que é uma checagem técnica de conformidade, não parecer jurídico.
+   Para atualizar as leis: `.claude/skills/juridico/ATUALIZAR.md`.
 
 6. **Corrigir, medir de novo, comparar** (antes/depois com números), rodar de novo 1, 4 e 5 para garantir que nada
    quebrou, e só então fazer commit e publicar (siga as regras de git da sessão).
