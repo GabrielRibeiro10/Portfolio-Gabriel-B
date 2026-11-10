@@ -620,7 +620,7 @@ if (animate) {
       drop.style.opacity = op.toFixed(3);
     };
     if (line) lineGo();
-    else { const f = () => dropFrame(0, null); addEventListener('scroll', f, { passive: true }); f(); }
+    else { const f = () => { if (dropFrame) dropFrame(0, null); }; addEventListener('scroll', f, { passive: true }); f(); }   // modo leve no meio do uso zera o dropFrame
   }
 }
 
