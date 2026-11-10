@@ -162,7 +162,14 @@ vê o site igual. **A auditoria garante isso em todo site, sem perguntar.**
 5c. **Como no ar: regras de segurança + página 404 — obrigatório antes de publicar.**
    `PLAYWRIGHT_BROWSERS_PATH=<scratchpad>/pw-webkit node .claude/skills/auditoria-site/scripts/producao.js --fotos=<scratchpad>/producao`
    Abre cada página no PC, no celular e no iPhone **com as regras do ar** (CSP do `vercel.json`) e acusa bloqueios;
-   confere se todo `<script>` executável colado na página tem o hash liberado; testa a 404. Tem que terminar com "ok".
+   confere se todo `<script>` executável colado na página tem o hash liberado; testa a 404; e confere o **cache**
+   (atualização do site tem que chegar a todos). Tem que terminar com "ok".
+   **Regra do cache:** quando o dono atualizar o site, todo visitante tem que ver a mudança na próxima visita. Nada de
+   `Cache-Control` com `max-age` > 0 (dias de cache) em `img/`, `css/`, `js/` etc. com arquivos de nome fixo: quem já
+   visitou continua vendo o arquivo velho (só a aba anônima mostra o novo). Use o padrão da Vercel (sem regra de
+   cache: o navegador confere a cada visita e o deploy limpa a CDN). Cache longo só com marca de versão (`?v=N` ou
+   `__V__` trocado no build) em **toda** referência. Ao tirar um cache longo que já estava no ar, ponha `?v=N` nos
+   arquivos que mudaram, para quem ainda guarda a cópia velha.
    Outra hospedagem (sem `vercel.json`): o script avisa; confira as regras do servidor real.
 
 5d. **Auditoria jurídica** (depois das etapas técnicas), com a skill `juridico` (`.claude/skills/juridico/`):

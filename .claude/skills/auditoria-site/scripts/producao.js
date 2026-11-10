@@ -6,6 +6,8 @@
 //  - confere se cada <script> colado na página tem o "hash" liberado na política (senão o navegador não roda);
 //  - 404: abre um endereço que não existe, inclusive dentro de pasta (/pasta/link-quebrado), servindo o 404.html como a
 //    Vercel faz, e confere que aparece no visual do site, sem arquivo faltando, e que o botão volta ao início.
+//  - cache: acusa Cache-Control com max-age > 0 (dias de cache) em arquivos referenciados sem marca de versão (?v=N):
+//    a atualização do site não chegaria a quem já visitou.
 // Uso: node producao.js [--paginas=index.html,termos.html] [--fotos=pasta]
 //      (com PLAYWRIGHT_BROWSERS_PATH apontando para o WebKit, também testa no iPhone; ver SKILL.md passo 5b)
 const fs = require('fs'), path = require('path'), crypto = require('crypto');
@@ -43,6 +45,32 @@ const { args, lista } = require('./comum');
       if (!liberados.has(h) && !scriptSrc.includes("'unsafe-inline'")) { ruins++; console.log(`!! ${pg}: script colado na página sem hash liberado no vercel.json (${h}) — no ar ele NÃO roda`); }
     }
     if (/<style[\s>]/.test(html) && !styleSrc.includes("'unsafe-inline'")) { ruins++; console.log(`!! ${pg}: bloco <style> na página — a política bloqueia; mova para um arquivo .css`); }
+  }
+
+  // ----- cache: atualização do site chega a todos? -----
+  // Cache-Control com max-age > 0 faz o navegador NÃO perguntar ao servidor durante esse tempo: o dono troca um arquivo
+  // mantendo o nome, publica, e quem já visitou continua vendo o velho (só a aba anônima mostra o novo). O padrão da
+  // Vercel (sem regra) é "max-age=0, must-revalidate": o navegador confere a cada visita e o deploy limpa a CDN.
+  // s-maxage só vale para a CDN, que a Vercel limpa a cada deploy: não conta.
+  const arquivosDoSite = (dir, out = []) => { for (const f of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (/^(\.|node_modules$|vendor$)/.test(f.name)) continue;
+    const c = path.join(dir, f.name);
+    if (f.isDirectory()) arquivosDoSite(c, out); else if (/\.(html|css|js|json|webmanifest)$/.test(f.name)) out.push(c);
+  } return out; };
+  const regrasCache = (cfg.headers || []).map((r) => [r.source, (r.headers || []).find((x) => /^cache-control$/i.test(x.key))])
+    .filter(([, h]) => h && +((h.value.match(/(?:^|[\s,])max-age=(\d+)/) || [])[1] || 0) > 0);
+  if (regrasCache.length) {
+    const textos = arquivosDoSite(raiz).map((f) => fs.readFileSync(f, 'utf8'));
+    for (const [src, h] of regrasCache) {
+      const seg = +h.value.match(/(?:^|[\s,])max-age=(\d+)/)[1], tempo = seg >= 86400 ? Math.round(seg / 86400) + ' dia(s)' : Math.round(seg / 3600) + ' hora(s)';
+      // padrão da Vercel ("/img/(.*)", "/:path*") -> expressão regular sobre o caminho do arquivo
+      const re = new RegExp('^' + src.replace(/^\//, '').replace(/\(\.\*\)|:\w+\*/g, '\u0000').replace(/:\w+/g, '\u0001').replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\u0000/g, '.*').replace(/\u0001/g, '[^/]+') + '$');
+      const semVersao = new Set();
+      for (const t of textos) for (const m of t.matchAll(/["'(\s,]\/?((?:[\w.-]+\/)*[\w.-]+\.(?:css|js|png|jpe?g|webp|avif|gif|svg|mp4|webm|woff2?|ico|json))(\?[^"')\s,]*)?/g))
+        if (re.test(m[1]) && !/[?&]v=/.test(m[2] || '') && !/__V__/.test(m[0])) semVersao.add(m[1]);
+      if (semVersao.size) { ruins++; console.log(`!! cache de ${tempo} em ${src} e arquivo sem marca de versão (${[...semVersao].slice(0, 3).join(', ')}${semVersao.size > 3 ? '…' : ''}): trocar o arquivo e publicar NÃO chega a quem já visitou (só a aba anônima mostra). Tire a regra de Cache-Control (padrão da Vercel) ou ponha ?v=N em toda referência e troque o N a cada mudança`); }
+      else console.log(`?? cache de ${tempo} em ${src}: todas as referências têm marca de versão; lembre de trocar a marca a cada mudança`);
+    }
   }
 
   // ----- navegadores disponíveis -----
