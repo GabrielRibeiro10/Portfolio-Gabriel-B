@@ -837,7 +837,7 @@ if (window.gsap && window.ScrollTrigger && !reduceMotion) {
     gsap.registerPlugin(ScrollTrigger);
     const layers = [
       ['.about-kicker', 70], ['.about-copy .about-lead', 120],
-      ['.about-copy p:not(.about-lead)', 90], ['.about-facts', 150],
+      ['.about-copy p:not(.about-lead)', 120], ['.about-facts', 150],   // os parágrafos andam junto com o lead
     ];
     const TITLE = 170;
     const mm = gsap.matchMedia();
@@ -848,7 +848,9 @@ if (window.gsap && window.ScrollTrigger && !reduceMotion) {
         scrollTrigger: { trigger: me, start: 'top bottom', end: 'bottom top', scrub: 0.6, invalidateOnRefresh: true } });
       for (const [sel, d] of layers) {
         const els = me.querySelectorAll(sel);
-        if (els.length) tl.fromTo(els, { y: d * k }, { y: -d * k }, 0);
+        // na propriedade translate (--ap), não no transform: a entrada [data-ab] usa transform e, ao terminar, o
+        // clearProps dela apagava o parallax (o texto ficava parado)
+        if (els.length) tl.fromTo(els, { '--ap': d * k + 'px' }, { '--ap': -d * k + 'px' }, 0);
       }
       // o deslocamento vai direto no título e no crachá (canvas 3D ou o desenhado). Antes ia numa variável no .about:
       // mudar uma variável na seção a cada quadro fazia o navegador recalcular o estilo de ~850 elementos
@@ -861,7 +863,7 @@ if (window.gsap && window.ScrollTrigger && !reduceMotion) {
       } }, 0);
       const off = () => { tl.scrollTrigger.kill(); tl.kill(); title.style.translate = '';
         for (const c of about.querySelectorAll(':scope > .cracha-canvas, :scope > .lanyard')) c.style.translate = '';
-        gsap.set(me.querySelectorAll(layers.map((l) => l[0]).join(',')), { clearProps: 'transform' }); };
+        gsap.set(me.querySelectorAll(layers.map((l) => l[0]).join(',')), { '--ap': '0px' }); };
       document.addEventListener('gr:leve', off, { once: true });
       return off;
     };
