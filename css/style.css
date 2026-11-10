@@ -2134,6 +2134,7 @@ html.leve .nc-more-go::after { animation: none; }
 @media (max-width: 599px) { .logo.logo-intro .logo-sep, .logo.logo-intro .logo-word { display: flex; } .logo.logo-intro .logo-sep { display: block; } }
 /* parallax da rolagem (js/main.js anima --hp): fora do transform, que é da entrada e do hover */
 .intro .btn-work, .stats, .socials { translate: 0 var(--hp, 0px); }
+.about-me :is(.about-kicker, .about-copy p, .about-facts) { translate: 0 var(--ap, 0px); }   /* idem no Sobre mim */
 .socials a { position: relative; }   /* para a entrada (uma bolinha sai de dentro da outra) */
 
 /* ---------- Letreiro estático (no lugar da faixa que corria) ----------
