@@ -24,6 +24,7 @@ Não aplicável: banco/RLS, autenticação e sessões, CSRF, SSRF, uploads, paga
 | Arquivos sensíveis no ar | `/.env`, `/.git/config`, `/vercel.json`, `/.claude/...` → 404 |
 | Segredos no repositório | Nenhum (busca por chave/token/senha; nenhum `.env` no histórico do Git) |
 | Dependências | Consulta à base OSV: nenhuma vulnerabilidade conhecida para gsap 3.12.5, three 0.170.0, lenis 1.3.26 |
+| Semgrep 1.185.0 (`p/javascript`, `p/xss`, `p/secrets`, `p/security-audit`, `p/default`, `--metrics=off`) | 225 regras em 21 arquivos: 2 alertas `missing-integrity` em `index.html:21-22`, ambos **falsos positivos** (são `<link itemprop>` de metadados apontando a imagem de compartilhamento do próprio domínio; o navegador não carrega recurso por eles, então SRI não se aplica). Nenhum outro achado |
 | Armazenamento no navegador | `localStorage`/`sessionStorage` guardam só o perfil de desempenho (modo leve), sem dados pessoais |
 
 ### Achados
@@ -37,7 +38,7 @@ Não aplicável: banco/RLS, autenticação e sessões, CSRF, SSRF, uploads, paga
 Nenhuma: não foi encontrado risco confirmado que precisasse de mudança.
 
 ### Limitações
-- Semgrep não está instalado; não foi rodado.
+- O Semgrep pula os arquivos minificados/grandes de `js/vendor/` (bibliotecas de terceiros); elas foram cobertas pela consulta de versões na OSV. `--config auto` não foi usado porque exige enviar métricas do projeto; foram usados os conjuntos de regras equivalentes. Para repetir: `semgrep scan --metrics=off --config p/javascript --config p/xss --config p/secrets --config p/security-audit --config p/default --exclude .claude .`
 - Não há `package.json`, então não existe `npm audit`; as versões das bibliotecas foram lidas dos próprios arquivos e conferidas na OSV.
 - Configurações da conta e do projeto na Vercel (acesso da equipe, proteção de deploys de preview, domínios) não foram verificadas.
 
