@@ -12,7 +12,8 @@ Esta base começa vazia. Adicione entradas quando houver aprendizados relevantes
 - Ainda não há aprendizados registrados.
 
 ## Aplicação web, APIs e infraestrutura
-- Ainda não há aprendizados registrados.
+- Site estático na Vercel com build publica arquivos do repositório (`aplicacao-web.md`, 2026-11-10)
+- Hash órfão na CSP (`aplicacao-web.md`, 2026-11-10)
 
 ## Inteligência artificial
 - Ainda não há aprendizados registrados.
