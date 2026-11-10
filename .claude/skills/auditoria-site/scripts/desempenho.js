@@ -14,7 +14,7 @@ const init = () => {
 (async () => {
   const a = args();
   const aparelhos = lista(a.aparelhos, ['celular-fraco', 'celular-medio', 'celular-bom', 'tablet-fraco', 'pc-fraco', 'pc-medio', 'pc-bom']);
-  const b = await chromium.launch();
+  const b = await chromium.launch(); const foraDaMeta = [];
   for (const nome of aparelhos) {
     const { ctx, page, ap, erros } = await abrir(b, nome, a.base + '/' + (a.pagina || 'index.html'), { modo: a.modo || 'auto', espera: 3500, init });
     if (a.css) await page.addStyleTag({ content: a.css });
@@ -33,11 +33,21 @@ const init = () => {
     const soma = lt.reduce((x, y) => x + y[1], 0);
     console.log(`\n== ${nome} ${ap.w}x${ap.h} cpu x${ap.cpu} | modo ${await modoAtual(page)} | rolou em ${((Date.now() - t0) / 1000).toFixed(1)}s`
       + ` | travadas longas ${lt.length} (soma ${soma}ms, maior ${Math.max(0, ...lt.map((x) => x[1]))}ms) | CLS ${cls.toFixed(3)}${erros.length ? ' | ERROS: ' + erros.join(' || ') : ''}`);
+    const lim = ap.cpu >= 6 ? 35 : 22; const acima = [];
     for (const [s, g] of [...ag.entries()].sort((x, y) => x[1].y - y[1].y)) {
       const m = g.sum / g.n, marca = m > 35 || g.pior > 150 ? '!!' : m > 22 ? ' ~' : '  ';
+      if (m > lim && g.n >= 5) acima.push(s + ' ' + m.toFixed(0) + 'ms');
       console.log(`  ${marca} ${s.padEnd(24)} quadro médio ${m.toFixed(0).padStart(3)}ms | lentos(>50ms) ${g.lentos}/${g.n} | pior ${g.pior}ms`);
     }
+    // META (SKILL.md): bons/médios quadro médio ≤ 22 ms; fracos ≤ 35 ms e travadas longas somando ≤ 1 s na rolagem inteira
+    const falhaSoma = ap.cpu >= 6 && soma > 1000;
+    const ok = !acima.length && !falhaSoma;
+    console.log(`  META ${ok ? 'ok' : 'NÃO'}${falhaSoma ? ' | travadas somam ' + (soma / 1000).toFixed(1) + ' s (meta ≤ 1 s)' : ''}${acima.length ? ' | acima de ' + lim + ' ms: ' + acima.join(', ') : ''}`);
+    if (!ok) foraDaMeta.push(nome);
     await ctx.close();
   }
+  if (foraDaMeta.length) console.log(`\nfora da meta: ${foraDaMeta.join(', ')}` + (foraDaMeta.some((n) => /fraco/.test(n))
+    ? '\naparelho fraco fora da meta: ache a causa (passo 3) e, sem causa única, simplifique no modo leve (passo 3b). Não é pendência para o dono.' : ''));
+  else console.log('\ntodos os aparelhos dentro da meta');
   await b.close();
 })();

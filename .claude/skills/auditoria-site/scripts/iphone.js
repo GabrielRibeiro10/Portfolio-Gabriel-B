@@ -2,8 +2,10 @@
 // (iPhone 6 ao 17, Mini, Plus, Pro, Pro Max, SE, Air), em pé e deitado, e nos iPads. Em cada um confere sozinho:
 //  - erros de JavaScript e arquivos que falharam;
 //  - rolagem para o lado (algo vazando da tela);
-//  - notebook dos Projetos: a tela mostra o site (cores) e não o retângulo cinza da tampa (defeito do Safari);
-//  - crachá do Sobre mim: aparece (3D ou desenhado) e o cartão tem a foto (não está em branco).
+//  - QUALQUER site: rola a página inteira e confere cada <canvas> e <video> grande: tem que aparecer com conteúdo,
+//    não em branco/cinza liso (o Safari esconde canvas e vídeo sem dar erro: limite de memória, 3D, autoplay);
+//  - checagens de efeitos conhecidos, só se o site tiver o elemento (exemplos do portfólio: notebook dos Projetos
+//    mostra o site e não a tampa cinza; crachá 3D com a foto). Efeito novo com 3D/canvas/vídeo: acrescente aqui.
 // As cores são medidas na própria foto da tela (sem depender de olho). Salva as fotos com --fotos para conferir.
 // Na 1ª vez da sessão instale o WebKit (ver SKILL.md, passo 5b).
 // Uso: PLAYWRIGHT_BROWSERS_PATH=<pasta> node iphone.js [--fotos=pasta] [--aparelhos="iPhone 13 Pro Max,iPhone SE"]
@@ -86,6 +88,23 @@ async function cores(page, png) {
         const png = await p.screenshot({ clip }); if (a.fotos) fs.writeFileSync(path.join(a.fotos, `${tag}-cracha.png`), png);
         const c = await cores(p, png);
         if (c.desvio < 25) prob.push(`crachá sem foto (região quase lisa: contraste ${c.desvio})`);
+      }
+      // canvas e vídeos de qualquer site: rola até cada um e mede a foto (lisa demais = em branco)
+      const midias = await p.evaluate(() => [...document.querySelectorAll('canvas, video')].map((el, i) => {
+        el.dataset.audMidia = i; const r = el.getBoundingClientRect(), cs = getComputedStyle(el);
+        return { i, tag: el.tagName.toLowerCase() + (el.className && typeof el.className === 'string' ? '.' + el.className.split(' ')[0] : ''), area: r.width * r.height, vis: cs.display !== 'none' && cs.visibility !== 'hidden' && +cs.opacity > 0.05 };
+      }).filter((m) => m.vis && m.area >= 20000).slice(0, 6));
+      for (const m of midias) {
+        await p.evaluate((i) => { const el = document.querySelector('[data-aud-midia="' + i + '"]'); const r = el.getBoundingClientRect(); scrollTo(0, r.top + scrollY - Math.max(0, (innerHeight - r.height) / 2)); }, m.i);
+        await p.waitForTimeout(2500);
+        const el = await p.$('[data-aud-midia="' + m.i + '"]'); const box = el && await el.boundingBox();
+        if (!box || box.width < 10 || box.height < 10) continue;
+        const vw2 = base.viewport.width, vh2 = base.viewport.height;
+        const clip = { x: Math.max(0, box.x), y: Math.max(0, box.y), width: Math.min(box.width, vw2 - Math.max(0, box.x)), height: Math.min(box.height, vh2 - Math.max(0, box.y)) };
+        if (clip.width < 10 || clip.height < 10) continue;
+        const png = await p.screenshot({ clip }); if (a.fotos) fs.writeFileSync(path.join(a.fotos, `${tag}-${m.tag.replace(/[^\w]+/g, '-')}.png`), png);
+        const c = await cores(p, png);
+        if (c.desvio < 5 && c.sat < 12) prob.push(`${m.tag} em branco/liso (contraste ${c.desvio}): o Safari pode não estar desenhando`);
       }
     } catch (e) { prob.push('não terminou: ' + e.message.split('\n')[0]); }
     if (erros.length) prob.push('ERROS: ' + erros.slice(0, 3).join(' || '));
