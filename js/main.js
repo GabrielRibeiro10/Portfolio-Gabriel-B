@@ -237,6 +237,18 @@ if (animate) {
     card.addEventListener('pointerleave', () => { rx(0); ry(0); lift(0); });
   }
 
+  // botão "Ver meus projetos", cartões de números e redes: na rolagem andam na mesma velocidade do card da citação
+  // (mesma distância em px, mesmo trecho e mesmo scrub). Vai na propriedade CSS translate (--hp), separada do
+  // transform: a entrada e o hover deles continuam usando transform sem brigar com o parallax. Nada no modo leve.
+  if (ScrollTrigger && !leve()) {
+    const els = [$('.intro .btn-work'), $('.stats'), $('.socials')].filter(Boolean);
+    const dist = () => card.offsetHeight * (isMobile ? 0.16 : 0.42);
+    const sts = els.map((el) => gsap.fromTo(el, { '--hp': () => (isMobile ? dist() : 0) + 'px' }, { '--hp': () => -dist() + 'px', ease: 'none',
+      scrollTrigger: { ...(isMobile ? { trigger: el, start: 'top 125%', end: 'bottom 15%' } : { trigger: hero, start: 'top top', end: 'bottom top' }),
+        scrub: 0.8, invalidateOnRefresh: true } }));
+    document.addEventListener('gr:leve', () => sts.forEach((t) => { t.scrollTrigger.kill(); t.kill(); gsap.set(els, { '--hp': '0px' }); }), { once: true });
+  }
+
   // conteúdo do painel: selo, apresentação palavra por palavra e card da citação
   const panelIn = (t, at) => t
     .from($('.badge'), { scale: 0.6, autoAlpha: 0, duration: 0.8, ease: 'back.out(2)', clearProps: 'transform,opacity,visibility' }, at)
