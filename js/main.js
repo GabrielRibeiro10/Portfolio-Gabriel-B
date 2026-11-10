@@ -448,7 +448,7 @@ document.querySelectorAll('.about-areas ol').forEach((list) => {
     // Modo leve: o vídeo NÃO some (regra da skill auditoria-site); fica sempre o de 720px, mais leve de decodificar
     const load = (v) => {
       if (!v || v.src) return;
-      v.src = v.dataset.src + (!leve() && v.parentElement.offsetWidth >= 420 ? '-960.mp4' : '-720.mp4');
+      v.src = v.dataset.src + (!leve() && v.parentElement.offsetWidth >= 420 ? '-960.mp4?v=2' : '-720.mp4?v=2');
       v.preload = 'auto';
     };
     const playVideo = (s, old) => {
