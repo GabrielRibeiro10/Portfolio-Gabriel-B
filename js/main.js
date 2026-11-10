@@ -239,14 +239,14 @@ if (animate) {
 
   // botão "Ver meus projetos", cartões de números e redes: na rolagem andam na mesma velocidade do card da citação
   // (mesma distância em px, mesmo trecho e mesmo scrub). Vai na propriedade CSS translate (--hp), separada do
-  // transform: a entrada e o hover deles continuam usando transform sem brigar com o parallax. Nada no modo leve.
-  if (ScrollTrigger && !leve()) {
+  // transform: a entrada e o hover deles continuam usando transform sem brigar com o parallax. Fica também no modo
+  // leve (celular mais simples): são só 3 elementos andando, custo quase zero.
+  if (ScrollTrigger) {
     const els = [$('.intro .btn-work'), $('.stats'), $('.socials')].filter(Boolean);
     const dist = () => card.offsetHeight * (isMobile ? 0.16 : 0.42);
     const sts = els.map((el) => gsap.fromTo(el, { '--hp': () => (isMobile ? dist() : 0) + 'px' }, { '--hp': () => -dist() + 'px', ease: 'none',
       scrollTrigger: { ...(isMobile ? { trigger: el, start: 'top 125%', end: 'bottom 15%' } : { trigger: hero, start: 'top top', end: 'bottom top' }),
         scrub: 0.8, invalidateOnRefresh: true } }));
-    document.addEventListener('gr:leve', () => sts.forEach((t) => { t.scrollTrigger.kill(); t.kill(); gsap.set(els, { '--hp': '0px' }); }), { once: true });
   }
 
   // conteúdo do painel: selo, apresentação palavra por palavra e card da citação
@@ -828,8 +828,8 @@ if (animate) {
 // ---------- Sobre mim: parallax na seção toda ----------
 // Camadas em velocidades diferentes enquanto a seção atravessa a tela: o selo mais devagar, o texto no meio, o
 // título e os números mais rápido. O crachá anda junto com o título como um bloco só (o mesmo translate no canvas;
-// js/cracha.js desconta isso da física): rolar não puxa nem balança o crachá. Menor no celular; parado para quem
-// prefere menos movimento e no modo leve.
+// js/cracha.js desconta isso da física): rolar não puxa nem balança o crachá. Um pouco menor no celular; parado só
+// para quem prefere menos movimento (no modo leve continua: são poucos elementos, só translate).
 if (window.gsap && window.ScrollTrigger && !reduceMotion) {
   const me = document.querySelector('.about-me'), about = document.querySelector('.about');
   const title = me && me.querySelector('.about-title');
@@ -842,7 +842,6 @@ if (window.gsap && window.ScrollTrigger && !reduceMotion) {
     const TITLE = 170;
     const mm = gsap.matchMedia();
     const build = (k) => {
-      if (leve()) return;
       const ty = { v: 0 };
       const tl = gsap.timeline({ defaults: { ease: 'none' },
         scrollTrigger: { trigger: me, start: 'top bottom', end: 'bottom top', scrub: 0.6, invalidateOnRefresh: true } });
@@ -864,11 +863,10 @@ if (window.gsap && window.ScrollTrigger && !reduceMotion) {
       const off = () => { tl.scrollTrigger.kill(); tl.kill(); title.style.translate = '';
         for (const c of about.querySelectorAll(':scope > .cracha-canvas, :scope > .lanyard')) c.style.translate = '';
         gsap.set(me.querySelectorAll(layers.map((l) => l[0]).join(',')), { '--ap': '0px' }); };
-      document.addEventListener('gr:leve', off, { once: true });
       return off;
     };
     mm.add('(min-width: 861px)', () => build(1));
-    mm.add('(max-width: 860px)', () => build(0.55));
+    mm.add('(max-width: 860px)', () => build(0.8));
   }
 }
 
