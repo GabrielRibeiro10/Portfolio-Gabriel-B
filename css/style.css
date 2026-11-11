@@ -942,9 +942,9 @@ a { color: inherit; text-decoration: none; }
 .pj-slide:is(.is-active, .is-leaving) .lp-screen img { animation: lp-scroll 44s cubic-bezier(.25, .05, .55, 1) 2s infinite alternate; }
 .pj.is-paused .lp-screen img { animation-play-state: paused; }
 @media (hover: hover) { .laptop:hover .lp-screen img { animation-play-state: paused; } }
-/* vídeo do site com os efeitos (js/main.js dá play quando a tampa abre): cobre a captura quando já está
+/* vídeo do site com os efeitos (js/main.js dá play quando o notebook entra, a tampa já abre com ele): cobre a captura quando já está
    tocando; se não carregar, a captura rolando continua lá embaixo */
-.lp-screen video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; opacity: 0; transition: opacity .4s; }
+.lp-screen video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; opacity: 0; }   /* sem esmaecer: a imagem parada não aparece no meio */
 .lp-screen video.is-on { opacity: 1; }
 .lp-screen:has(video.is-on) img { visibility: hidden; }
 
@@ -2154,7 +2154,9 @@ html.leve .nc-more-go::after { animation: none; }
   font-family: "Instrument Serif", Georgia, "Times New Roman", serif; font-style: italic; font-weight: 400;
   letter-spacing: -.02em; color: var(--orange);
 }
-.faq-statement .word-mask { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .08em; margin-bottom: -.08em; }
+/* a máscara (overflow: hidden) passa um pouco das bordas da palavra: o itálico inclina para fora da caixa e cortava
+   o acento de "você", a ponta do "d" e o pé do "q"; a margem negativa devolve o espaço, o texto não sai do lugar */
+.faq-statement .word-mask { display: inline-block; overflow: hidden; vertical-align: top; padding: .16em .14em .18em; margin: -.16em -.14em -.18em; }
 .faq-statement .word { display: inline-block; }
 @media (max-width: 860px) { .faq-statement { margin-top: 36px; font-size: clamp(42px, 12.5vw, 64px); max-width: 12ch; } }
 /* frase da chamada separada em palavras (GSAP): o degradê do destaque não pode pegar as outras palavras (que também
