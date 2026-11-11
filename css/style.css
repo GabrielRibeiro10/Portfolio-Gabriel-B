@@ -1869,7 +1869,7 @@ html.leve .intro .btn-work, html.leve .intro .btn-work::before, html.leve .intro
    molde dos ombros e anda junto com a foto. Igual no PC e no celular. */
 .person-rim {
   position: absolute; inset: 0; pointer-events: none;
-  background: url("../img/gabriel-luz.webp") 0 0 / 100% 100% no-repeat;
+  background: url("../img/gabriel-luz.webp?v=2") 0 0 / 100% 100% no-repeat;
   mix-blend-mode: screen;
 }
 
@@ -2047,15 +2047,17 @@ html.nc-gal-on .nichos.ni-live .nc-shot, html.nc-gal-on .nichos.ni-live.is-in .n
 /* ---------- Hero: fundo em imagem (img/hero-fundo.webp, enviada pelo Gabriel) ----------
    Substitui o degradê e o desenho de círculos (svg.hero-art fica escondido; a luz amarela em volta da pessoa continua).
    Para voltar ao fundo anterior: apagar este bloco. */
+/* por baixo da imagem, a mesma imagem em miniatura (72 px, embutida): enquanto a grande baixa, a tela já mostra o
+   degradê com os arcos (ampliado ele fica liso, igual ao original) em vez de uma tela laranja chapada que depois trocava */
 .hero-bg, html.leve .hero-bg {
-  background: #e05300 url("../img/hero-fundo.webp") center / cover no-repeat;
+  background: url("../img/hero-fundo.webp") center / cover no-repeat, url("data:image/webp;base64,UklGRrwBAABXRUJQVlA4ILABAADwDwCdASpIADUAPmEmkEUyoiGYDAYBKAYEoAsSUAOY0rqiJsWHwAwOB7vQsKMG4QHHS3SBpbUamhXZis5XWmYUDS+v351n6s3vtTmb+anhgq/BrF9KqlKCtVw3wtR47hkZZgvlEnLTUt+rDD6SztyJ3lnBm02mL0UhE6GkL3B+KaHKH65HzKvoAP767EI5T/Su1tzlu/Erv6gz/5aH/y0PxXrVTqEmrW9lkxtivGTfqwib9Ll4X+PgfKXcLN6vUwzX7n7VRjFX0WgGptMYat4TO36Pcx5a5phJIJaJm91WwkyXAiTtGqmEOuSV92Qi0j4SRlBdp1BmUYPaHrF1irZF+dx/duc2yn8gQOSgbslBqDroFZOsSfh8t77XL0CuhfHuQxwqR4MWnqJ3AbgTo7yZHyf7mWezsDUEB/broiZR9rkpTNnbJRwZsg+Lr3buICi0YVMkJB7GvuKAwIeE0duA6ko3WCMtbyKaGEf22CFLm02dmsDBNL6a9YLA6wPlxCIU/PfBZkaUnyenQa8sEm8Sd4GKy8Ma5PfudnYH+K76NZULwNiPHKZrP8ADVNwAAAA=") center / cover no-repeat, #e05300;
 }
 .hero-art { display: none; }
 @media (max-width: 860px), (max-aspect-ratio: 4/5), (orientation: landscape) and (max-height: 500px) and (max-width: 1000px) {
-  .hero-bg, html.leve .hero-bg { background-image: url("../img/hero-fundo-960.webp"); background-position: 30% 50%; }
+  .hero-bg, html.leve .hero-bg { background-image: url("../img/hero-fundo-960.webp"), url("data:image/webp;base64,UklGRu4AAABXRUJQVlA4IOIAAACQCACdASooAB4APmEkkEWkIaGYDVQAQAYEsgBOmYJbm9c/HLmOHr4JIB+scdYvg0AvsqjI6fUmeSLjJKL8RjiuGgeCYQJ9Nqlv8akfyAD++mGvt+R+2EDHWDpnjO17/1fFosP1cA/+q92p1dUgP7TYeuy/WYso1w3gvkQlTjE0W1uzszSW7Guj5a6ZHcqwVFa32ssNvzpDHMqaPp4qe6r3l+c6gAjHZRlX/+W6DQhDUI43FuNXylA/NiM7nC68l+pLgPSpj0ULWEOq2fWbNbfue52bTb+PTEE0CA4oy+PAUAAA"); background-position: 30% 50%; }
 }
 @media (min-resolution: 2dppx) and (max-width: 860px) {
-  .hero-bg, html.leve .hero-bg { background-image: url("../img/hero-fundo.webp"); }
+  .hero-bg, html.leve .hero-bg { background-image: url("../img/hero-fundo.webp"), url("data:image/webp;base64,UklGRu4AAABXRUJQVlA4IOIAAACQCACdASooAB4APmEkkEWkIaGYDVQAQAYEsgBOmYJbm9c/HLmOHr4JIB+scdYvg0AvsqjI6fUmeSLjJKL8RjiuGgeCYQJ9Nqlv8akfyAD++mGvt+R+2EDHWDpnjO17/1fFosP1cA/+q92p1dUgP7TYeuy/WYso1w3gvkQlTjE0W1uzszSW7Guj5a6ZHcqwVFa32ssNvzpDHMqaPp4qe6r3l+c6gAjHZRlX/+W6DQhDUI43FuNXylA/NiM7nC68l+pLgPSpj0ULWEOq2fWbNbfue52bTb+PTEE0CA4oy+PAUAAA"); }
 }
 
 /* "E não para por aí": de ponta a ponta (encosta nos cantos da tela), cantos retos, conteúdo alinhado à coluna */
@@ -2112,6 +2114,7 @@ html.leve .nc-more-go::after { animation: none; }
     background:
       linear-gradient(180deg, rgba(240, 122, 0, 0) calc(100svh - 220px), #f07a00 100svh),
       url("../img/hero-fundo-960.webp") 30% 0 / auto 100svh no-repeat,
+      url("data:image/webp;base64,UklGRu4AAABXRUJQVlA4IOIAAACQCACdASooAB4APmEkkEWkIaGYDVQAQAYEsgBOmYJbm9c/HLmOHr4JIB+scdYvg0AvsqjI6fUmeSLjJKL8RjiuGgeCYQJ9Nqlv8akfyAD++mGvt+R+2EDHWDpnjO17/1fFosP1cA/+q92p1dUgP7TYeuy/WYso1w3gvkQlTjE0W1uzszSW7Guj5a6ZHcqwVFa32ssNvzpDHMqaPp4qe6r3l+c6gAjHZRlX/+W6DQhDUI43FuNXylA/NiM7nC68l+pLgPSpj0ULWEOq2fWbNbfue52bTb+PTEE0CA4oy+PAUAAA") 30% 0 / auto 100svh no-repeat,
       #f07a00;
   }
 }
@@ -2120,6 +2123,7 @@ html.leve .nc-more-go::after { animation: none; }
     background:
       linear-gradient(180deg, rgba(240, 122, 0, 0) calc(100svh - 220px), #f07a00 100svh),
       url("../img/hero-fundo.webp") 30% 0 / auto 100svh no-repeat,
+      url("data:image/webp;base64,UklGRu4AAABXRUJQVlA4IOIAAACQCACdASooAB4APmEkkEWkIaGYDVQAQAYEsgBOmYJbm9c/HLmOHr4JIB+scdYvg0AvsqjI6fUmeSLjJKL8RjiuGgeCYQJ9Nqlv8akfyAD++mGvt+R+2EDHWDpnjO17/1fFosP1cA/+q92p1dUgP7TYeuy/WYso1w3gvkQlTjE0W1uzszSW7Guj5a6ZHcqwVFa32ssNvzpDHMqaPp4qe6r3l+c6gAjHZRlX/+W6DQhDUI43FuNXylA/NiM7nC68l+pLgPSpj0ULWEOq2fWbNbfue52bTb+PTEE0CA4oy+PAUAAA") 30% 0 / auto 100svh no-repeat,
       #f07a00;
   }
 }
