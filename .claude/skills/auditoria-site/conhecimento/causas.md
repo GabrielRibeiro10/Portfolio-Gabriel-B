@@ -80,3 +80,14 @@ Achar a causa: `causas.js --secao=#id --aparelho=celular-fraco` e confirmar desl
 - **Por que a auditoria anterior não pegou:** a checagem visual do modo leve foi feita com a seção já parada na tela
   (screenshot depois de pular até ela), e o parallax foi estendido ao `.lanyard` na própria auditoria sem repetir a
   checagem com rolagem. Regra: **depois de mexer em parallax/translate, medir as peças presas ao longo da rolagem**.
+
+## Peça que acompanha uma animação por "tempo fixo" fica para trás em aparelho lento — 2026-11-11
+- **Status:** confirmado (medido) — visto em: portfólio (crachá do modo leve acompanhando a entrada do título)
+- **Sintoma:** só em aparelho lento (ou com a CPU desacelerada 6x no teste), o cartão fica parado fora da tela e a fita
+  sai do lugar; em PC bom nunca aparece.
+- **Causa:** o código acompanhava o título por 2,2 s fixos. A entrada do título avança por quadro (tempo limitado por
+  quadro), então em aparelho lento dura mais que 2,2 s e o acompanhamento parava no meio do caminho.
+- **Correção:** acompanhar até a animação avisar que terminou (callback de fim), nunca por tempo fixo; e refazer a
+  posição quando algo acima muda de altura (ResizeObserver no conteúdo de cima, não na seção inteira).
+- **Como testar:** `Emulation.setCPUThrottlingRate` 6 pelo CDP + rolagem com a roda (não `scrollTo`, que briga com
+  Lenis) + medir por pixels se há vão entre a âncora e a peça.
