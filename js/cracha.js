@@ -8,6 +8,22 @@ const slot = about && about.querySelector('.cracha-slot');
 const title = about && about.querySelector('.about-title');
 const fig = slot && slot.querySelector('.cracha');
 const mob = () => matchMedia('(max-width: 860px)').matches;
+// Título, fita e cartão nunca se soltam: as posições são medidas dentro da seção, então qualquer coisa que mude o
+// lugar do "g" ou do cartão refaz a conta. Isso é: o conteúdo acima (Projetos: imagem carregando, carrossel), o próprio
+// título (fonte trocando) e a coluna do cartão mudando de tamanho, a janela mudando e as fontes chegando. O FAQ (que
+// muda de altura a cada quadro quando abre) fica de fora: ele está abaixo e não mexe no título nem no cartão.
+function onShift(fn) {
+  let q = 0;
+  const go = () => { if (!q) q = requestAnimationFrame(() => { q = 0; fn(); }); };
+  if ('ResizeObserver' in window) {
+    const ro = new ResizeObserver(go);
+    for (const e of [about.querySelector('.projects'), about.querySelector('.about-me .about-kicker'), title, slot]) if (e) ro.observe(e);
+  }
+  addEventListener('resize', go);
+  addEventListener('load', go, { once: true });
+  if (document.fonts && document.fonts.addEventListener) document.fonts.addEventListener('loadingdone', go);
+  return go;
+}
 
 // ----- entrada do título (estilo awwwards): "Design que emociona." e depois "Código que entrega." entram da esquerda
 // para a direita, uma linha logo atrás da outra, com arrancada rápida e freada longa. Enquanto correm, inclinam um
@@ -18,8 +34,12 @@ const mob = () => matchMedia('(max-width: 860px)').matches;
 // a posição do "g" a cada quadro) acompanha certinho. Quem prefere menos movimento vê tudo parado.
 const slide = Boolean(fig && title) && !matchMedia('(prefers-reduced-motion: reduce)').matches;
 let titleIn = !slide, seen = false, ready = false;
-const waitTitle = [];
+const waitTitle = [], titleEnd = [];
 const whenTitleIn = (f) => (titleIn ? f() : waitTitle.push(f));
+// quando o título termina de entrar (num aparelho lento a entrada demora mais que o previsto: quem acompanha o "g"
+// espera este aviso, e não um tempo fixo, senão o crachá ficava parado no meio do caminho)
+let titleDone = !slide;
+const whenTitleDone = (f) => (titleDone ? f() : titleEnd.push(f));
 const markReady = () => { ready = true; goTitle(); };
 // curva cubic-bezier(.3, 0, .1, 1): acelera rápido e freia devagar, sem o tranco do expo.out (que arremessava o crachá)
 const bezier = (x1, y1, x2, y2) => {
@@ -54,7 +74,10 @@ function goTitle() {
       if (soft) ln.style.filter = p < 1 && v > 0.15 ? `blur(${Math.min(4, v * 1.8).toFixed(2)}px)` : '';
     });
     if (busy) requestAnimationFrame(f);
-    else { title.classList.remove('ab-slide'); lines.forEach((ln) => { ln.style.transform = ln.style.opacity = ln.style.filter = ''; }); }
+    else {
+      title.classList.remove('ab-slide'); lines.forEach((ln) => { ln.style.transform = ln.style.opacity = ln.style.filter = ''; });
+      titleDone = true; titleEnd.splice(0).forEach((g) => g());
+    }
   };
   requestAnimationFrame(f);
   waitTitle.splice(0).forEach((g) => g());
@@ -161,7 +184,14 @@ async function lanyard() {
   const box = (n, l, t, w, h) => Object.assign(n.style, { left: px(l), top: px(t), width: px(w), height: px(h) });
   function place() {
     const { r } = anchor(), ar = about.getBoundingClientRect();
-    const x = r.left + r.width * tail.x - ar.left, y = r.top + r.height * tail.y - ar.top;   // centro do traço do "g"
+    // parallax do Sobre mim (js/main.js): título, gancho/fita e cartão andam juntos com o mesmo translate. As medidas
+    // abaixo já vêm com esse translate (o título e o cartão estão deslocados), e o .lanyard também é deslocado: sem
+    // descontar, o gancho caía longe do "g" e a fita encurtava conforme a rolagem
+    // no modo leve o título não tem parallax (js/main.js): se o modo leve ligou no meio do uso, tira já o que sobrou
+    if (document.documentElement.classList.contains('leve')) title.style.translate = '';
+    const tr = title.style.translate, ty = parseFloat(tr.split(' ')[1]) || 0;
+    el.style.translate = fig.style.translate = tr;
+    const x = r.left + r.width * tail.x - ar.left, y = r.top + r.height * tail.y - ar.top - ty;   // centro do traço do "g"
     const W = mob() ? 150 : 180, BAND = Math.round(W * 0.12);
     // mesmas contas do buildHook() do 3D
     const t = tail.th * r.height, rw = Math.max(1.4, t * 0.18), R = t / 2 + rw + 0.6;
@@ -173,7 +203,7 @@ async function lanyard() {
     const fr = fig.getBoundingClientRect();
     dx = x - (fr.left - dx + fr.width / 2 - ar.left);
     fig.style.transform = `translateX(${px(dx)})`;
-    const A = y + sh + hb, top = A - rw * 3.2, bottom = fr.top - ar.top - 3;   // termina dentro do clipe
+    const A = y + sh + hb, top = A - rw * 3.2, bottom = fr.top - ar.top - 3 - ty;   // termina dentro do clipe
     box(band, x - BAND / 2, top, BAND, Math.max(0, bottom - top));
     Object.assign(band.style, {
       borderRadius: `${px(BAND / 2)} ${px(BAND / 2)} 0 0 / ${px(rw * 2.2)} ${px(rw * 2.2)} 0 0`,
@@ -184,15 +214,12 @@ async function lanyard() {
   relayout();
   markReady();
   // acompanha o "g" só enquanto o título desliza (antes ficava 3 s refazendo a posição a cada quadro logo ao montar,
-  // com a pessoa ainda na hero: travava a hero em aparelho fraco)
-  let until = 0;
-  const follow = () => { place(); if (performance.now() < until) requestAnimationFrame(follow); };
-  whenTitleIn(() => { const go = performance.now() >= until; until = performance.now() + 2200; if (go) requestAnimationFrame(follow); });
-  // só a largura importa (o "g" muda de lugar quando a largura muda). A altura da seção muda a cada quadro quando uma
-  // resposta do FAQ abre (o FAQ fica dentro dela): reagir à altura redesenhava a letra num canvas a cada quadro e travava
-  let lastW = about.clientWidth;
-  if ('ResizeObserver' in window) new ResizeObserver(() => { const w = about.clientWidth; if (w !== lastW) { lastW = w; requestAnimationFrame(relayout); } }).observe(about);
-  else addEventListener('resize', relayout);
+  // com a pessoa ainda na hero: travava a hero em aparelho fraco). Vai até o título terminar de verdade, e não por um
+  // tempo fixo: num aparelho lento a entrada passava dos 2,2 s e o cartão ficava preso fora da tela, à esquerda
+  const follow = () => { place(); if (!titleDone) requestAnimationFrame(follow); };
+  whenTitleIn(() => requestAnimationFrame(follow));
+  whenTitleDone(() => requestAnimationFrame(place));
+  onShift(relayout);
 }
 
 async function start() {
@@ -313,6 +340,9 @@ async function start() {
     P.x = r.left + r.width * tail.x - ar.left;
     // parallax do Sobre mim (js/main.js): o título e o crachá andam juntos (o mesmo translate nos dois); a física
     // trabalha sem esse deslocamento, então rolar a página não puxa nem balança o crachá
+    // o canvas recebe o mesmo translate já aqui: se montar com a página parada, o js/main.js só o atualizaria na
+    // próxima rolagem e, até lá, a fita e o cartão ficariam fora do "g"
+    canvas.style.translate = title.style.translate;
     P.y = r.top + r.height * tail.y - ar.top - (parseFloat((title.style.translate || '').split(' ')[1]) || 0);
     placeA();
   }
@@ -486,9 +516,8 @@ async function start() {
   else whenTitleIn(() => { pin(); hang(0.5); show(); });   // aparece junto com o título, que o arrasta para a direita
   new IntersectionObserver((e) => { visible = e[0].isIntersecting; kick(); }).observe(canvas);   // só o pedaço do crachá, não a seção inteira
   const relayout = () => { layout(); if (!running) draw(); kick(); };
-  addEventListener('resize', relayout);
-  addEventListener('load', relayout);
-  setTimeout(relayout, 1800);   // depois da entrada do título
+  onShift(relayout);
+  whenTitleDone(relayout);   // depois da entrada do título (antes era 1,8 s fixo; em aparelho lento a entrada demora mais)
 
   // ----- arrastar: o canvas não recebe cliques (o texto embaixo continua clicável), então testa o cartão aqui -----
   const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
