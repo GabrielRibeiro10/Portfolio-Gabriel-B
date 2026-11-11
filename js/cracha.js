@@ -187,6 +187,8 @@ async function lanyard() {
     // parallax do Sobre mim (js/main.js): título, gancho/fita e cartão andam juntos com o mesmo translate. As medidas
     // abaixo já vêm com esse translate (o título e o cartão estão deslocados), e o .lanyard também é deslocado: sem
     // descontar, o gancho caía longe do "g" e a fita encurtava conforme a rolagem
+    // no modo leve o título não tem parallax (js/main.js): se o modo leve ligou no meio do uso, tira já o que sobrou
+    if (document.documentElement.classList.contains('leve')) title.style.translate = '';
     const tr = title.style.translate, ty = parseFloat(tr.split(' ')[1]) || 0;
     el.style.translate = fig.style.translate = tr;
     const x = r.left + r.width * tail.x - ar.left, y = r.top + r.height * tail.y - ar.top - ty;   // centro do traço do "g"
