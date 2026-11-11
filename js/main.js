@@ -831,7 +831,7 @@ if (animate) {
 // Camadas em velocidades diferentes enquanto a seção atravessa a tela: o selo mais devagar, o texto no meio, o
 // título e os números mais rápido. O crachá anda junto com o título como um bloco só (o mesmo translate no canvas;
 // js/cracha.js desconta isso da física): rolar não puxa nem balança o crachá. Um pouco menor no celular; parado só
-// para quem prefere menos movimento (no modo leve continua: são poucos elementos, só translate).
+// para quem prefere menos movimento. No modo leve o título, a fita e o crachá ficam parados; o resto continua.
 if (window.gsap && window.ScrollTrigger && !reduceMotion) {
   const me = document.querySelector('.about-me'), about = document.querySelector('.about');
   const title = me && me.querySelector('.about-title');
@@ -855,9 +855,11 @@ if (window.gsap && window.ScrollTrigger && !reduceMotion) {
       }
       // o deslocamento vai direto no título e no crachá (canvas 3D ou, no modo leve, gancho/fita e o cartão juntos). Antes ia numa variável no .about:
       // mudar uma variável na seção a cada quadro fazia o navegador recalcular o estilo de ~850 elementos
+      // modo leve: título, fita e crachá ficam parados (sem parallax); o resto do Sobre mim continua. Se o modo leve
+      // ligar no meio do uso, o próximo quadro tira o deslocamento que já estava neles
       let last = '';
       tl.fromTo(ty, { v: TITLE * k }, { v: -TITLE * k, onUpdate: () => {
-        const v = `0 ${ty.v.toFixed(1)}px`;
+        const v = document.documentElement.classList.contains('leve') ? '' : `0 ${ty.v.toFixed(1)}px`;
         if (v === last) return;
         last = v; title.style.translate = v;
         for (const c of about.querySelectorAll(':scope > .cracha-canvas, :scope > .lanyard, .cracha-leve .cracha')) c.style.translate = v;
