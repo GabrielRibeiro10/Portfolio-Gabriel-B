@@ -183,7 +183,7 @@ a { color: inherit; text-decoration: none; }
 }
 .person img { display: block; width: 100%; height: 100%; }
 /* luz laranja na pessoa (a foto original é de estúdio, cinza): já vem pintada na própria foto
-   (img/gabriel-recorte.webp), com o mesmo degradê de antes (105deg, laranja à esquerda, escuro à direita, soft-light,
+   (img/gabriel-hero.webp), com o mesmo degradê de antes (105deg, laranja à esquerda, escuro à direita, soft-light,
    só onde há pessoa). Antes era uma camada com mix-blend-mode + máscara por cima da foto: em placa de vídeo de verdade
    (e no Safari do iPhone) a mistura saía em degraus de cor e emendas, que viravam listras de sombra no rosto. */
 
