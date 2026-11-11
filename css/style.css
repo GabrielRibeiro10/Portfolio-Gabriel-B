@@ -1869,7 +1869,7 @@ html.leve .intro .btn-work, html.leve .intro .btn-work::before, html.leve .intro
    molde dos ombros e anda junto com a foto. Igual no PC e no celular. */
 .person-rim {
   position: absolute; inset: 0; pointer-events: none;
-  background: url("../img/gabriel-luz.webp?v=2") 0 0 / 100% 100% no-repeat;
+  background: url("../img/gabriel-luz.webp?v=3") 0 0 / 100% 100% no-repeat;
   mix-blend-mode: screen;
 }
 
