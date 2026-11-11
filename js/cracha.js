@@ -161,7 +161,12 @@ async function lanyard() {
   const box = (n, l, t, w, h) => Object.assign(n.style, { left: px(l), top: px(t), width: px(w), height: px(h) });
   function place() {
     const { r } = anchor(), ar = about.getBoundingClientRect();
-    const x = r.left + r.width * tail.x - ar.left, y = r.top + r.height * tail.y - ar.top;   // centro do traço do "g"
+    // parallax do Sobre mim (js/main.js): título, gancho/fita e cartão andam juntos com o mesmo translate. As medidas
+    // abaixo já vêm com esse translate (o título e o cartão estão deslocados), e o .lanyard também é deslocado: sem
+    // descontar, o gancho caía longe do "g" e a fita encurtava conforme a rolagem
+    const tr = title.style.translate, ty = parseFloat(tr.split(' ')[1]) || 0;
+    el.style.translate = fig.style.translate = tr;
+    const x = r.left + r.width * tail.x - ar.left, y = r.top + r.height * tail.y - ar.top - ty;   // centro do traço do "g"
     const W = mob() ? 150 : 180, BAND = Math.round(W * 0.12);
     // mesmas contas do buildHook() do 3D
     const t = tail.th * r.height, rw = Math.max(1.4, t * 0.18), R = t / 2 + rw + 0.6;
@@ -173,7 +178,7 @@ async function lanyard() {
     const fr = fig.getBoundingClientRect();
     dx = x - (fr.left - dx + fr.width / 2 - ar.left);
     fig.style.transform = `translateX(${px(dx)})`;
-    const A = y + sh + hb, top = A - rw * 3.2, bottom = fr.top - ar.top - 3;   // termina dentro do clipe
+    const A = y + sh + hb, top = A - rw * 3.2, bottom = fr.top - ar.top - 3 - ty;   // termina dentro do clipe
     box(band, x - BAND / 2, top, BAND, Math.max(0, bottom - top));
     Object.assign(band.style, {
       borderRadius: `${px(BAND / 2)} ${px(BAND / 2)} 0 0 / ${px(rw * 2.2)} ${px(rw * 2.2)} 0 0`,
