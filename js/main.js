@@ -853,17 +853,17 @@ if (window.gsap && window.ScrollTrigger && !reduceMotion) {
         // clearProps dela apagava o parallax (o texto ficava parado)
         if (els.length) tl.fromTo(els, { '--ap': d * k + 'px' }, { '--ap': -d * k + 'px' }, 0);
       }
-      // o deslocamento vai direto no título e no crachá (canvas 3D ou o desenhado). Antes ia numa variável no .about:
+      // o deslocamento vai direto no título e no crachá (canvas 3D ou, no modo leve, gancho/fita e o cartão juntos). Antes ia numa variável no .about:
       // mudar uma variável na seção a cada quadro fazia o navegador recalcular o estilo de ~850 elementos
       let last = '';
       tl.fromTo(ty, { v: TITLE * k }, { v: -TITLE * k, onUpdate: () => {
         const v = `0 ${ty.v.toFixed(1)}px`;
         if (v === last) return;
         last = v; title.style.translate = v;
-        for (const c of about.querySelectorAll(':scope > .cracha-canvas, :scope > .lanyard')) c.style.translate = v;
+        for (const c of about.querySelectorAll(':scope > .cracha-canvas, :scope > .lanyard, .cracha-leve .cracha')) c.style.translate = v;
       } }, 0);
       const off = () => { tl.scrollTrigger.kill(); tl.kill(); title.style.translate = '';
-        for (const c of about.querySelectorAll(':scope > .cracha-canvas, :scope > .lanyard')) c.style.translate = '';
+        for (const c of about.querySelectorAll(':scope > .cracha-canvas, :scope > .lanyard, .cracha-leve .cracha')) c.style.translate = '';
         gsap.set(me.querySelectorAll(layers.map((l) => l[0]).join(',')), { '--ap': '0px' }); };
       return off;
     };

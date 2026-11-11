@@ -63,3 +63,20 @@ Achar a causa: `causas.js --secao=#id --aparelho=celular-fraco` e confirmar desl
   pré-carregamento; **sem congelar**: 1/4 dos quadros em 60% da resolução, ver `efeitos.md`) → iframe do mapa.
   Juntos, com o vídeo da abertura andando: computador fraco 12,7 → 0,4-0,5 s, tablet 6,9 → ~0,1-0,2 s, celular
   7,3 → ~0,05-0,2 s. Animações presas à rolagem e Lenis renderam pouco ou pioraram.
+
+## Peça "presa" a um elemento com parallax sai do lugar no modo leve — 2026-11-11
+- **Status:** confirmado (medido) — visto em: portfólio (crachá do "Sobre mim")
+- **Sintoma:** no modo leve, gancho/fita desenhados em HTML ficam longe da letra onde deveriam prender e a fita fica
+  curta (ou comprida); muda conforme a velocidade com que a pessoa rolou até a seção. Sem erro no console.
+- **Causa:** o elemento âncora (título) e a peça desenhada (`.lanyard`) recebiam o **mesmo** `translate` do parallax,
+  mas a peça era posicionada a partir do `getBoundingClientRect()` do título, que **já inclui** esse translate. O
+  deslocamento contava duas vezes e ficava congelado no valor do momento da última medição. O cartão (que não
+  recebia o translate) também não andava junto, então a fita encurtava.
+- **Como achar:** rolar a página inteira devagar e rápido (não pular direto para a seção) e, a cada passo, medir a
+  distância entre a âncora e a peça (`getBoundingClientRect` dos dois). Tem que ser **constante**; se varia com a
+  rolagem, há translate contado duas vezes ou peça que não acompanha.
+- **Correção:** tudo que forma um bloco (âncora, peça desenhada e cartão) recebe o mesmo translate, e quem posiciona a
+  peça desconta o translate atual das medidas.
+- **Por que a auditoria anterior não pegou:** a checagem visual do modo leve foi feita com a seção já parada na tela
+  (screenshot depois de pular até ela), e o parallax foi estendido ao `.lanyard` na própria auditoria sem repetir a
+  checagem com rolagem. Regra: **depois de mexer em parallax/translate, medir as peças presas ao longo da rolagem**.
