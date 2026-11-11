@@ -441,8 +441,9 @@ document.querySelectorAll('.about-areas ol').forEach((list) => {
   if (slides.length) {
     const count = pj.querySelector('.pj-count b'), dots = [...pj.querySelectorAll('.pj-dots i')];
     let cur = -1, inView = false;
-    // vídeo do site na tela: começa do início quando a tampa termina de abrir (css: 1.3s + 1.3s) e só toca
-    // com a seção à vista; o do notebook que saiu para depois que ele some
+    // vídeo do site na tela: começa do início no momento em que o notebook entra, então a tampa já abre com os efeitos
+    // rodando (antes ele esperava a tampa abrir e aparecia antes a imagem parada do site). Só toca com a seção à
+    // vista; o do notebook que saiu para depois que ele some. A imagem fica embaixo só se o vídeo não carregar.
     const vid = (s) => s && s.querySelector('.lp-screen video');
     // dois tamanhos de cada vídeo: 960px (PC e tablet) e 720px (notebook pequeno, no celular); só baixa quando for tocar.
     // Modo leve: o vídeo NÃO some (regra da skill auditoria-site); fica sempre o de 720px, mais leve de decodificar
@@ -453,24 +454,27 @@ document.querySelectorAll('.about-areas ol').forEach((list) => {
     };
     const playVideo = (s, old) => {
       const o = vid(old);
-      if (o) { o.canStart = false; setTimeout(() => { if (old !== slides[cur]) { o.pause(); o.classList.remove('is-on'); } }, 700); }
+      if (o) { o.canStart = false; setTimeout(() => { if (old !== slides[cur]) { o.pause(); o.classList.remove('is-on'); } }, 500); }
       const v = vid(s);
       if (!v || reduceMotion) return;
-      clearTimeout(v.startTimer);
-      v.canStart = false;
-      v.pause();
-      v.classList.remove('is-on');
       load(v);
-      v.startTimer = setTimeout(() => {
-        if (s !== slides[cur]) return;
-        v.canStart = true;
-        v.currentTime = 0;
-        if (inView) v.play().catch(() => {});
-      }, 1300);
+      v.canStart = true;
+      if (v.readyState >= 1) v.currentTime = 0;
+      // já tem o primeiro quadro: mostra o vídeo na hora, sem passar pela imagem
+      if (v.readyState >= 2) v.classList.add('is-on');
+      if (inView) v.play().catch(() => {});
     };
     slides.forEach((s) => {
       const v = vid(s);
-      if (v) v.addEventListener('playing', () => v.classList.add('is-on'));
+      if (!v) return;
+      const on = () => { if (s === slides[cur]) v.classList.add('is-on'); };
+      v.addEventListener('loadeddata', on);
+      v.addEventListener('playing', () => {
+        on();
+        // fluidez: com este tocando, já baixa o vídeo do próximo projeto, para a troca não engasgar carregando e
+        // decodificando o vídeo novo bem na hora em que o notebook entra (e ele já abre com os efeitos)
+        if (s === slides[cur]) load(vid(slides[(cur + 1) % slides.length]));
+      });
     });
     // modo leve ligando no meio do uso: o vídeo continua (o próximo a carregar já vem em 720px)
     const show = (i, dir = 1) => {
@@ -482,7 +486,7 @@ document.querySelectorAll('.about-areas ol').forEach((list) => {
         old.classList.replace('is-active', 'is-leaving');
         old.inert = true;
         clearTimeout(old.leaveTimer);
-        old.leaveTimer = setTimeout(() => old.classList.remove('is-leaving'), 700);   // depois de sumir (css: visibility .. .6s)
+        old.leaveTimer = setTimeout(() => old.classList.remove('is-leaving'), 500);   // depois de sumir (css: visibility .. .45s)
       }
       // o próximo vai para o lado de onde vem sem animar (ele e o notebook: senão o notebook
       // atravessava a tela e entrava pelo lado errado), e só então entra
@@ -512,7 +516,7 @@ document.querySelectorAll('.about-areas ol').forEach((list) => {
         if (v && v.canStart) { if (inView) v.play().catch(() => {}); else v.pause(); }
       }).observe(pj);
       // o vídeo do primeiro projeto começa a baixar quando a seção chega perto
-      new IntersectionObserver(([e], o) => { if (e.isIntersecting) { o.disconnect(); load(vid(slides[0])); } }, { rootMargin: '600px 0px' })
+      new IntersectionObserver(([e], o) => { if (e.isIntersecting) { o.disconnect(); load(vid(slides[0])); } }, { rootMargin: '1200px 0px' })
         .observe(pj);
     } else show(0);
 
@@ -521,14 +525,14 @@ document.querySelectorAll('.about-areas ol').forEach((list) => {
       if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); step(e.key === 'ArrowRight' ? 1 : -1); }
     });
 
-    // arrastar para o lado (dedo ou mouse): mais de 50px na horizontal troca de projeto
+    // arrastar para o lado (dedo ou mouse): mais de 40px na horizontal troca de projeto
     let sx = null, sy = 0;
     pj.querySelector('.pj-track').addEventListener('pointerdown', (e) => { if (e.button === 0) { sx = e.clientX; sy = e.clientY; } });
     addEventListener('pointerup', (e) => {
       if (sx === null) return;
       const dx = e.clientX - sx, dy = e.clientY - sy;
       sx = null;
-      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.2) step(dx < 0 ? 1 : -1);
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.2) step(dx < 0 ? 1 : -1);
     });
     addEventListener('pointercancel', () => { sx = null; });
 
@@ -948,7 +952,7 @@ if (window.gsap && window.ScrollTrigger && !reduceMotion) {
   if (st) {
     gsap.registerPlugin(ScrollTrigger);
     const w = splitWords(st);
-    gsap.from(w, { yPercent: 118, rotation: 4, transformOrigin: '0% 100%', duration: 1.3, ease: 'expo.out', stagger: 0.06,
+    gsap.from(w, { yPercent: 140, rotation: 4, transformOrigin: '0% 100%', duration: 1.3, ease: 'expo.out', stagger: 0.06,
       scrollTrigger: { trigger: st, start: 'top 85%', once: true } });
   }
 }
