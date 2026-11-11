@@ -441,7 +441,7 @@ document.querySelectorAll('.about-areas ol').forEach((list) => {
   if (slides.length) {
     const count = pj.querySelector('.pj-count b'), dots = [...pj.querySelectorAll('.pj-dots i')];
     let cur = -1, inView = false;
-    // vídeo do site na tela: começa do início quando a tampa termina de abrir (css: 1.3s + 1.3s) e só toca
+    // vídeo do site na tela: começa do início quando a tampa termina de abrir (css: .3s + .65s) e só toca
     // com a seção à vista; o do notebook que saiu para depois que ele some
     const vid = (s) => s && s.querySelector('.lp-screen video');
     // dois tamanhos de cada vídeo: 960px (PC e tablet) e 720px (notebook pequeno, no celular); só baixa quando for tocar.
@@ -453,7 +453,7 @@ document.querySelectorAll('.about-areas ol').forEach((list) => {
     };
     const playVideo = (s, old) => {
       const o = vid(old);
-      if (o) { o.canStart = false; setTimeout(() => { if (old !== slides[cur]) { o.pause(); o.classList.remove('is-on'); } }, 700); }
+      if (o) { o.canStart = false; setTimeout(() => { if (old !== slides[cur]) { o.pause(); o.classList.remove('is-on'); } }, 500); }
       const v = vid(s);
       if (!v || reduceMotion) return;
       clearTimeout(v.startTimer);
@@ -466,11 +466,16 @@ document.querySelectorAll('.about-areas ol').forEach((list) => {
         v.canStart = true;
         v.currentTime = 0;
         if (inView) v.play().catch(() => {});
-      }, 1300);
+      }, 950);
     };
     slides.forEach((s) => {
       const v = vid(s);
-      if (v) v.addEventListener('playing', () => v.classList.add('is-on'));
+      if (v) v.addEventListener('playing', () => {
+        v.classList.add('is-on');
+        // fluidez: com este tocando, já baixa o vídeo do próximo projeto, para a troca não engasgar carregando e
+        // decodificando o vídeo novo bem na hora em que o notebook entra
+        if (s === slides[cur]) load(vid(slides[(cur + 1) % slides.length]));
+      });
     });
     // modo leve ligando no meio do uso: o vídeo continua (o próximo a carregar já vem em 720px)
     const show = (i, dir = 1) => {
@@ -482,7 +487,7 @@ document.querySelectorAll('.about-areas ol').forEach((list) => {
         old.classList.replace('is-active', 'is-leaving');
         old.inert = true;
         clearTimeout(old.leaveTimer);
-        old.leaveTimer = setTimeout(() => old.classList.remove('is-leaving'), 700);   // depois de sumir (css: visibility .. .6s)
+        old.leaveTimer = setTimeout(() => old.classList.remove('is-leaving'), 500);   // depois de sumir (css: visibility .. .45s)
       }
       // o próximo vai para o lado de onde vem sem animar (ele e o notebook: senão o notebook
       // atravessava a tela e entrava pelo lado errado), e só então entra
@@ -521,14 +526,14 @@ document.querySelectorAll('.about-areas ol').forEach((list) => {
       if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); step(e.key === 'ArrowRight' ? 1 : -1); }
     });
 
-    // arrastar para o lado (dedo ou mouse): mais de 50px na horizontal troca de projeto
+    // arrastar para o lado (dedo ou mouse): mais de 40px na horizontal troca de projeto
     let sx = null, sy = 0;
     pj.querySelector('.pj-track').addEventListener('pointerdown', (e) => { if (e.button === 0) { sx = e.clientX; sy = e.clientY; } });
     addEventListener('pointerup', (e) => {
       if (sx === null) return;
       const dx = e.clientX - sx, dy = e.clientY - sy;
       sx = null;
-      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.2) step(dx < 0 ? 1 : -1);
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.2) step(dx < 0 ? 1 : -1);
     });
     addEventListener('pointercancel', () => { sx = null; });
 
