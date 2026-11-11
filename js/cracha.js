@@ -318,6 +318,9 @@ async function start() {
     P.x = r.left + r.width * tail.x - ar.left;
     // parallax do Sobre mim (js/main.js): o título e o crachá andam juntos (o mesmo translate nos dois); a física
     // trabalha sem esse deslocamento, então rolar a página não puxa nem balança o crachá
+    // o canvas recebe o mesmo translate já aqui: se montar com a página parada, o js/main.js só o atualizaria na
+    // próxima rolagem e, até lá, a fita e o cartão ficariam fora do "g"
+    canvas.style.translate = title.style.translate;
     P.y = r.top + r.height * tail.y - ar.top - (parseFloat((title.style.translate || '').split(' ')[1]) || 0);
     placeA();
   }
