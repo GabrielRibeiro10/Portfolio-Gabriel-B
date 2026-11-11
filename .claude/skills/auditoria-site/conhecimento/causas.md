@@ -63,3 +63,31 @@ Achar a causa: `causas.js --secao=#id --aparelho=celular-fraco` e confirmar desl
   pré-carregamento; **sem congelar**: 1/4 dos quadros em 60% da resolução, ver `efeitos.md`) → iframe do mapa.
   Juntos, com o vídeo da abertura andando: computador fraco 12,7 → 0,4-0,5 s, tablet 6,9 → ~0,1-0,2 s, celular
   7,3 → ~0,05-0,2 s. Animações presas à rolagem e Lenis renderam pouco ou pioraram.
+
+## Peça "presa" a um elemento com parallax sai do lugar no modo leve — 2026-11-11
+- **Status:** confirmado (medido) — visto em: portfólio (crachá do "Sobre mim")
+- **Sintoma:** no modo leve, gancho/fita desenhados em HTML ficam longe da letra onde deveriam prender e a fita fica
+  curta (ou comprida); muda conforme a velocidade com que a pessoa rolou até a seção. Sem erro no console.
+- **Causa:** o elemento âncora (título) e a peça desenhada (`.lanyard`) recebiam o **mesmo** `translate` do parallax,
+  mas a peça era posicionada a partir do `getBoundingClientRect()` do título, que **já inclui** esse translate. O
+  deslocamento contava duas vezes e ficava congelado no valor do momento da última medição. O cartão (que não
+  recebia o translate) também não andava junto, então a fita encurtava.
+- **Como achar:** rolar a página inteira devagar e rápido (não pular direto para a seção) e, a cada passo, medir a
+  distância entre a âncora e a peça (`getBoundingClientRect` dos dois). Tem que ser **constante**; se varia com a
+  rolagem, há translate contado duas vezes ou peça que não acompanha.
+- **Correção:** tudo que forma um bloco (âncora, peça desenhada e cartão) recebe o mesmo translate, e quem posiciona a
+  peça desconta o translate atual das medidas.
+- **Por que a auditoria anterior não pegou:** a checagem visual do modo leve foi feita com a seção já parada na tela
+  (screenshot depois de pular até ela), e o parallax foi estendido ao `.lanyard` na própria auditoria sem repetir a
+  checagem com rolagem. Regra: **depois de mexer em parallax/translate, medir as peças presas ao longo da rolagem**.
+
+## Peça que acompanha uma animação por "tempo fixo" fica para trás em aparelho lento — 2026-11-11
+- **Status:** confirmado (medido) — visto em: portfólio (crachá do modo leve acompanhando a entrada do título)
+- **Sintoma:** só em aparelho lento (ou com a CPU desacelerada 6x no teste), o cartão fica parado fora da tela e a fita
+  sai do lugar; em PC bom nunca aparece.
+- **Causa:** o código acompanhava o título por 2,2 s fixos. A entrada do título avança por quadro (tempo limitado por
+  quadro), então em aparelho lento dura mais que 2,2 s e o acompanhamento parava no meio do caminho.
+- **Correção:** acompanhar até a animação avisar que terminou (callback de fim), nunca por tempo fixo; e refazer a
+  posição quando algo acima muda de altura (ResizeObserver no conteúdo de cima, não na seção inteira).
+- **Como testar:** `Emulation.setCPUThrottlingRate` 6 pelo CDP + rolagem com a roda (não `scrollTo`, que briga com
+  Lenis) + medir por pixels se há vão entre a âncora e a peça.

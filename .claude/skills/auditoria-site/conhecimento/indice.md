@@ -26,6 +26,8 @@ Atualize a cada entrada nova (arquivo · título · data · status).
 - tabela rápida (16 sintomas → causa → correção) · 2026-11-10 · confirmado
 - leitura de posição depois de escrita (layout forçado) · 2026-11-10 · confirmado
 - aparelho fraco lento em tudo: como achar o que pesa · 2026-11-10 · confirmado
+- peça presa a elemento com parallax sai do lugar (translate contado 2x) · 2026-11-11 · confirmado
+- peça que acompanha animação por tempo fixo fica para trás em aparelho lento · 2026-11-11 · confirmado
 
 ## Safari / iPhone (`safari-iphone.md`)
 - canvas ou vídeo em branco sem erro · 2026-11-10 · confirmado
