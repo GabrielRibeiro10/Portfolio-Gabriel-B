@@ -167,8 +167,16 @@ let lanyardOn = false;
 async function lanyard() {
   if (lanyardOn) return;
   lanyardOn = true;
-  await document.fonts.load('600 20px "Inter Tight"').catch(() => {});
-  await document.fonts.load(getComputedStyle(title).font).catch(() => {});
+  // a foto do cartão: com o <figure> escondido o loading="lazy" nem começava a baixar, e o cartão aparecia branco
+  // até a foto chegar. Baixa e decodifica antes de mostrar (falhou: mostra assim mesmo, sem travar o crachá).
+  // O Chrome às vezes nunca resolve decode() de imagem dentro do <figure> recortado: no máximo 1,5 s de espera
+  const img = fig.querySelector('img');
+  if (img) img.loading = 'eager';
+  await Promise.all([
+    document.fonts.load('600 20px "Inter Tight"').catch(() => {}),
+    document.fonts.load(getComputedStyle(title).font).catch(() => {}),
+    img && Promise.race([img.decode().catch(() => {}), new Promise((r) => setTimeout(r, 1500))]),
+  ]);
   const el = document.createElement('div');
   el.className = 'lanyard';
   el.setAttribute('aria-hidden', 'true');
