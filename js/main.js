@@ -110,24 +110,18 @@ if (animate) {
   const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
 
   // ----- abertura com a marca (como no vídeo de referência) -----
-  // Só o fundo da hero à vista: o GR aparece pequeno no centro e cresce enquanto se desenha, o fio e o nome
-  // "Gabriel Ribeiro" se revelam ao lado, a marca segura um instante e então sobe encolhendo até o lugar dela no
+  // Só o fundo da hero à vista: a marca aparece pequena no centro e cresce enquanto se revela da esquerda para a
+  // direita (o GR primeiro, depois o nome), segura um instante e então sobe encolhendo até o lugar dela no
   // canto (é a própria .logo, movida por transform: termina exatamente onde já fica). A hero entra enquanto ela pousa.
-  // No celular o nome (que lá fica escondido) aparece só na abertura e some ao pousar.
-  const logo = $('.logo'), word = $('.logo-word'), sep = $('.logo-sep');
+  const logo = $('.logo');
   const D = 2.35;   // quando o resto da hero começa (a marca pousa em ~3,3 s)
-  const wordHidden = getComputedStyle(word).display === 'none';
-  if (wordHidden) logo.classList.add('logo-intro');
   const hr = hero.getBoundingClientRect(), lr = logo.getBoundingClientRect();
-  const S = Math.min(isMobile ? 2.6 : 3.1, (hr.width * (isMobile ? 0.7 : 0.42)) / lr.width);
+  const S = Math.min(isMobile ? 2.6 : 3.1, (hr.width * (isMobile ? 0.8 : 0.42)) / lr.width);
   const dx = hr.left + hr.width / 2 - (lr.left + lr.width / 2), dy = hr.top + Math.min(hr.height, innerHeight) / 2 - (lr.top + lr.height / 2);
   gsap.set(logo, { x: dx, y: dy, scale: S * 0.55, transformOrigin: '50% 50%', autoAlpha: 0 });
-  // autoRound: false — sem ele o GSAP arredonda o px e o traço pulava de 1 para 0, sem desenhar
   tl.to(logo, { autoAlpha: 1, duration: 0.5, ease: 'power2.out' }, 0.15)
     .to(logo, { scale: S, duration: 1.6, ease: 'expo.out' }, 0.15)
-    .from($$('.logo .lg-s'), { strokeDashoffset: 1.05, autoRound: false, duration: 0.9, stagger: 0.1, ease: 'power2.inOut', clearProps: 'strokeDashoffset' }, 0.2)
-    .from(sep, { scaleY: 0, duration: 0.7, clearProps: 'transform' }, 0.85)
-    .from(word, { clipPath: 'inset(0% 100% 0% 0%)', duration: 1.0, ease: 'expo.inOut', clearProps: 'clipPath' }, 0.9)
+    .from(logo, { clipPath: 'inset(-40% 100% -40% -10%)', duration: 1.5, ease: 'expo.inOut', clearProps: 'clipPath' }, 0.2)
     .to(logo, { x: 0, y: 0, scale: 1, duration: 1.25, ease: 'expo.inOut', clearProps: 'transform' }, 2.05);
   // a página fica parada até a marca pousar no canto (roda, toque e teclado; o Lenis para junto, lá embaixo).
   // Sem mexer no overflow: a barra de rolagem não some, então nada pula de lugar ao soltar.
@@ -146,8 +140,6 @@ if (animate) {
     tl.call(free, null, 3.3);
     setTimeout(free, 6000);   // trava de segurança: nunca fica preso (aba em segundo plano, erro na animação)
   }
-  if (wordHidden) tl.to([sep, word], { autoAlpha: 0, duration: 0.35, ease: 'power1.out' }, 2.75)
-    .call(() => { logo.classList.remove('logo-intro'); gsap.set([sep, word], { clearProps: 'opacity,visibility' }); }, null, 3.35);
 
   // painel claro desenrola de cima para baixo (no celular ele fica mais abaixo: entra na rolagem)
   if (!isMobile) {
@@ -354,25 +346,10 @@ if (window.Lenis && !reduceMotion && !leve() && matchMedia('(hover: hover) and (
 // Para todos: as animações de enfeite (fundos que se mexem, brilhos, letreiro, a marca GR) param quando a
 // parte delas sai da tela e voltam quando ela aparece (o navegador não gasta tempo pintando o que não se vê)
 if ('IntersectionObserver' in window) {
-  const logo = document.querySelector('.logo-mark');
   const io = new IntersectionObserver((es) => es.forEach((e) => {
     e.target.classList.toggle('is-off', !e.isIntersecting);
-    if (logo && e.target.classList.contains('hero')) (e.isIntersecting && !leve() ? logo.unpauseAnimations() : logo.pauseAnimations());
   }), { rootMargin: '120px 0px' });
   document.querySelectorAll('.hero, .about-title, .stack, .faq-bg, .site-footer, .doc-hero').forEach((el) => io.observe(el));
-}
-// modo leve: a marca GR fica parada (o degradê que corre redesenha o traço com sombra a cada quadro)
-const stopLogo = () => { const l = document.querySelector('.logo-mark'); if (l) l.pauseAnimations(); };
-if (leve()) stopLogo();
-document.addEventListener('gr:leve', stopLogo);
-// marca: passar o mouse desenha o GR uma vez até o fim; entrar e sair de novo no meio não recomeça
-{
-  const logo = document.querySelector('.logo'), last = logo && logo.querySelector('.lg-s:last-of-type');
-  if (logo && matchMedia('(hover: hover)').matches) {
-    // na abertura a marca cresce e voa até o canto por baixo da seta: ignora até ela pousar
-    logo.addEventListener('mouseenter', () => { if (!(window.gsap && gsap.isTweening(logo))) logo.classList.add('is-drawing'); });
-    logo.addEventListener('animationend', (e) => { if (e.target === last) logo.classList.remove('is-drawing'); });
-  }
 }
 
 // "O que eu entrego": o fio laranja desce junto com a rolagem (a ponta fica a 60% da altura da tela),
