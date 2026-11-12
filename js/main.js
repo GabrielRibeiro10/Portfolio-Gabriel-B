@@ -110,9 +110,10 @@ if (animate) {
   const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
 
   // ----- abertura com a marca (como no vídeo de referência) -----
-  // Só o fundo da hero à vista: a marca aparece pequena no centro e cresce enquanto se revela da esquerda para a
-  // direita (o GR primeiro, depois o nome), segura um instante e então sobe encolhendo até o lugar dela no
-  // canto (é a própria .logo, movida por transform: termina exatamente onde já fica). A hero entra enquanto ela pousa.
+  // Só o fundo da hero à vista: a marca aparece pequena no centro e cresce enquanto o GR se desenha, o fio cresce e o
+  // nome "Gabriel Ribeiro" se revela ao lado; o brilho e o cursor acendem, a marca segura um instante e então sobe
+  // encolhendo até o lugar dela no canto (é a própria .logo, movida por transform: termina exatamente onde já fica).
+  // A hero entra enquanto ela pousa.
   const logo = $('.logo');
   const D = 2.35;   // quando o resto da hero começa (a marca pousa em ~3,3 s)
   const hr = hero.getBoundingClientRect(), lr = logo.getBoundingClientRect();
@@ -121,7 +122,10 @@ if (animate) {
   gsap.set(logo, { x: dx, y: dy, scale: S * 0.55, transformOrigin: '50% 50%', autoAlpha: 0 });
   tl.to(logo, { autoAlpha: 1, duration: 0.5, ease: 'power2.out' }, 0.15)
     .to(logo, { scale: S, duration: 1.6, ease: 'expo.out' }, 0.15)
-    .from(logo, { clipPath: 'inset(-40% 100% -40% -10%)', duration: 1.5, ease: 'expo.inOut', clearProps: 'clipPath' }, 0.2)
+    .from($('.lg-gr'), { clipPath: 'inset(0% 100% 0% 0%)', duration: 1.1, ease: 'power2.inOut', clearProps: 'clipPath' }, 0.2)
+    .from($('.lg-bar'), { scaleY: 0, duration: 0.7, clearProps: 'transform' }, 0.85)
+    .from($('.lg-name'), { clipPath: 'inset(0% 100% 0% 49%)', duration: 1.0, ease: 'expo.inOut', clearProps: 'clipPath' }, 0.9)
+    .from($$('.logo-shine, .lg-cursor'), { autoAlpha: 0, duration: 0.4, ease: 'power1.out', clearProps: 'opacity,visibility' }, 1.8)
     .to(logo, { x: 0, y: 0, scale: 1, duration: 1.25, ease: 'expo.inOut', clearProps: 'transform' }, 2.05);
   // a página fica parada até a marca pousar no canto (roda, toque e teclado; o Lenis para junto, lá embaixo).
   // Sem mexer no overflow: a barra de rolagem não some, então nada pula de lugar ao soltar.
@@ -350,6 +354,15 @@ if ('IntersectionObserver' in window) {
     e.target.classList.toggle('is-off', !e.isIntersecting);
   }), { rootMargin: '120px 0px' });
   document.querySelectorAll('.hero, .about-title, .stack, .faq-bg, .site-footer, .doc-hero').forEach((el) => io.observe(el));
+}
+// marca: passar o mouse redesenha o GR uma vez até o fim; entrar e sair de novo no meio não recomeça
+{
+  const logo = document.querySelector('.logo'), gr = logo && logo.querySelector('.lg-gr');
+  if (gr && matchMedia('(hover: hover)').matches) {
+    // na abertura a marca cresce e voa até o canto por baixo da seta: ignora até ela pousar
+    logo.addEventListener('mouseenter', () => { if (!(window.gsap && gsap.isTweening(logo))) logo.classList.add('is-drawing'); });
+    gr.addEventListener('animationend', () => logo.classList.remove('is-drawing'));
+  }
 }
 
 // "O que eu entrego": o fio laranja desce junto com a rolagem (a ponta fica a 60% da altura da tela),
