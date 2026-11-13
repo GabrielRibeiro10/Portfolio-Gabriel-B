@@ -1001,6 +1001,12 @@ a { color: inherit; text-decoration: none; }
 .lp-screen video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; opacity: 0; }   /* sem esmaecer: a imagem parada não aparece no meio */
 .lp-screen video.is-on { opacity: 1; }
 .lp-screen:has(video.is-on) img { visibility: hidden; }
+/* Tela sem "bugada" antes do site aparecer (celular fraco): a captura (720×5000 px) só aparece depois de decodificada
+   inteira (js/main.js põe .is-ready); antes a tela ficava escura e ela era pintada aos pedaços. Com o vídeo tocando, a
+   captura escondida para de animar e solta a camada enorme (maior que o limite das placas de vídeo fracas, que a
+   desenhavam em faixas). Modo leve: captura parada (o vídeo continua tocando, mais leve). */
+.pj.lp-js .lp-screen img:not(.is-ready) { opacity: 0; }
+.pj-slide .lp-screen:has(video.is-on) img, html.leve .pj-slide .lp-screen img { animation: none; will-change: auto; }
 
 /* setas, contador e indicador */
 .pj-nav { position: relative; z-index: 2; display: flex; align-items: center; gap: 12px; margin-top: clamp(18px, 2vw, 28px); }
