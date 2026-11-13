@@ -757,6 +757,12 @@ if (animate) {
       if (!svgPt) return shape.isPointInFill(new DOMPoint(x, y));
       svgPt.x = x; svgPt.y = y; return shape.isPointInFill(svgPt);
     };
+    // caixa da onda SEM o balanço (fw-sway: translateX + scaleX, origem na borda esquerda). Medir com o balanço no meio
+    // deslocava a borda calculada até ~25 px e a curva da chamada final nascia fora da onda (ficava uma ponta)
+    const waveBox = () => {
+      const r = wave.getBoundingClientRect(), m = new DOMMatrixReadOnly(getComputedStyle(wave).transform);
+      return { left: r.left - m.e, top: r.top, width: r.width / (m.a || 1), height: r.height };
+    };
     const edgeAt = (uy, from) => {
       let x = from;
       for (; x > -200; x -= 4) if (inFill(x, uy)) break;
@@ -768,7 +774,7 @@ if (animate) {
     // da faixa e desenha dali uma curva que desce na mesma direção, arredonda e segue em ondas até a direita
     const edge = () => {
       if (phone.matches || !shape || !shape.isPointInFill) { cta.style.removeProperty('--ctop'); cta.style.removeProperty('--ex'); return; }
-      const wr = wave.getBoundingClientRect(), cr = cta.getBoundingClientRect();
+      const wr = waveBox(), cr = cta.getBoundingClientRect();
       const k = Math.max(wr.width / 420, wr.height / 2400), uy = (cr.top - wr.top) / k;
       const ux = edgeAt(uy, 420);
       if (ux < 0) { cta.style.removeProperty('--ctop'); return; }
@@ -793,7 +799,7 @@ if (animate) {
     const crest = faq.querySelector('.faq-crest');
     const crestFit = () => {
       if (!crest || !shape || !shape.isPointInFill) return;
-      const wr = wave.getBoundingClientRect(), fr = faq.getBoundingClientRect();
+      const wr = waveBox(), fr = faq.getBoundingClientRect();
       const k = Math.max(wr.width / 420, wr.height / 2400), ux = edgeAt((fr.top - wr.top) / k, 420);
       const left = wr.left + ux * k - fr.left - 1, w = fr.width - left + 2;
       if (ux < 0 || w < 18) { put(crest, 'display', 'none'); return; }
