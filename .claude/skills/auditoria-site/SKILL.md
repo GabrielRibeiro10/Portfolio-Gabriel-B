@@ -16,7 +16,7 @@ mexer e grave nela o que aprender (seção "Aprendizado").**
 
 ## Antes de começar
 
-1. Leia `conhecimento/README.md` e `conhecimento/indice.md`. Depois do passo 0, leia as fichas de `efeitos.md` dos
+1. Leia `conhecimento/README.md`, `conhecimento/indice.md` e `conhecimento/novo-site.md` (o que todo site já deve ter). Depois do passo 0, leia as fichas de `efeitos.md` dos
    efeitos que o site usa e as entradas de `causas.md`, `safari-iphone.md` e `ambiente-de-teste.md` que se aplicam.
 2. Diga ao usuário onde está a skill que está usando (caminho) e se a base é a principal ou uma cópia (ver
    "Onde a skill mora").
@@ -95,6 +95,10 @@ vê o site igual. **A auditoria garante isso em todo site, sem perguntar.**
    e o modo normal nos aparelhos médios: `... desempenho.js --modo=normal --aparelhos=celular-medio,pc-medio`
    (se o site tiver WebGL, esconda o canvas para medir o resto: `--css="canvas.x{display:none!important}"`).
    Confira em cada resultado o modo em que o site ficou (linha `==`): o teste pode cair no leve no meio.
+
+2a. **Abertura / primeira tela:** `node .claude/skills/auditoria-site/scripts/abertura.js --alvo=".logo"` (troque
+   o alvo pelo elemento da abertura). Separa travadas **antes** de a página aparecer (carregamento: fontes, scripts)
+   das travadas **na** abertura. O `desempenho.js` não mede esse trecho.
 
 2b. **Efeitos de placa de vídeo:** `node .claude/skills/auditoria-site/scripts/pesados.js` e `... --largura=1366`.
    Leia a lista **inteira** (não corte com `head`: os pequenos vêm no fim e também contam). Meta: nenhuma linha
@@ -179,7 +183,9 @@ vê o site igual. **A auditoria garante isso em todo site, sem perguntar.**
 ## Aprendizado (obrigatório em toda auditoria)
 
 A skill aprende junto com o dono. **Grave automaticamente** na base `conhecimento/` tudo que for reutilizável em
-outro site, e conte no relatório o que gravou.
+outro site, e conte no relatório o que gravou. **Vale para toda correção feita num site, não só para auditorias**
+(pedido do dono): cada problema corrigido vira entrada na base **e** a regra que o teria evitado entra em
+`novo-site.md`, para o próximo site já nascer sem ele.
 
 O que gravar:
 - **Efeito novo** (marcado NOVO no passo 0, ou que você criou no site): ficha em `efeitos.md` com o marcador

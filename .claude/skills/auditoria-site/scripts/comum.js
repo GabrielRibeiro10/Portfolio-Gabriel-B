@@ -1,5 +1,26 @@
 // Peças comuns dos scripts da auditoria: perfis de aparelho, abrir página, rolar como uma pessoa.
-const { chromium } = require('playwright');
+// Playwright: se não estiver instalado, explica como (em vez de quebrar com MODULE_NOT_FOUND)
+let pw;
+try { pw = require('playwright'); } catch (e) {
+  console.error([
+    'Playwright não encontrado. Instale numa pasta de rascunho e aponte NODE_PATH para ela:',
+    '  npm i playwright@<versão do Chromium em cache: chromium-1148 = 1.49.1>  (na pasta de rascunho)',
+    '  NODE_PATH=<pasta>/node_modules node <script>',
+    'Ver conhecimento/ambiente-de-teste.md'].join('\n'));
+  process.exit(1);
+}
+// No Windows usa o Chrome instalado: o navegador que vem com o Playwright (headless shell) monta a página até 50x mais
+// devagar ali e dá números falsos (ver conhecimento/ambiente-de-teste.md). Sem Chrome instalado, cai no do Playwright.
+// AUD_NAVEGADOR=playwright força o do Playwright. Atenção: o Chrome real tem placa de vídeo, então no modo "auto" o
+// site fica no modo normal; use --modo=leve para medir o leve.
+const chromium = {
+  launch: async (o = {}) => {
+    if (process.platform === 'win32' && !o.channel && process.env.AUD_NAVEGADOR !== 'playwright') {
+      try { return await pw.chromium.launch({ ...o, channel: 'chrome' }); } catch (e) { /* sem Chrome: segue abaixo */ }
+    }
+    return pw.chromium.launch(o);
+  },
+};
 
 // Aparelhos simulados. cpu = quantas vezes mais lento que o computador do teste (1 = bom, 3 = médio, 6 = fraco).
 // toque = tela de toque (celular/tablet): o site recebe eventos de toque e "pointer: coarse".

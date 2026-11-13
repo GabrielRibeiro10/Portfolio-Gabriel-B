@@ -1,5 +1,8 @@
 # Índice da base de conhecimento
 
+## Site novo (`novo-site.md`)
+- lista de prevenção: tudo que já deu problema, virado regra de começo de projeto · 2026-11-13 · ler antes de criar qualquer site
+
 Atualize a cada entrada nova (arquivo · título · data · status).
 
 ## Efeitos (`efeitos.md`)
