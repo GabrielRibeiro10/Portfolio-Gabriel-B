@@ -535,6 +535,19 @@ document.querySelectorAll('.about-areas ol').forEach((list) => {
       count.textContent = String(i + 1).padStart(2, '0');
       dots.forEach((d, k) => d.classList.toggle('is-on', k === i));
     };
+    // captura do site na tela: só aparece decodificada inteira (css .lp-js/.is-ready); antes ela surgia aos pedaços
+    // no celular fraco. Começa a baixar junto com o vídeo, quando a seção chega perto (antes: loading="lazy", em cima da hora)
+    const shots = slides.map((s) => s.querySelector('.lp-screen img')).filter(Boolean);
+    const ready = (img) => {
+      if (img.readyOn) return; img.readyOn = true;
+      const ok = () => img.classList.add('is-ready');
+      const dec = () => Promise.race([(img.decode ? img.decode() : Promise.resolve()).catch(() => {}), new Promise((r) => setTimeout(r, 2500))]).then(ok);
+      if (img.complete) (img.naturalWidth ? dec() : ok());
+      else { img.addEventListener('load', dec, { once: true }); img.addEventListener('error', ok, { once: true }); }
+    };
+    pj.classList.add('lp-js');
+    shots.forEach(ready);
+    const eager = () => shots.forEach((img) => { img.loading = 'eager'; });
     const step = (dir) => show(Math.max(cur, 0) + dir, dir);
     slides.forEach((s, k) => { s.inert = k > 0; });
 
@@ -548,7 +561,7 @@ document.querySelectorAll('.about-areas ol').forEach((list) => {
         if (v && v.canStart) { if (inView) v.play().catch(() => {}); else v.pause(); }
       }).observe(pj);
       // o vídeo do primeiro projeto começa a baixar quando a seção chega perto
-      new IntersectionObserver(([e], o) => { if (e.isIntersecting) { o.disconnect(); load(vid(slides[0])); } }, { rootMargin: '1200px 0px' })
+      new IntersectionObserver(([e], o) => { if (e.isIntersecting) { o.disconnect(); load(vid(slides[0])); eager(); } }, { rootMargin: '1200px 0px' })
         .observe(pj);
     } else show(0);
 

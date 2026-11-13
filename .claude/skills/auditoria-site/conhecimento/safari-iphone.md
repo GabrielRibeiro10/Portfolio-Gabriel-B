@@ -43,3 +43,14 @@ baixo. Conferir com `iphone.js` (motor do Safari, todos os iPhones e iPads) e, a
   estiver ligada. Declarar a marca **antes** da primeira chamada de desenho (senão dá erro de variável usada antes de
   existir).
 - **Números:** iPhone 6 e 13 no teste: 2 → 0 avisos; crachá 3D no PC (modo normal) igual, sem erros.
+
+## Imagem muito alta numa "tela" (captura de site rolando) pisca/monta aos pedaços no celular fraco — 2026-11-13
+- **Status:** observação (relatada pelo dono num celular fraco; não reproduz no teste, que decodifica imagem rápido)
+- **Onde:** captura de página inteira (ex.: 720×5000 px) dentro de um mockup de notebook/celular, com animação de
+  rolagem e `will-change: transform`.
+- **Causa provável:** a camada fica maior que o limite de textura das placas fracas (720×5000 em tela 2x ≈ 1440×10000)
+  e é desenhada em faixas; e a imagem entra antes de terminar de decodificar.
+- **Correção (portfólio):** esconder a imagem até `img.decode()` (com trava de 2,5 s), começar a baixar junto com o vídeo
+  (não `loading="lazy"` em cima da hora), e tirar animação/`will-change` quando o vídeo cobre a imagem e no modo leve.
+- **Como conferir:** classes `.is-ready` na imagem e `animation: none; will-change: auto` com o vídeo tocando. A
+  confirmação mesmo é num celular fraco de verdade.

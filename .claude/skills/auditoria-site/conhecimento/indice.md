@@ -35,6 +35,7 @@ Atualize a cada entrada nova (arquivo · título · data · status).
 - canvas ou vídeo em branco sem erro · 2026-11-10 · confirmado
 - 3D em CSS mostra a face de trás · 2026-11-10 · confirmado
 - foto some de cartão 3D (WebGL) · 2026-11-10 · confirmado
+- imagem muito alta numa "tela" monta aos pedaços no celular fraco · 2026-11-13 · observação
 - glTexStorage2D: Texture is immutable ao desmontar o 3D (draw depois do dispose) · 2026-11-12 · confirmado
 
 ## Ambiente de teste (`ambiente-de-teste.md`)
