@@ -1,5 +1,14 @@
 /* Página 404 (404.html). Própria e leve: não carrega o style.css inteiro do site. Mesmas cores, fontes e imagem de
    fundo da hero. A fonte reserva tem a largura da Inter Tight, para nada "pular" quando ela carrega. */
+/* Fontes servidas pelo próprio site (antes vinham do Google Fonts: a página esperava o servidor do Google, DNS +
+   conexão + 2 arquivos, antes de aparecer e de rodar a abertura da hero; e o IP do visitante ia para o Google).
+   Só o conjunto latino (português inteiro). Inter Tight é variável: um arquivo serve os pesos 400 a 700. */
+@font-face { font-family: "Inter Tight"; font-style: normal; font-weight: 100 900; font-display: swap;
+  src: url(../fonts/inter-tight-latin.woff2) format("woff2"); }
+@font-face { font-family: "Instrument Serif"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url(../fonts/instrument-serif-latin.woff2) format("woff2"); }
+@font-face { font-family: "Instrument Serif"; font-style: italic; font-weight: 400; font-display: swap;
+  src: url(../fonts/instrument-serif-italic-latin.woff2) format("woff2"); }
 @font-face {
   font-family: "Inter Tight Fallback";
   src: local("Arial"), local("Helvetica"), local("Liberation Sans"), local("Roboto");

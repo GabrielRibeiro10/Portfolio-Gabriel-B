@@ -1,6 +1,15 @@
 /* fonte reserva com a mesma largura da Inter Tight (Arial/Roboto ajustadas): enquanto a Inter Tight carrega, o texto
    já ocupa o mesmo espaço e nada "pula" quando ela chega (antes o título das páginas legais quebrava numa linha a
    mais e a página subia 100 px). size-adjust = mediana de 297 textos do site (Inter Tight / Arial); métricas verticais da Inter Tight. */
+/* Fontes servidas pelo próprio site (antes vinham do Google Fonts: a página esperava o servidor do Google, DNS +
+   conexão + 2 arquivos, antes de aparecer e de rodar a abertura da hero; e o IP do visitante ia para o Google).
+   Só o conjunto latino (português inteiro). Inter Tight é variável: um arquivo serve os pesos 400 a 700. */
+@font-face { font-family: "Inter Tight"; font-style: normal; font-weight: 100 900; font-display: swap;
+  src: url(../fonts/inter-tight-latin.woff2) format("woff2"); }
+@font-face { font-family: "Instrument Serif"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url(../fonts/instrument-serif-latin.woff2) format("woff2"); }
+@font-face { font-family: "Instrument Serif"; font-style: italic; font-weight: 400; font-display: swap;
+  src: url(../fonts/instrument-serif-italic-latin.woff2) format("woff2"); }
 @font-face {
   font-family: "Inter Tight Fallback";
   src: local("Arial"), local("Helvetica"), local("Liberation Sans"), local("Roboto");
