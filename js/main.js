@@ -116,6 +116,7 @@ if (animate) {
 
   // clearProps devolve o controle ao CSS no fim (efeitos de hover usam transform)
   const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
+  tl.timeScale(1.35);   // abertura e entrada da hero ~35% mais rápidas (a marca pousa em ~3,3 s em vez de ~4,4 s)
 
   // ----- abertura da marca (~4 s) -----
   // Um fundo abstrato (.gr-open: vermelho, laranja e amarelo, formas curvas em camadas que se movem devagar) cobre a
