@@ -2210,6 +2210,22 @@ html.leve .nc-more-go::after { animation: none; }
   }
 }
 
+/* tela em pé (celular e tablet): a mesma paisagem na versão vertical (img/hero-fundo-mobile, 941x1672, sem ampliar),
+   cobrindo a primeira tela; a horizontal fica para PC e celular deitado */
+@media (max-aspect-ratio: 4/5) {
+  .hero-bg, html.leve .hero-bg {
+    background:
+      linear-gradient(180deg, rgba(240, 122, 0, 0) calc(100svh - 220px), #f07a00 100svh),
+      url("../img/hero-fundo-mobile.webp?v=1") 50% 0 / max(100%, 56.3svh) auto no-repeat,
+      url("data:image/webp;base64,UklGRqwCAABXRUJQVlA4IKACAABQDgCdASokAEAAPqlCnUmmI6MhMBquqMAVCWwAs7O0hoe1+YJU2w9E4sOeoDbe+YrztPRx/1d9A3nlf3bo7wnLy4bjzH4mHT53Z8dSNeFDeRIuIU7Lyq/z/AuRRByr//zTYwxhC4JS8643CcwBLr2N0iWvi5j9brpA3WAA/v3sHvz7X4n97fE7sP2yrPNfuMqJ/pZ+Q9sBos8xAV/9WxuyE5RydpyagfeG/MO1kzPqko0G5x8lr4Se+txt8lh0VPzFk+REeVhJ5HIToWzotBjtX8RHBYSFoTIN/Mw7uB7MaWVPScf0gU6Qkm4BqAMxna/f3jxglFEL42ca/1Im8Snl6dAqJbWvD/jAuKhVj+sGbF1ewHke/mLAGLVlyJAOBBzt6PRXe6Fn9yzmE/GlXH/TYetfCs9vZDhZPL97+ccsuITA5S7IjFKyqbKTGuu2KTwkIIqrdiYVVnpEEpecdOMszn4so9j/2TvDfVTa1YrVQkZtd+PwXU5rCa47s0eEX7XigCjqftHQ7gMapBIICW14NQz5jA//hniCi9f4cM+hkPTdvKEL+JnNSJcNPlCKMkz68s4XYMTGjm9q7Tc6aurExvbEc4/8BqEqxvpjd0KZm5I1NmcYcnu/6zfyY61kI1wwxan+Eulbj18a3Vj1tmixRzXlatBuLKfy4JuVBwaAZszdduydzeVmLzz3vh066fBeLcKm/cdeGany0+ybvak+iBPBaGvrs9RHI5TZrSY3wNgTM+1eEFNce/mlmTSfqEl9Lxjxxw4loI+p5bEvSM+bu5+6H6XV2B8LkwZ3rlOQpqbNtOTWTtVIdl+j6Dce1WwEgyxBxSwl+pHn4yPi9cjTtfcnZOWD3OOHGqmMqmMhFvnRsT6bZfyCU+/0Iv0AAAA=") 50% 0 / max(100%, 56.3svh) auto no-repeat,
+      #f07a00;
+    background:
+      linear-gradient(180deg, rgba(240, 122, 0, 0) calc(100svh - 220px), #f07a00 100svh),
+      image-set(url("../img/hero-fundo-mobile.avif?v=1") type("image/avif"), url("../img/hero-fundo-mobile.webp?v=1") type("image/webp")) 50% 0 / max(100%, 56.3svh) auto no-repeat,
+      url("data:image/webp;base64,UklGRqwCAABXRUJQVlA4IKACAABQDgCdASokAEAAPqlCnUmmI6MhMBquqMAVCWwAs7O0hoe1+YJU2w9E4sOeoDbe+YrztPRx/1d9A3nlf3bo7wnLy4bjzH4mHT53Z8dSNeFDeRIuIU7Lyq/z/AuRRByr//zTYwxhC4JS8643CcwBLr2N0iWvi5j9brpA3WAA/v3sHvz7X4n97fE7sP2yrPNfuMqJ/pZ+Q9sBos8xAV/9WxuyE5RydpyagfeG/MO1kzPqko0G5x8lr4Se+txt8lh0VPzFk+REeVhJ5HIToWzotBjtX8RHBYSFoTIN/Mw7uB7MaWVPScf0gU6Qkm4BqAMxna/f3jxglFEL42ca/1Im8Snl6dAqJbWvD/jAuKhVj+sGbF1ewHke/mLAGLVlyJAOBBzt6PRXe6Fn9yzmE/GlXH/TYetfCs9vZDhZPL97+ccsuITA5S7IjFKyqbKTGuu2KTwkIIqrdiYVVnpEEpecdOMszn4so9j/2TvDfVTa1YrVQkZtd+PwXU5rCa47s0eEX7XigCjqftHQ7gMapBIICW14NQz5jA//hniCi9f4cM+hkPTdvKEL+JnNSJcNPlCKMkz68s4XYMTGjm9q7Tc6aurExvbEc4/8BqEqxvpjd0KZm5I1NmcYcnu/6zfyY61kI1wwxan+Eulbj18a3Vj1tmixRzXlatBuLKfy4JuVBwaAZszdduydzeVmLzz3vh066fBeLcKm/cdeGany0+ybvak+iBPBaGvrs9RHI5TZrSY3wNgTM+1eEFNce/mlmTSfqEl9Lxjxxw4loI+p5bEvSM+bu5+6H6XV2B8LkwZ3rlOQpqbNtOTWTtVIdl+j6Dce1WwEgyxBxSwl+pHn4yPi9cjTtfcnZOWD3OOHGqmMqmMhFvnRsT6bZfyCU+/0Iv0AAAA=") 50% 0 / max(100%, 56.3svh) auto no-repeat,
+      #f07a00;
+  }
+}
 /* hero: volta o "sol" atrás da pessoa (disco dourado do ombro e as luzes amarelas do svg.hero-art) sobre a imagem de
    fundo; só o círculo ferrugem do alto fica escondido (a imagem já tem os arcos dela) */
 .hero-art { display: block; }
