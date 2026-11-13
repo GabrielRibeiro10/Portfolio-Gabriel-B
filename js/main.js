@@ -100,6 +100,14 @@ if (animate) {
   const pitchWords = splitWords($('.pitch-text'));
   const smallWords = splitWords($('.pitch-small'));
   const quoteWords = splitWords($('.quote-card blockquote'));
+  // modo leve (aparelho fraco): o título sobe linha por linha (mesma máscara) e os textos do painel entram inteiros,
+  // em vez de letra por letra / palavra por palavra. No PC fraco centenas de letras e palavras animando ao mesmo
+  // tempo deixavam a abertura em ~39 ms por quadro (meta 35); quem tem aparelho bom vê igual a antes
+  const L = leve();
+  const titleIn = L ? $$('.intro h1 .line') : chars;
+  const textIn = (t, words, el, dur, stag, at) => (L
+    ? t.from(el, { y: 18, autoAlpha: 0, duration: dur, ease: 'power3.out', clearProps: 'transform,opacity,visibility' }, at)
+    : t.from(words, { yPercent: 110, duration: dur, stagger: stag }, at));
   const nums = $$('[data-count]');
   nums.forEach(resetCount);
 
@@ -149,7 +157,7 @@ if (animate) {
   if (!isMobile) {
     tl.from($('.panel'), { clipPath: 'inset(0% 0% 100% 0% round 16px)', duration: 1.25, ease: 'expo.inOut', clearProps: 'clipPath' }, D + 0.05);
   }
-  tl.from(chars, { yPercent: 115, rotation: 8, transformOrigin: '0% 100%', duration: 1.25, stagger: 0.035 }, D + 0.3)
+  tl.from(titleIn, { yPercent: 115, rotation: L ? 0 : 8, transformOrigin: '0% 100%', duration: 1.25, stagger: L ? 0.1 : 0.035 }, D + 0.3)
     .from($('.tag'), { clipPath: 'inset(0% 100% 0% 0% round 999px)', duration: 1.1, ease: 'expo.inOut', clearProps: 'clipPath' }, D + 0.3)
     .from($$('.nav a'), { yPercent: -120, autoAlpha: 0, duration: 0.9, stagger: 0.06, clearProps: 'transform,opacity,visibility' }, D + 0.6)
     .from($('.btn-work'), { y: 30, scale: 0.9, autoAlpha: 0, duration: 1, clearProps: 'transform,opacity,visibility' }, D + 0.85);
@@ -246,18 +254,20 @@ if (animate) {
   }
 
   // conteúdo do painel: selo, apresentação palavra por palavra e card da citação
-  const panelIn = (t, at) => t
-    .from($('.badge'), { scale: 0.6, autoAlpha: 0, duration: 0.8, ease: 'back.out(2)', clearProps: 'transform,opacity,visibility' }, at)
-    .from(pitchWords, { yPercent: 110, duration: 1, stagger: 0.025 }, at + 0.05)
-    .from(smallWords, { yPercent: 110, duration: 0.8, stagger: 0.03 }, at + 0.4)
+  const panelIn = (t, at) => {
+    t.from($('.badge'), { scale: 0.6, autoAlpha: 0, duration: 0.8, ease: 'back.out(2)', clearProps: 'transform,opacity,visibility' }, at);
+    textIn(t, pitchWords, $('.pitch-text'), 1, 0.025, at + 0.05);
+    textIn(t, smallWords, $('.pitch-small'), 0.8, 0.03, at + 0.4);
     // card da citação: levanta em 3D (dobrado para trás, de baixo), a foto salta, nome e cargo deslizam, as
     // palavras sobem; depois a rolagem move o card e a luz dele, e no PC ele inclina seguindo o mouse
-    .fromTo(card, { y: 70, rotationX: -24, scale: 0.94, autoAlpha: 0, transformPerspective: 900, transformOrigin: '50% 100%' },
+    t.fromTo(card, { y: 70, rotationX: -24, scale: 0.94, autoAlpha: 0, transformPerspective: 900, transformOrigin: '50% 100%' },
       { y: 0, rotationX: 0, scale: 1, autoAlpha: 1, duration: 1.4, ease: 'expo.out', clearProps: 'transform,opacity,visibility' }, at + 0.3)
     .from($('.quote-head img'), { scale: 0.3, rotation: -14, autoAlpha: 0, duration: 0.9, ease: 'back.out(2.2)', clearProps: 'transform,opacity,visibility' }, at + 0.55)
-    .from($$('.quote-head strong, .quote-head span'), { x: -18, autoAlpha: 0, duration: 0.8, stagger: 0.08, clearProps: 'transform,opacity,visibility' }, at + 0.62)
-    .from(quoteWords, { yPercent: 110, duration: 0.9, stagger: 0.03 }, at + 0.7)
-    .call(cardAlive, null, at + 1.75);   // depois do fim da entrada (o clearProps dela apagaria o parallax)
+    .from($$('.quote-head strong, .quote-head span'), { x: -18, autoAlpha: 0, duration: 0.8, stagger: 0.08, clearProps: 'transform,opacity,visibility' }, at + 0.62);
+    textIn(t, quoteWords, $('.quote-card blockquote'), 0.9, 0.03, at + 0.7);
+    t.call(cardAlive, null, at + 1.75);   // depois do fim da entrada (o clearProps dela apagaria o parallax)
+    return t;
+  };
   if (!isMobile) {
     panelIn(tl, D + 0.7);
   } else {
