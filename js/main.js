@@ -222,7 +222,7 @@ if (animate) {
     // marca vem antes): o parallax da rolagem podia devolvê-la ao lugar antes, e ela aparecia durante a abertura
     // em segundos reais: a linha do tempo roda acelerada (timeScale), esta animação não. Sobe junto com a abertura
     // do fundo (D), sem esperar
-    const wait = Math.max(0, (D - tl.time()) / tl.timeScale());
+    const wait = Math.max(0, (D + 0.4 - tl.time()) / tl.timeScale());
     gsap.fromTo(person, { yPercent: 100 },
       { yPercent: 0, duration: 1.2, ease: 'expo.out', delay: wait, immediateRender: false,
         onStart: () => gsap.set(person, { autoAlpha: 1 }) });
