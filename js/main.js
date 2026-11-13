@@ -131,12 +131,14 @@ if (animate) {
   const S = Math.min(isMobile ? 2.6 : 3.1, (hr.width * (isMobile ? 0.8 : 0.42)) / lr.width);
   const cy = Math.min(hr.height, innerHeight) / 2;
   const dx = hr.left + hr.width / 2 - (lr.left + lr.width / 2), dy = hr.top + cy - (lr.top + lr.height / 2);
-  const sharp = 'blur(0px) brightness(1) drop-shadow(0 0 6px rgba(255,149,54,.55)) drop-shadow(0 2px 10px rgba(120,35,5,.35))';
+  // mesmo filtro do css (.logo): ao pousar, o clearProps não troca o brilho de uma vez (antes dava um salto)
+  const sharp = 'blur(0px) brightness(1) drop-shadow(0 0 4px rgba(255,149,54,.25))';
   // o .gr-open já aparece com a página (css: .gsap-loading), sem as formas; aqui ele passa a ser do GSAP
   gsap.set(open, { display: 'block', '--r': -30, '--cy': cy + 'px' });
   gsap.set(layers, { autoAlpha: 0 });
-  gsap.set(logo, { x: dx, y: dy, scale: S * 0.9, transformOrigin: '50% 50%', autoAlpha: 0, zIndex: 9, transition: 'none',
-    filter: lite ? sharp : 'blur(7px) brightness(1.8) drop-shadow(0 0 16px rgba(255,196,130,.95)) drop-shadow(0 2px 10px rgba(120,35,5,0))' });
+  // force3D: false = sem camada 3D: a logo fica nítida o caminho todo e não "estala" ao parar no canto
+  gsap.set(logo, { x: dx, y: dy, scale: S * 0.94, transformOrigin: '50% 50%', autoAlpha: 0, zIndex: 9, transition: 'none', force3D: false,
+    filter: lite ? sharp : 'blur(5px) brightness(1.25) drop-shadow(0 0 10px rgba(255,170,100,.45))' });
   // fundo: as três formas chegam uma depois da outra e derivam em ritmos e sentidos diferentes (xPercent/yPercent)
   const drift = [[-6, 4, -7, 5, -3, 5], [7, -5, 6, -6, 4, -4], [-3, -4, 10, 4, 3, -8]];
   tl.to(layers, { autoAlpha: 1, duration: 1.1, ease: 'power2.out', stagger: 0.18 }, 0.05);
@@ -158,7 +160,7 @@ if (animate) {
     duration: 1.7, ease: 'power2.inOut' }, 2.8)
     .to(layers, { autoAlpha: 0, duration: 1.1, ease: 'power1.in' }, 3.45)
     .set(open, { display: 'none' }, 4.65)
-    .to(logo, { x: 0, y: 0, scale: 1, duration: 1.5, ease: 'power3.inOut', clearProps: 'transform,filter,zIndex,transition,opacity,visibility' }, 2.9)
+    .to(logo, { x: 0, y: 0, scale: 1, duration: 1.6, ease: 'power2.inOut', force3D: false, clearProps: 'transform,filter,zIndex,transition,opacity,visibility' }, 2.9)
     .from($$('.logo-shine, .lg-cursor'), { autoAlpha: 0, duration: 0.4, ease: 'power1.out', clearProps: 'opacity,visibility' }, 4.3);
   // a página fica parada até a marca pousar no canto (roda, toque e teclado; o Lenis para junto, lá embaixo).
   // Sem mexer no overflow: a barra de rolagem não some, então nada pula de lugar ao soltar.
