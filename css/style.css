@@ -2182,6 +2182,7 @@ html.leve .nc-more-go::after { animation: none; }
 .hero-art g[mask] > circle:first-child { display: none; }
 /* fundo novo (paisagem escura com arcos): sem o sol amarelo atrás da pessoa e com a luz de contorno bem mais suave */
 .person-rim { opacity: .3; }
+.hero-art g[mask] > circle:nth-child(2) { display: none; }   /* sem o disco amarelo (lua) atrás do ombro */
 
 /* parallax da rolagem (js/main.js anima --hp): fora do transform, que é da entrada e do hover */
 .intro .btn-work, .stats, .socials { translate: 0 var(--hp, 0px); }
