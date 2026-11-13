@@ -2181,7 +2181,7 @@ html.leve .nc-more-go::after { animation: none; }
 .hero-art { display: block; }
 .hero-art g[mask] > circle:first-child { display: none; }
 /* fundo novo (paisagem escura com arcos): sem o sol amarelo atrás da pessoa e com a luz de contorno bem mais suave */
-.person-rim { opacity: .3; }
+.person-rim { opacity: .08; }
 .hero-art g[mask] > circle:nth-child(2) { display: none; }   /* sem o disco amarelo (lua) atrás do ombro */
 .hero-art { display: none; }   /* sem a luz amarela atrás da pessoa */
 
