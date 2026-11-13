@@ -14,7 +14,7 @@ const { chromium, args, lista, abrir, modoAtual } = require('./comum');
   if (a.fotos) fs.mkdirSync(a.fotos, { recursive: true });
   const b = await chromium.launch();
   for (const nome of aparelhos) {
-    const { ctx, page, ap, erros } = await abrir(b, nome, a.base + '/' + pagina, { espera: 4000 });
+    const { ctx, page, ap, erros } = await abrir(b, nome, a.base + '/' + pagina, { espera: +a.espera || 4000 });   // --espera=ms: sites com abertura longa em aparelho fraco
     const out = [];
     // a) alvos da primeira tela: algo por cima?
     const alvos = await page.evaluate(() => [...document.querySelectorAll('a, button, [role=button], summary')].filter((el) => {

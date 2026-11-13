@@ -10,6 +10,7 @@ Achar a causa: `causas.js --secao=#id --aparelho=celular-fraco` e confirmar desl
 | `UpdateLayoutTree` alto e um elemento com centenas de filhos mudando `style` a cada quadro | variável CSS (`--x`) mudada no pai de uma seção inteira (herda para todos os filhos) | aplicar o valor direto no elemento que se move (`translate`/`transform`), ou `@property` com `inherits: false` |
 | `Layout` alto, elemento mudando `style` a cada quadro | animar `top/left/width/height` | `transform: translate...` + `will-change: transform` |
 | `Paint` alto com algo parado na tela | `box-shadow`/`filter`/degradê animado em loop infinito | deixar fixo, ou animar `opacity` de uma camada com a sombra |
+| placa de vídeo ocupada o tempo todo com a página parada; `Paint` contínuo numa área pequena (botão, logo) | brilho/fio de luz animado **redesenhando**: degradê cônico girando por ângulo (`@property --a` no `conic-gradient`), faixa de brilho andando por `background-position`, ainda mais dentro de `mask`/`mix-blend`/`filter: drop-shadow` | desenhar o degradê **uma vez** num elemento filho e só **girar/deslizar** ele (`transform`); a máscara fica parada no pai (entrada abaixo) |
 | elemento animando em seção que já saiu da tela | loop de `requestAnimationFrame` ou ouvinte de `scroll` global sem limite | `IntersectionObserver`: só anima/escuta perto da tela; parar o loop quando assenta |
 | função JS rodando a cada quadro sem nada mudar | `getBoundingClientRect`/medições em loop "por garantia" | rodar só enquanto algo de fato se move; guardar medidas e refazer só no `resize` |
 | `getBoundingClientRect`/`offsetHeight` caros no perfil de JS, mesmo medindo poucos elementos | **leitura depois de escrita**: a medição roda depois que animações já escreveram estilos no quadro e obriga o navegador a recalcular a página inteira (ver entrada abaixo) | medir no começo do quadro, antes das escritas |
@@ -91,3 +92,25 @@ Achar a causa: `causas.js --secao=#id --aparelho=celular-fraco` e confirmar desl
   posição quando algo acima muda de altura (ResizeObserver no conteúdo de cima, não na seção inteira).
 - **Como testar:** `Emulation.setCPUThrottlingRate` 6 pelo CDP + rolagem com a roda (não `scrollTo`, que briga com
   Lenis) + medir por pixels se há vão entre a âncora e a peça.
+
+## Brilho que redesenha em vez de mover (fio de luz girando, faixa de brilho) — 2026-11-12
+- **Status:** confirmado (medido)
+- **Onde se aplica:** botões com "fio de luz" correndo pela borda, logos com reflexo passando, qualquer brilho em loop
+  feito com degradê.
+- **Sintoma:** o dono sente travadinhas na primeira tela, mesmo parada; o `desempenho.js` (sem placa de vídeo) não
+  acusa nada. Com placa de vídeo ligada no Chrome, o rastro mostra `GPUTask` e `Paint` contínuos.
+- **Causa:** a animação muda algo que faz parte do **desenho**: o ângulo de um `conic-gradient` (via `@property`) ou o
+  `background-position` de um degradê. Cada quadro é uma imagem nova: o navegador redesenha o degradê, refaz a
+  máscara (borda recortada com `mask-composite`, ou máscara com a imagem da logo), a mistura de cores e as sombras do
+  pai (`filter: drop-shadow`), 60 vezes por segundo, sem parar.
+- **Como medir:** trace do Chrome **com placa de vídeo** (`--enable-gpu --use-angle=d3d11` no Windows), somando
+  `GPUTask` e `Paint` em ~3 s com o mouse mexendo, desligando um efeito por vez (`animation: none`).
+- **Correção (mesmo visual):** o degradê vai para um elemento filho, desenhado uma vez. Fio de luz: o filho é um
+  quadrado maior que o botão (`width:150%; aspect-ratio:1` centralizado) com o `conic-gradient` fixo e
+  `animation: rotate`; o pai continua com a máscara da borda e `overflow:hidden`. Faixa de brilho: o filho tem 3x a
+  largura e anda com `translateX` (−66,667% → 0 equivale a `background-position` 100% → 0%). Conferir com fotos no
+  mesmo instante da animação (`getAnimations()`, `pause()`, `currentTime`).
+- **Números (portfólio, hero, PC com placa de vídeo, ms em 3 s):** placa de vídeo 190 → 37; pintura 51 → 2. Só o fio
+  do botão era 111 ms; o brilho da logo, 64; as sombras da logo pararam de pesar sozinhas (55 ms) porque o brilho
+  dentro delas não força mais redesenho.
+- **Limitações:** a máscara parada ainda custa na primeira pintura. `@property` animando cor/ângulo é sempre redesenho.

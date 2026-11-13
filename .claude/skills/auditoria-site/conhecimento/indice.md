@@ -16,7 +16,7 @@ Atualize a cada entrada nova (arquivo · título · data · status).
 - filter-blur · desfoque · 2026-11-10 · observação
 - mask · máscara (animada por JS: desenhar uma vez no modo leve) · 2026-11-10 · confirmado
 - mix-blend · mistura de cores · 2026-11-10 · observação
-- animacao-infinita · animações CSS em loop · 2026-11-10 · observação
+- animacao-infinita · animações CSS em loop (brilho que redesenha → girar/deslizar) · 2026-11-12 · confirmado
 - texto-letra-a-letra · texto quebrado em letras (maior peso do Maria Festinha) · 2026-11-10 · confirmado
 - css-3d · 3D em CSS · 2026-11-10 · confirmado
 - sticky · position: sticky · 2026-11-10 · observação
@@ -28,11 +28,13 @@ Atualize a cada entrada nova (arquivo · título · data · status).
 - aparelho fraco lento em tudo: como achar o que pesa · 2026-11-10 · confirmado
 - peça presa a elemento com parallax sai do lugar (translate contado 2x) · 2026-11-11 · confirmado
 - peça que acompanha animação por tempo fixo fica para trás em aparelho lento · 2026-11-11 · confirmado
+- brilho que redesenha em vez de mover (fio de luz girando, faixa de brilho) · 2026-11-12 · confirmado
 
 ## Safari / iPhone (`safari-iphone.md`)
 - canvas ou vídeo em branco sem erro · 2026-11-10 · confirmado
 - 3D em CSS mostra a face de trás · 2026-11-10 · confirmado
 - foto some de cartão 3D (WebGL) · 2026-11-10 · confirmado
+- glTexStorage2D: Texture is immutable ao desmontar o 3D (draw depois do dispose) · 2026-11-12 · confirmado
 
 ## Ambiente de teste (`ambiente-de-teste.md`)
 - instalar WebKit (install-deps) · 2026-11-10 · confirmado
@@ -42,3 +44,5 @@ Atualize a cada entrada nova (arquivo · título · data · status).
 - alarmes falsos conhecidos · 2026-11-10 · confirmado
 - dicas de medição · 2026-11-10 · confirmado
 - ferramentas para medir efeito por efeito (--js, camadas, quadro médio) · 2026-11-10 · confirmado
+- abertura longa: teste olha antes da página ficar pronta (cliente.js --espera) · 2026-11-12 · confirmado
+- rodando no Windows (Playwright, servidor, CRLF no hash, placa de vídeo) · 2026-11-12 · confirmado

@@ -158,10 +158,14 @@ leve** (versão parada mais próxima do visual) · **Cuidados** (defeitos conhec
 
 <!-- efeito: animacao-infinita -->
 ## Animações CSS em loop infinito
-- **Custo:** pintura contínua se animam `box-shadow`/`filter`/degradê; barato se só `transform`/`opacity`.
-- **Medir:** `document.getAnimations()` com `iterations === Infinity`; `Paint` alto no `causas.js` com a página parada.
+- **Custo:** pintura contínua se animam `box-shadow`/`filter`/degradê (inclusive ângulo de `conic-gradient` por
+  `@property` e `background-position`); barato se só `transform`/`opacity`.
+- **Medir:** `document.getAnimations()` com `iterations === Infinity`; `Paint` alto no `causas.js` com a página parada;
+  o custo real só aparece com placa de vídeo (trace com `GPUTask`, ver `causas.md`, "Brilho que redesenha").
+- **Correção para todos (mesmo visual):** desenhar o degradê uma vez num filho e girar/deslizar com `transform`.
+  Portfólio: placa de vídeo da hero 190 → 37 ms em 3 s.
 - **Modo leve:** parar (`animation: none`) ou deixar só `transform`/`opacity`. Pausar com a aba em segundo plano.
-- **Visto em:** portfólio, Maria Festinha. — observação
+- **Visto em:** portfólio, Maria Festinha. — confirmado (medido, 2026-11-12)
 
 <!-- efeito: texto-letra-a-letra -->
 ## Texto quebrado em letras/palavras animadas
@@ -175,6 +179,11 @@ leve** (versão parada mais próxima do visual) · **Cuidados** (defeitos conhec
   rolagem: só opacidade (sem giro 3D nem `filter`). Leitores de tela: `aria-label`/`.sr-only` com o texto inteiro.
 - **Números (Maria Festinha, modo leve, travadas somadas):** celular fraco 7,3 s → 1,9 s; computador fraco
   12,7 s → 6,0 s; tablet fraco 6,9 s → 2,8 s (só com esta mudança).
+- **Abertura da primeira tela (portfólio, 2026-11-12):** o teste começa a rolar durante a abertura, então letras do
+  título + palavras do painel caem na medição da 1ª seção (`section.panel` no PC fraco 39 ms, `META NÃO`). Modo leve
+  sem tirar o efeito: título **linha por linha** com a mesma máscara (`.line` em vez de `.char`, sem giro) e
+  parágrafos entrando **inteiros** (`y` + `opacity`). PC fraco 39 → 34 ms; celular fraco 33 → 20 ms; tablet fraco
+  32 → 21 ms. O estado final fica igual ao do modo normal (conferido por foto).
 - **Visto em:** portfólio, Maria Festinha. — confirmado (medido)
 
 <!-- efeito: css-3d -->

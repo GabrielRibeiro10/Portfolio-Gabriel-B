@@ -47,6 +47,31 @@ são do site; outras ele não consegue mostrar. Antes de corrigir ou descartar u
   Confira com `document.elementFromPoint` no centro do link depois de parado.
 - Antes de descartar qualquer aviso, **confirme no navegador** e só então anote aqui.
 
+## Abertura longa: teste olha antes da página ficar pronta — 2026-11-12
+- **Status:** confirmado
+- **Sintoma:** no aparelho fraco o `cliente.js` acha só 1 alvo na 1ª tela e testa 0 links; o `responsivo.js` acusa
+  "toque pequeno" num ícone (ex.: 15x15) que depois tem tamanho normal.
+- **Causa:** a abertura (logo, letras, ícones nascendo em escala 0,3) ainda está rodando; num processador 6x mais lento
+  ela termina ~6-10 s depois de carregar. Visto: portfólio (abertura com a marca + trava de rolagem até ela pousar).
+- **O que fazer:** `cliente.js --espera=12000` nos aparelhos fracos (novo parâmetro). Para "toque pequeno", meça o
+  elemento depois da abertura (`getBoundingClientRect` ~9 s depois) antes de corrigir.
+
+## Rodando no Windows (fora do servidor Linux) — 2026-11-12
+- **Status:** confirmado
+- **Playwright:** não vem instalado. Instale numa pasta fora do repositório (`npm install playwright` no scratchpad,
+  `npx playwright install chromium webkit`) e rode com `NODE_PATH=<pasta>\node_modules` e `PLAYWRIGHT_BROWSERS_PATH`
+  apontando para os navegadores (no Windows, com Chrome e WebKit na mesma pasta, pode exportar para todos os scripts).
+  Não precisa de `install-deps`.
+- **Servidor:** `python -m http.server` caiu no meio do `iphone.js` ("Could not connect to server" em dezenas de
+  aparelhos = alarme falso). Use `npx http-server . -p 8123 -a 127.0.0.1 -c-1` e passe `--base=http://127.0.0.1:8123`
+  (`localhost` pode resolver para `::1` e não achar o servidor).
+- **`producao.js` "script colado sem hash" (falso):** o git do Windows grava os arquivos com quebra de linha CRLF
+  (`core.autocrlf=true`); o hash do script muda, mas o site no ar (publicado do repositório, LF) bate com o
+  `vercel.json`. Confira o hash no HTML **publicado** antes de mexer. Pelo mesmo motivo, a 404 no iPhone acusou
+  "stylesheet bloqueado" só no teste local; aberta no ar no WebKit, sem bloqueio.
+- **Placa de vídeo:** o Chrome do Windows sem tela aceita `--enable-gpu --use-angle=d3d11`: dá para medir custo de
+  placa de vídeo de verdade (o servidor Linux não consegue). Use para efeitos de brilho/máscara/blur.
+
 ## Medições
 - Não rode duas medições de desempenho ao mesmo tempo (uma rouba processador da outra).
 - `pesados.js`: leia a lista inteira; não corte com `head` (itens pequenos de risco ALTO ficam no fim).

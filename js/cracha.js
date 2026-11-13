@@ -455,6 +455,7 @@ async function start() {
   const smp = Array.from({ length: S }, () => new THREE.Vector3());
   const Z = new THREE.Vector3(0, 0, 1), tan = new THREE.Vector3(), side = new THREE.Vector3(), cr = new THREE.Vector3();
   function draw() {
+    if (dead) return;   // 3D já desmontado (modo leve no meio do uso)
     toW(T, vT); toW(BL, vL); toW(BR, vR);
     up.addVectors(vL, vR).multiplyScalar(0.5).subVectors(vT, up).normalize();
     right.subVectors(vR, vL); right.addScaledVector(up, -right.dot(up)).normalize();
@@ -487,8 +488,12 @@ async function start() {
   }
 
   // ----- laço: só roda enquanto a seção está na tela e algo se mexe -----
-  let running = false, visible = true, last = 0, acc = 0, still = 0, since = 0;
+  // dead: o modo leve ligou no meio do uso e o 3D foi desmontado. Um quadro já agendado ou um reajuste de posição
+  // ainda chamavam draw() depois do renderer.dispose(): o three.js reenviava as texturas e o Safari acusava
+  // "glTexStorage2D: Texture is immutable" (visto no teste de iPhone com o modo leve ligando por lentidão)
+  let running = false, visible = true, last = 0, acc = 0, still = 0, since = 0, dead = false;
   function frame(t) {
+    if (dead) { running = false; return; }
     const dt = Math.min(0.05, (t - last) / 1000 || 1 / 60); last = t; acc += dt;
     // o título pode estar animando: o "g" muda de lugar. O gancho não pula de uma vez para a posição nova: anda um
     // pedaço em cada passo da física (num quadro atrasado o salto era grande e o cartão disparava a girar)
@@ -523,7 +528,6 @@ async function start() {
   const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
   const local = (e) => { const ar = about.getBoundingClientRect(); return { x: e.clientX - ar.left, y: e.clientY - ar.top }; };
   // modo leve ligado no meio do uso: some o 3D e volta o crachá estático
-  let dead = false;
   document.addEventListener('gr:leve', () => {
     dead = true; visible = false; drag = null; about.style.cursor = '';
     canvas.remove(); renderer.dispose(); about.classList.remove('cracha-3d'); lanyard();
