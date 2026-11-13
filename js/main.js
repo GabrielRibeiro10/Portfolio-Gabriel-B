@@ -114,8 +114,10 @@ if (animate) {
   // a foto é centralizada com translateX(-50%) no CSS; o GSAP passa a cuidar do transform
   gsap.set(withArt, { xPercent: -50, x: 0, y: 0 });
 
-  // clearProps devolve o controle ao CSS no fim (efeitos de hover usam transform)
-  const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
+  // clearProps devolve o controle ao CSS no fim (efeitos de hover usam transform). No fim avisa 'gr:hero-fim': o que
+  // pesa e está fora da tela (crachá 3D) espera a entrada acabar para não travá-la
+  const tl = gsap.timeline({ defaults: { ease: 'expo.out' },
+    onComplete: () => { window.grHeroDone = true; document.dispatchEvent(new Event('gr:hero-fim')); } });
   tl.timeScale(1.35);   // abertura e entrada da hero ~35% mais rápidas (a marca pousa em ~3,3 s em vez de ~4,4 s)
 
   // ----- abertura da marca (~4 s) -----
@@ -734,11 +736,19 @@ if (animate) {
     };
     // ponto da borda da onda (unidades do desenho) na altura uy: o primeiro ponto laranja vindo da direita
     // (passo de 4 e depois refinamento de 1: ~4x menos testes)
+    // ponto: DOMPoint nos navegadores novos; os um pouco mais antigos (Chrome até ~131) só aceitam SVGPoint e davam
+    // erro aqui (a borda da chamada e a crista não eram desenhadas)
+    let svgPt;
+    const inFill = (x, y) => {
+      if (svgPt === undefined) { try { shape.isPointInFill(new DOMPoint(0, 0)); svgPt = false; } catch (e) { svgPt = shape.ownerSVGElement.createSVGPoint(); } }
+      if (!svgPt) return shape.isPointInFill(new DOMPoint(x, y));
+      svgPt.x = x; svgPt.y = y; return shape.isPointInFill(svgPt);
+    };
     const edgeAt = (uy, from) => {
       let x = from;
-      for (; x > -200; x -= 4) if (shape.isPointInFill(new DOMPoint(x, uy))) break;
+      for (; x > -200; x -= 4) if (inFill(x, uy)) break;
       if (x <= -200) return -1;
-      for (let y = Math.min(from, x + 4); y >= x; y -= 1) if (shape.isPointInFill(new DOMPoint(y, uy))) return y;
+      for (let y = Math.min(from, x + 4); y >= x; y -= 1) if (inFill(y, uy)) return y;
       return x;
     };
     // PC: a borda de cima da chamada final sai da onda laranja da esquerda. Acha onde a borda da onda cruza o topo

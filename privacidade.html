@@ -14,9 +14,7 @@
   <link rel="icon" href="img/favicon-32.png" sizes="32x32" type="image/png">
   <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" as="font" type="font/woff2" href="fonts/inter-tight-latin.woff2" crossorigin>
   <!-- primeiro de tudo: recarregar volta ao topo e o modo leve para aparelhos fracos -->
   <script src="js/desempenho.js"></script>
   <link rel="stylesheet" href="css/style.css">
@@ -64,7 +62,7 @@
       <h1 class="doc-title">Política de <em>Privacidade</em></h1>
       <p class="doc-lead">Quais dados este site trata, para quê, com quem eles são compartilhados e como você controla tudo isso, de acordo com a Lei Geral de Proteção de Dados.</p>
       <ul class="doc-meta">
-        <li><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3.5" width="11" height="10" rx="2"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3"/></svg>Última atualização: <time datetime="2026-11-03">3 de novembro de 2026</time></li>
+        <li><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3.5" width="11" height="10" rx="2"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3"/></svg>Última atualização: <time datetime="2026-11-13">13 de novembro de 2026</time></li>
         <li><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.5"/><path d="M8 5v3l2 1.5"/></svg>Leitura de 4 min</li>
         <li><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.8l5 1.9v3.7c0 3.2-2.1 5.9-5 6.8-2.9-.9-5-3.6-5-6.8V3.7z"/><path d="M5.8 8l1.5 1.5 3-3.1"/></svg>LGPD · Lei nº 13.709/2018</li>
       </ul>
@@ -139,14 +137,13 @@
         <p><strong>Não vendo nem alugo dados pessoais.</strong> Eles só passam pelos fornecedores necessários para o site funcionar:</p>
         <ul>
           <li><strong>Vercel Inc.</strong>, hospedagem do site: trata os dados de navegação.</li>
-          <li><strong>Google (Google Fonts)</strong>, que entrega as fontes do site: recebe o endereço IP do seu navegador quando as fontes são carregadas.</li>
           <li><strong>WhatsApp (Meta)</strong>, onde acontecem as conversas, de acordo com a política de privacidade do próprio WhatsApp.</li>
         </ul>
         <p>Os dados também podem ser entregues a autoridades públicas quando houver obrigação legal ou ordem judicial.</p>
       </section>
       <section class="doc-sec" id="internacional" aria-labelledby="internacional-t">
         <h2 id="internacional-t"><b>05</b>Transferência internacional</h2>
-        <p>A Vercel, o Google e o WhatsApp podem armazenar e processar dados em servidores fora do Brasil, principalmente nos Estados Unidos. Essas transferências seguem o artigo 33 da LGPD e as garantias contratuais oferecidas por esses fornecedores.</p>
+        <p>A Vercel e o WhatsApp podem armazenar e processar dados em servidores fora do Brasil, principalmente nos Estados Unidos. Essas transferências seguem o artigo 33 da LGPD e as garantias contratuais oferecidas por esses fornecedores.</p>
       </section>
       <section class="doc-sec" id="retencao" aria-labelledby="retencao-t">
         <h2 id="retencao-t"><b>06</b>Por quanto tempo os dados ficam guardados</h2>

@@ -115,7 +115,15 @@ if (fig && title) {
     o.disconnect(); boot();
   }, { rootMargin: '400px 0px' }).observe(slot);
   const idle = (f) => ('requestIdleCallback' in window ? requestIdleCallback(f, { timeout: 4000 }) : setTimeout(f, 1500));
-  const early = () => setTimeout(() => idle(() => { if (!scrolling) boot(); else setTimeout(early, 600); }), 3400);   // logo depois que a marca da abertura pousa (antes de a pessoa rolar)
+  // logo depois que a entrada da hero termina (aviso 'gr:hero-fim' do js/main.js), antes de a pessoa rolar. Antes era um
+  // tempo fixo (3,4 s) que caía no meio da entrada: o three.js montando travava o painel e o título entrando.
+  const tryBoot = () => idle(() => { if (!scrolling) boot(); else setTimeout(tryBoot, 600); });
+  const early = () => {
+    if (window.grHeroDone) return setTimeout(tryBoot, 300);
+    let go = false; const once = () => { if (!go) { go = true; setTimeout(tryBoot, 300); } };
+    document.addEventListener('gr:hero-fim', once, { once: true });
+    setTimeout(once, 7000);   // trava: sem GSAP / menos movimento o aviso não vem
+  };
   let scrolling = false, st = 0;
   addEventListener('scroll', () => { scrolling = true; clearTimeout(st); st = setTimeout(() => { scrolling = false; }, 250); }, { passive: true });
   if (document.readyState === 'complete') early(); else addEventListener('load', early, { once: true });

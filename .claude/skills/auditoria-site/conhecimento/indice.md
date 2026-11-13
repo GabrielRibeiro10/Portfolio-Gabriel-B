@@ -29,6 +29,7 @@ Atualize a cada entrada nova (arquivo · título · data · status).
 - peça presa a elemento com parallax sai do lugar (translate contado 2x) · 2026-11-11 · confirmado
 - peça que acompanha animação por tempo fixo fica para trás em aparelho lento · 2026-11-11 · confirmado
 - brilho que redesenha em vez de mover (fio de luz girando, faixa de brilho) · 2026-11-12 · confirmado
+- página demora a aparecer: Google Fonts + peso fora da tela no meio da abertura · 2026-11-13 · confirmado
 
 ## Safari / iPhone (`safari-iphone.md`)
 - canvas ou vídeo em branco sem erro · 2026-11-10 · confirmado
@@ -38,6 +39,7 @@ Atualize a cada entrada nova (arquivo · título · data · status).
 
 ## Ambiente de teste (`ambiente-de-teste.md`)
 - instalar WebKit (install-deps) · 2026-11-10 · confirmado
+- Windows: usar Chrome instalado (headless shell 50x mais lento no layout) · 2026-11-13 · confirmado
 - sem placa de vídeo: site cai no modo leve sozinho · 2026-11-10 · confirmado
 - WebGL exagerado no teste · 2026-11-10 · confirmado
 - régua: comparar com site conhecido · 2026-11-10 · confirmado

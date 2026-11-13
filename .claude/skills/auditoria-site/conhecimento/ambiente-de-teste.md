@@ -29,6 +29,19 @@ são do site; outras ele não consegue mostrar. Antes de corrigir ou descartar u
 - **O que fazer:** medir o resto escondendo o canvas (`--css="canvas.x{display:none!important}"`). O custo real do
   3D só num aparelho.
 
+## Windows: usar o Chrome instalado, não o "headless shell" do Playwright — 2026-11-13
+- **Status:** confirmado (medido)
+- **Sintoma:** no Windows, layouts de 0,5–2 s até em página simples (acessibilidade.html: 1 s para 420 objetos);
+  todos os aparelhos, até o PC bom, parecem travar no carregamento. Visita de aquecimento não resolve.
+- **Causa:** o `chromium_headless_shell` do Playwright monta texto/fontes muito devagar nesse ambiente.
+- **Correção:** `chromium.launch({ channel: 'chrome' })` (Chrome instalado): o mesmo layout cai para 2–19 ms. Com o
+  Chrome real há placa de vídeo, então a detecção automática dá "normal"; force `--modo=leve` para medir o leve.
+- **Playwright ausente:** instale numa pasta de rascunho a versão que bate com o Chromium em cache
+  (`ms-playwright/chromium-1148` = playwright@1.49.1) e use `NODE_PATH=<pasta>/node_modules`.
+- **Abertura da página:** o `desempenho.js` só mede depois da abertura. Para a hero, marque eventos
+  (DOMContentLoaded, "marca aparece", fim da entrada) junto das travadas longas: travada antes da tela aparecer não é
+  travada da animação.
+
 ## Régua do teste: comparar com um site conhecido — 2026-11-10
 - **Status:** confirmado
 - **Quando:** números ruins demais em tudo. Rode o mesmo `desempenho.js` no portfólio (que passa): se ele também

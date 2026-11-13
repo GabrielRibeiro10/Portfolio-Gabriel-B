@@ -114,3 +114,15 @@ Achar a causa: `causas.js --secao=#id --aparelho=celular-fraco` e confirmar desl
   do botão era 111 ms; o brilho da logo, 64; as sombras da logo pararam de pesar sozinhas (55 ms) porque o brilho
   dentro delas não força mais redesenho.
 - **Limitações:** a máscara parada ainda custa na primeira pintura. `@property` animando cor/ângulo é sempre redesenho.
+## Página demora a aparecer: Google Fonts e peso fora da tela no meio da abertura — 2026-11-13
+- **Status:** confirmado (medido, Chrome real, CPU 3x/6x)
+- **Onde:** qualquer site com `fonts.googleapis.com` no `<head>` e scripts `defer` que montam a abertura.
+- **Sintoma:** a tela fica vazia vários segundos; as travadas grandes ficam **antes** do DOMContentLoaded (meça com
+  eventos: DOMContentLoaded, "marca/hero aparece", fim da entrada), não durante a animação.
+- **Causa:** o CSS externo do Google segura a primeira pintura **e** os scripts `defer` (DNS + conexão + 2 arquivos).
+- **Correção:** fontes no próprio site (`fonts/*.woff2`, só o conjunto latino; fonte variável = 1 arquivo para todos
+  os pesos), `@font-face` com `font-display: swap` no CSS principal, `preload` da fonte do texto, tirar o Google da
+  CSP e **da política de privacidade** (deixa de receber o IP do visitante).
+- **Números (portfólio):** marca aparecendo: PC médio 5,4 s → 2,5–3,4 s; PC fraco 7,1 s → 3,5–4,0 s.
+- **Junto:** efeito pesado fora da tela (crachá 3D/three.js) que liga por tempo fixo caiu no meio da entrada. Ligue-o
+  por um aviso de "entrada terminou" (`gr:hero-fim`), não por relógio. PC bom: travadas da abertura 2,7 s → 1,8 s.
