@@ -90,13 +90,22 @@
     </g>
   </svg>
 
+  <!-- abertura da marca: fundo abstrato em camadas (vermelho, laranja e amarelo, formas curvas que se movem devagar)
+       por cima da hero; no fim ele se abre do centro e se afasta (js/main.js). Fica escondido sem a abertura. -->
+  <div class="gr-open" aria-hidden="true">
+    <i class="gr-open__l gr-open__l1"></i>
+    <i class="gr-open__l gr-open__l2"></i>
+    <i class="gr-open__l gr-open__l3"></i>
+  </div>
+
   <!-- marca: logo GR + Gabriel Ribeiro (img/logo-gabriel-ribeiro.webp, fundo transparente) em três recortes da mesma
-       imagem (GR, fio e nome), para a abertura revelar um de cada vez; o brilho que corre e o cursor piscando por cima -->
+       imagem (GR, fio e nome; o hover redesenha o GR); o brilho que corre, o reflexo único da abertura e o cursor -->
   <a class="logo" href="#" aria-label="Gabriel Ribeiro, início">
     <img class="logo-mark lg-gr" src="img/logo-gabriel-ribeiro.webp" alt="" width="900" height="299" decoding="async" fetchpriority="high">
     <img class="logo-mark lg-bar" src="img/logo-gabriel-ribeiro.webp" alt="" width="900" height="299" decoding="async">
     <img class="logo-mark lg-name" src="img/logo-gabriel-ribeiro.webp" alt="" width="900" height="299" decoding="async">
     <span class="logo-shine" aria-hidden="true"><i></i></span>
+    <span class="lg-flash" aria-hidden="true"><i></i></span>
     <span class="lg-cursor" aria-hidden="true"></span>
   </a>
 

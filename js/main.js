@@ -117,24 +117,49 @@ if (animate) {
   // clearProps devolve o controle ao CSS no fim (efeitos de hover usam transform)
   const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
 
-  // ----- abertura com a marca (como no vídeo de referência) -----
-  // Só o fundo da hero à vista: a marca aparece pequena no centro e cresce enquanto o GR se desenha, o fio cresce e o
-  // nome "Gabriel Ribeiro" se revela ao lado; o brilho e o cursor acendem, a marca segura um instante e então sobe
-  // encolhendo até o lugar dela no canto (é a própria .logo, movida por transform: termina exatamente onde já fica).
-  // A hero entra enquanto ela pousa.
-  const logo = $('.logo');
-  const D = 2.35;   // quando o resto da hero começa (a marca pousa em ~3,3 s)
+  // ----- abertura da marca (~4 s) -----
+  // Um fundo abstrato (.gr-open: vermelho, laranja e amarelo, formas curvas em camadas que se movem devagar) cobre a
+  // hero. No centro a marca surge primeiro como um brilho difuso (desfocada e clara) e fica nítida e estável; um
+  // reflexo de luz atravessa a logo uma vez. Depois o fundo se abre do centro e as camadas se afastam crescendo,
+  // revelando a hero, enquanto a marca vai encolhendo até o lugar dela no canto (é a própria .logo, movida por
+  // transform: termina exatamente onde já fica). A imagem da logo não muda: só opacidade, escala, foco e luz.
+  // Modo leve: sem desfoque e sem a máscara que abre (repintam a cada quadro); o fundo só se apaga crescendo.
+  const logo = $('.logo'), open = $('.gr-open'), layers = $$('.gr-open__l');
+  const lite = leve();
+  const D = 2.85;   // quando o resto da hero começa: junto com a abertura do fundo (a marca pousa em ~4,4 s)
   const hr = hero.getBoundingClientRect(), lr = logo.getBoundingClientRect();
   const S = Math.min(isMobile ? 2.6 : 3.1, (hr.width * (isMobile ? 0.8 : 0.42)) / lr.width);
-  const dx = hr.left + hr.width / 2 - (lr.left + lr.width / 2), dy = hr.top + Math.min(hr.height, innerHeight) / 2 - (lr.top + lr.height / 2);
-  gsap.set(logo, { x: dx, y: dy, scale: S * 0.55, transformOrigin: '50% 50%', autoAlpha: 0 });
-  tl.to(logo, { autoAlpha: 1, duration: 0.5, ease: 'power2.out' }, 0.15)
-    .to(logo, { scale: S, duration: 1.6, ease: 'expo.out' }, 0.15)
-    .from($('.lg-gr'), { clipPath: 'inset(0% 100% 0% 0%)', duration: 1.1, ease: 'power2.inOut', clearProps: 'clipPath' }, 0.2)
-    .from($('.lg-bar'), { scaleY: 0, duration: 0.7, clearProps: 'transform' }, 0.85)
-    .from($('.lg-name'), { clipPath: 'inset(0% 100% 0% 49%)', duration: 1.0, ease: 'expo.inOut', clearProps: 'clipPath' }, 0.9)
-    .from($$('.logo-shine, .lg-cursor'), { autoAlpha: 0, duration: 0.4, ease: 'power1.out', clearProps: 'opacity,visibility' }, 1.8)
-    .to(logo, { x: 0, y: 0, scale: 1, duration: 1.25, ease: 'expo.inOut', clearProps: 'transform' }, 2.05);
+  const cy = Math.min(hr.height, innerHeight) / 2;
+  const dx = hr.left + hr.width / 2 - (lr.left + lr.width / 2), dy = hr.top + cy - (lr.top + lr.height / 2);
+  const sharp = 'blur(0px) brightness(1) drop-shadow(0 0 6px rgba(255,149,54,.55)) drop-shadow(0 2px 10px rgba(120,35,5,.35))';
+  // o .gr-open já aparece com a página (css: .gsap-loading), sem as formas; aqui ele passa a ser do GSAP
+  gsap.set(open, { display: 'block', '--r': -30, '--cy': cy + 'px' });
+  gsap.set(layers, { autoAlpha: 0 });
+  gsap.set(logo, { x: dx, y: dy, scale: S * 0.9, transformOrigin: '50% 50%', autoAlpha: 0, zIndex: 9, transition: 'none',
+    filter: lite ? sharp : 'blur(7px) brightness(1.8) drop-shadow(0 0 16px rgba(255,196,130,.95)) drop-shadow(0 2px 10px rgba(120,35,5,0))' });
+  // fundo: as três formas chegam uma depois da outra e derivam em ritmos e sentidos diferentes (xPercent/yPercent)
+  const drift = [[-6, 4, -7, 5, -3, 5], [7, -5, 6, -6, 4, -4], [-3, -4, 10, 4, 3, -8]];
+  tl.to(layers, { autoAlpha: 1, duration: 1.1, ease: 'power2.out', stagger: 0.18 }, 0.05);
+  layers.forEach((l, i) => {
+    const [x0, y0, r0, x1, y1, r1] = drift[i];
+    tl.fromTo(l, { xPercent: x0, yPercent: y0, rotation: r0 }, { xPercent: x1, yPercent: y1, rotation: r1, duration: 4.4, ease: 'sine.inOut' }, 0);
+  });
+  // marca: brilho difuso → nítida e estável → reflexo
+  tl.to(logo, { autoAlpha: 1, duration: 0.7, ease: 'power2.out' }, 0.35)
+    .to(logo, { scale: S, duration: 2.2, ease: 'power3.out' }, 0.35);
+  if (!lite) tl.to(logo, { filter: sharp, duration: 1.15, ease: 'power2.inOut' }, 0.75);
+  tl.fromTo($('.lg-flash i'), { xPercent: -100 }, { xPercent: 100, duration: 0.9, ease: 'power2.inOut', immediateRender: false }, 2.0);
+  // o fundo se abre do centro e se afasta: cada forma vai para o seu lado (x/y, à parte da deriva) crescendo como se
+  // passasse pela câmera e apagando; a hero entra por trás, pela abertura
+  const away = [[-0.22, 0.2, 1.7], [0.22, -0.2, 1.8], [0.16, 0.18, 2.3]];
+  if (lite) tl.to(open, { autoAlpha: 0, duration: 1.5, ease: 'power1.inOut' }, 2.85);
+  else tl.to(open, { '--r': 115, duration: 1.8, ease: 'power1.inOut' }, 2.8);
+  tl.to(layers, { x: (i) => away[i][0] * hr.width, y: (i) => away[i][1] * hr.height, scale: (i) => away[i][2],
+    duration: 1.7, ease: 'power2.inOut' }, 2.8)
+    .to(layers, { autoAlpha: 0, duration: 1.1, ease: 'power1.in' }, 3.45)
+    .set(open, { display: 'none' }, 4.65)
+    .to(logo, { x: 0, y: 0, scale: 1, duration: 1.5, ease: 'power3.inOut', clearProps: 'transform,filter,zIndex,transition,opacity,visibility' }, 2.9)
+    .from($$('.logo-shine, .lg-cursor'), { autoAlpha: 0, duration: 0.4, ease: 'power1.out', clearProps: 'opacity,visibility' }, 4.3);
   // a página fica parada até a marca pousar no canto (roda, toque e teclado; o Lenis para junto, lá embaixo).
   // Sem mexer no overflow: a barra de rolagem não some, então nada pula de lugar ao soltar.
   {
@@ -149,8 +174,8 @@ if (animate) {
       evs.forEach((t) => removeEventListener(t, block, { passive: false }));
       document.dispatchEvent(new Event('gr:intro-fim'));
     };
-    tl.call(free, null, 3.3);
-    setTimeout(free, 6000);   // trava de segurança: nunca fica preso (aba em segundo plano, erro na animação)
+    tl.call(free, null, 4.45);
+    setTimeout(free, 7000);   // trava de segurança: nunca fica preso (aba em segundo plano, erro na animação)
   }
 
   // painel claro desenrola de cima para baixo (no celular ele fica mais abaixo: entra na rolagem)
