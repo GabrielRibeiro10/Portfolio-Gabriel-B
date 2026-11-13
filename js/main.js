@@ -220,12 +220,14 @@ if (animate) {
   photoReady().then(() => requestAnimationFrame(() => requestAnimationFrame(() => {
     // sobe de baixo da moldura, inteira e opaca (sem efeito de aparecer). Fica invisível até a hora (a abertura com a
     // marca vem antes): o parallax da rolagem podia devolvê-la ao lugar antes, e ela aparecia durante a abertura
-    const wait = Math.max(0, D + 0.5 - tl.time());
+    // em segundos reais: a linha do tempo roda acelerada (timeScale), esta animação não. Sobe junto com a abertura
+    // do fundo (D), sem esperar
+    const wait = Math.max(0, (D - tl.time()) / tl.timeScale());
     gsap.fromTo(person, { yPercent: 100 },
-      { yPercent: 0, duration: 1.4, ease: 'expo.out', delay: wait, immediateRender: false,
+      { yPercent: 0, duration: 1.2, ease: 'expo.out', delay: wait, immediateRender: false,
         onStart: () => gsap.set(person, { autoAlpha: 1 }) });
     // o desenho amarelo aparece atrás quando a foto está chegando
-    if (art.length) gsap.to(art, { autoAlpha: 1, scale: 1, duration: 1.3, ease: 'expo.out', delay: Math.max(0, D + 0.5 - tl.time()) + 0.55 });
+    if (art.length) gsap.to(art, { autoAlpha: 1, scale: 1, duration: 1.3, ease: 'expo.out', delay: wait + 0.4 });
   })));
 
   // card da citação, depois da entrada: parallax e luz que acompanham a rolagem (ScrollTrigger com scrub) e, no PC
