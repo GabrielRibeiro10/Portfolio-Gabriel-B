@@ -31,12 +31,136 @@
   <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
   <link rel="preload" as="font" type="font/woff2" href="fonts/inter-tight-latin.woff2" crossorigin>
   <!-- foto da hero (recorte com a luz pintada); o ?v= troca quando a foto muda, para o cache de 7 dias não segurar a antiga -->
-  <link rel="preload" as="image" href="img/gabriel-hero.webp?v=12" fetchpriority="high">
+  <link rel="preload" as="image" href="img/gabriel-hero.webp?v=12" imagesrcset="img/gabriel-hero-800.webp?v=12 800w, img/gabriel-hero.webp?v=12 1024w" imagesizes="(max-aspect-ratio: 4/5) min(100vw, 50vh), 80vh" fetchpriority="high">
   <!-- fundo da hero baixa junto com a página (antes só depois do CSS: a tela ficava laranja chapada por um instante) -->
   <link rel="preload" as="image" href="img/hero-fundo.avif?v=4" type="image/avif" media="(min-aspect-ratio: 4/5)" fetchpriority="high">
   <link rel="preload" as="image" href="img/hero-fundo-mobile.avif?v=1" type="image/avif" media="(max-aspect-ratio: 4/5)" fetchpriority="high">
   <!-- primeiro de tudo: recarregar volta ao topo e o modo leve para aparelhos fracos -->
-  <script src="js/desempenho.js"></script>
+  <!-- cópia embutida de js/desempenho.js (as outras páginas usam o arquivo): embutida para não bloquear a primeira
+       pintura com mais um download. Mudou o js/desempenho.js? Copie aqui e gere a assinatura de novo no vercel.json. -->
+  <script>
+(() => {
+  const html = document.documentElement;
+  // Segmentos em galeria (js/segmentos.js): o layout dela vale desde a primeira pintura, senão a seção mudava de altura
+  // quando o script rodasse e a página "pulava" (em celular fraco, ~1,7 s depois de abrir)
+  try { if (!matchMedia('(prefers-reduced-motion: reduce)').matches) html.classList.add('nc-gal-on'); } catch (e) { /* sem matchMedia */ }
+
+  // ---------- 1) recarregar → topo ----------
+  let reload = false;
+  try {
+    const nav = performance.getEntriesByType('navigation')[0];
+    reload = nav ? nav.type === 'reload' : performance.navigation && performance.navigation.type === 1;
+  } catch (e) { /* navegador antigo: segue o padrão */ }
+  if (reload) {
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    if (location.hash) history.replaceState(history.state, '', location.pathname + location.search);
+    const top = () => { if (scrollY || document.documentElement.scrollTop) window.scrollTo(0, 0); };
+    top();
+    document.addEventListener('DOMContentLoaded', top);
+    addEventListener('load', () => { top(); requestAnimationFrame(top); setTimeout(top, 60); });
+  }
+  window.grReload = reload;
+
+  // ---------- 2) modo leve ----------
+  // A decisão sai antes da primeira pintura: a hero já abre no modo certo e nada desliga no meio da entrada.
+  let force = null;
+  try { force = new URLSearchParams(location.search).get('leve'); } catch (e) { /* sem URLSearchParams */ }
+  const ss = (k, v) => { try { if (v === undefined) return sessionStorage.getItem(k); sessionStorage.setItem(k, v); } catch (e) { return null; } };
+  if (force === '0') { ss('gr-leve', '0'); return; }
+
+  const on = (why) => {
+    if (html.classList.contains('leve')) return;
+    html.classList.add('leve');
+    html.dataset.leve = why;
+    if (force !== '1') ss('gr-leve', '1');
+    document.dispatchEvent(new CustomEvent('gr:leve', { detail: why }));
+  };
+  window.grLeve = on;
+
+  // Perfil do aparelho: placa de vídeo + processador + memória. É do aparelho, não da visita, então fica
+  // guardado (localStorage, 30 dias) e as próximas visitas nem medem de novo.
+  const KEY = 'gr-perfil-v2';
+  const profile = () => {
+    try { const p = JSON.parse(localStorage.getItem(KEY)); if (p && Date.now() - p.t < 2592e6) return p; } catch (e) { /* sem storage */ }
+    const p = { t: Date.now(), gpu: '', cpu: 0, why: '' };
+
+    // placa de vídeo: sem WebGL, ou WebGL só por software (o navegador avisa com failIfMajorPerformanceCaveat),
+    // ou uma placa conhecida por ser fraca
+    try {
+      const cv = document.createElement('canvas');
+      const gl = cv.getContext('webgl', { failIfMajorPerformanceCaveat: true });
+      if (!gl) p.why = 'gpu';
+      else {
+        const ext = gl.getExtension('WEBGL_debug_renderer_info');
+        p.gpu = String(gl.getParameter(ext ? ext.UNMASKED_RENDERER_WEBGL : gl.RENDERER) || '');
+        if (/swiftshader|llvmpipe|softpipe|software|basic render|gdi generic|mali-[2-4]\d\d|mali-t[0-8]\d\d|mali-g[35]1\b|adreno\D*([1-4]\d\d|50\d)\b|powervr sgx|ge8\d{3}|videocore|\bgma\b|hd graphics( family)?\b(?! \d)|hd graphics [2-4]\d{3}\b/i.test(p.gpu)) p.why = 'gpu';
+        const lose = gl.getExtension('WEBGL_lose_context');
+        if (lose) lose.loseContext();
+      }
+    } catch (e) { p.why = 'gpu'; }
+
+    // processador: quanta conta cabe em 3 ms, 4 vezes, valendo a melhor (uma interrupção só piora o número).
+    // ~12 ms no total, antes de existir algo na tela. Computador comum ≈ 1500+, celular fraco < 350.
+    const bench = () => {
+      const a = new Float64Array(256);
+      let x = 0, best = 0;
+      for (let w = 0; w < 4; w++) {
+        let n = 0;
+        const end = performance.now() + 3;
+        do { for (let i = 0; i < 200; i++) a[i & 255] = x = (x + Math.sqrt(n + i) * 1.0001) % 1e6; n += 200; }
+        while (performance.now() < end && n < 4e5);   // teto: relógio impreciso (Firefox protegido) não trava
+        if (n > best) best = n;
+      }
+      return Math.round(best / 100) + (a[7] < 0 ? 1 : 0);
+    };
+    p.cpu = bench();
+    if (p.cpu < 350) p.cpu = Math.max(p.cpu, bench());   // confirma antes de concluir que é fraco
+
+    const apple = /apple/i.test(p.gpu);   // Safari esconde memória e núcleos: ali vale só a medida
+    const cores = navigator.hardwareConcurrency || 8, mem = navigator.deviceMemory || 8;
+    if (!p.why && p.cpu < 350) p.why = 'cpu';
+    if (!p.why && !apple && (cores <= 2 || mem <= 2)) p.why = 'aparelho';
+    try { localStorage.setItem(KEY, JSON.stringify(p)); } catch (e) { /* sem storage */ }
+    return p;
+  };
+
+  const c = navigator.connection || {};
+  if (force === '1') on('forçado');
+  else if (ss('gr-leve') === '1') on('sessão');
+  else if (c.saveData || /(^|-)2g$/.test(c.effectiveType || '')) on('dados');
+  else {
+    const p = profile();
+    window.grPerfil = p;   // para conferir no console
+    if (p.why) on(p.why);
+  }
+  if (html.classList.contains('leve') || ss('gr-leve') === '0') return;
+
+  // ---------- rede de segurança: só para lentidão de verdade ----------
+  // Um engasgo isolado (o three.js do crachá chegando, um vídeo começando) não conta. Mede em janelas de
+  // 2 s (com a aba à vista, nos primeiros segundos depois da entrada e enquanto a pessoa rola) e só liga
+  // se duas janelas seguidas tiverem a mediana abaixo de ~25 quadros por segundo. 30 fps fixos (modo
+  // economia de bateria do iPhone) não contam como lento.
+  let frames = [], spent = 0, bad = 0, last = 0, raf = 0, until = 0;
+  const tick = (t) => {
+    raf = 0;
+    const dt = last ? t - last : 0;
+    last = t;
+    if (dt > 0 && dt < 250 && document.visibilityState === 'visible') { frames.push(dt); spent += dt; }
+    if (spent >= 2000) {
+      frames.sort((a, b) => a - b);
+      bad = frames[frames.length >> 1] > 40 ? bad + 1 : 0;
+      frames = []; spent = 0;
+      if (bad >= 2) { on('fps'); removeEventListener('scroll', onScroll); return; }
+    }
+    if (performance.now() < until) raf = requestAnimationFrame(tick);
+    else last = 0;
+  };
+  const watch = (ms) => { until = Math.max(until, performance.now() + ms); if (!raf) raf = requestAnimationFrame(tick); };
+  const onScroll = () => watch(300);
+  addEventListener('load', () => setTimeout(() => watch(4200), 2600), { once: true });   // depois da entrada da hero
+  addEventListener('scroll', onScroll, { passive: true });
+})();
+  </script>
   <link rel="stylesheet" href="css/style.css">
   <!-- ATENÇÃO: o vercel.json libera só este script embutido pela assinatura (sha256 no Content-Security-Policy).
        Mudou uma vírgula aqui dentro? Gere a assinatura de novo, senão o navegador bloqueia o script. -->
@@ -99,9 +223,9 @@
   <!-- marca: logo GR + Gabriel Ribeiro (img/logo-gabriel-ribeiro.webp, fundo transparente) em três recortes da mesma
        imagem (GR, fio e nome; o hover redesenha o GR); o brilho que corre, o reflexo único da abertura e o cursor -->
   <a class="logo" href="#" aria-label="Gabriel Ribeiro, início">
-    <img class="logo-mark lg-gr" src="img/logo-gabriel-ribeiro.webp" alt="" width="900" height="299" decoding="async" fetchpriority="high">
-    <img class="logo-mark lg-bar" src="img/logo-gabriel-ribeiro.webp" alt="" width="900" height="299" decoding="async">
-    <img class="logo-mark lg-name" src="img/logo-gabriel-ribeiro.webp" alt="" width="900" height="299" decoding="async">
+    <img class="logo-mark lg-gr" src="img/logo-gabriel-ribeiro-540.webp" crossorigin="anonymous" alt="" width="900" height="299" decoding="async" fetchpriority="high">
+    <img class="logo-mark lg-bar" src="img/logo-gabriel-ribeiro-540.webp" crossorigin="anonymous" alt="" width="900" height="299" decoding="async">
+    <img class="logo-mark lg-name" src="img/logo-gabriel-ribeiro-540.webp" crossorigin="anonymous" alt="" width="900" height="299" decoding="async">
     <span class="logo-shine" aria-hidden="true"><i></i></span>
     <span class="lg-flash" aria-hidden="true"><i></i></span>
     <span class="lg-cursor" aria-hidden="true"></span>
@@ -155,7 +279,7 @@
 
   <!-- Foto recortada: fica na frente do painel, como na referência -->
   <div class="person">
-    <img src="img/gabriel-hero.webp?v=12" alt="Gabriel Ribeiro, sorrindo e olhando para cima" width="1024" height="1536" fetchpriority="high">
+    <img src="img/gabriel-hero.webp?v=12" srcset="img/gabriel-hero-800.webp?v=12 800w, img/gabriel-hero.webp?v=12 1024w" sizes="(max-aspect-ratio: 4/5) min(100vw, 50vh), 80vh" alt="Gabriel Ribeiro, sorrindo e olhando para cima" width="1024" height="1536" fetchpriority="high">
     <!-- luz de contorno: a luz quente do fundo "abraçando" a borda do cabelo, do rosto e dos ombros, por dentro do
          recorte (img/gabriel-luz.webp, gerada a partir do recorte e das cores do fundo atrás de cada ponto) -->
     <span class="person-rim" aria-hidden="true"></span>

@@ -75,8 +75,8 @@ a { color: inherit; text-decoration: none; }
 .lg-name { clip-path: inset(0 0 0 49%); }
 .logo-shine {
   position: absolute; inset: 0; pointer-events: none; overflow: hidden;
-  -webkit-mask: url(../img/logo-gabriel-ribeiro.webp) 0 0 / 100% 100% no-repeat;
-          mask: url(../img/logo-gabriel-ribeiro.webp) 0 0 / 100% 100% no-repeat;
+  -webkit-mask: url(../img/logo-gabriel-ribeiro-540.webp) 0 0 / 100% 100% no-repeat;
+          mask: url(../img/logo-gabriel-ribeiro-540.webp) 0 0 / 100% 100% no-repeat;
   mix-blend-mode: screen; opacity: .3;
 }
 /* a faixa de luz é desenhada uma vez (3x a largura da logo) e só desliza (transform, feito pela placa de vídeo).
@@ -104,8 +104,8 @@ a { color: inherit; text-decoration: none; }
 /* reflexo único da abertura: faixa clara que atravessa a logo uma vez (recortada pela própria imagem) */
 .lg-flash {
   position: absolute; inset: 0; pointer-events: none; overflow: hidden;
-  -webkit-mask: url(../img/logo-gabriel-ribeiro.webp) 0 0 / 100% 100% no-repeat;
-          mask: url(../img/logo-gabriel-ribeiro.webp) 0 0 / 100% 100% no-repeat;
+  -webkit-mask: url(../img/logo-gabriel-ribeiro-540.webp) 0 0 / 100% 100% no-repeat;
+          mask: url(../img/logo-gabriel-ribeiro-540.webp) 0 0 / 100% 100% no-repeat;
   mix-blend-mode: screen; opacity: .45;   /* reflexo da abertura mais discreto */
 }
 .lg-flash i { position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(105deg, transparent 28%, rgba(255, 236, 200, .55) 42%, #fff 50%, rgba(255, 236, 200, .55) 58%, transparent 72%); }
