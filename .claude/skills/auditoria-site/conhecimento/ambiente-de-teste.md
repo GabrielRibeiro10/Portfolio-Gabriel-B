@@ -156,3 +156,9 @@ são do site; outras ele não consegue mostrar. Antes de corrigir ou descartar u
   Windows estava com a CPU a 100% por outros programas. Antes de comparar números, conferir a carga
   (`Get-CimInstance Win32_Processor | Measure LoadPercentage`). Sem PC livre, provar a correção pelo que não depende
   de velocidade: contagem de mudanças de estilo do `causas.js` e posição dos elementos antes/depois de rolar.
+
+## Programa de fundo segurando a CPU — 2026-11-18 · observação
+- Num PC do dono, um processo "UninstallMonitor" usava >1 núcleo o tempo todo: o pc-medio deu ~34 ms em TODAS as
+  seções (piso de 30 quadros/s), sem diferença entre efeitos. Antes de medir, ver o uso por processo (diferença de
+  CPU em 3 s no PowerShell) e pedir ao dono para fechar o que pesa; sem isso, comparar só picos grandes e A/B na
+  mesma rodada.

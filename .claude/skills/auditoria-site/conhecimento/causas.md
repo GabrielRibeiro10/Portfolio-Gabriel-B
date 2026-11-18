@@ -135,7 +135,13 @@ Achar a causa: `causas.js --secao=#id --aparelho=celular-fraco` e confirmar desl
   (Tecnologias 43 → 27 ms, pior 934 → 150 ms). Testar também as outras suspeitas (degradês, contagem) para descartar.
 - Correção (modo leve, celular/tablet): foto pronta do desenho (Playwright, 430 px × DPR 2, `?leve=1`, só o fundo
   visível, sem a máscara) em WebP (8,6 KB), como `background` com `100% auto`; o SVG fica `display: none` só no leve.
-  A máscara de degradê do contêiner continua por cima. Visual igual; aparelho bom segue com o SVG animado.
+  A máscara de degradê do contêiner continua por cima. Visual igual.
+- Atualização (2026-11-18, medido): a travada também aparece no celular MÉDIO no modo normal (Tecnologias 61 ms,
+  pior 0,9 s). Solução para todos os modos no celular/tablet: a foto (430 px × DPR 3, 17 KB) num ::before com a
+  MESMA animação de balanço (transform, roda no compositor); no leve, parada. Resultado no celular médio, efeitos
+  ligados: Tecnologias 61 → 35 ms (pior 0,9 → 0,22 s), FAQ 43 → 28 ms. Conferir a borda no ponto máximo do balanço
+  (translateX negativo + scaleX a partir da esquerda: o esticão tem que cobrir o deslocamento). No PC o SVG fica,
+  porque lá a forma depende de medidas do layout.
 
 ## Parallax "barato" de vários elementos ainda pesa no celular fraco — 2026-11-18 · confirmado (medido)
 - Onde: topo com parallax de rolagem (ScrollTrigger scrub) na foto, no desenho atrás dela e em 3 elementos com

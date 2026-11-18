@@ -94,3 +94,4 @@ Atualize a cada entrada nova (arquivo · título · data · status).
 - descobrir.js reconhece detecção embutida; modo auto no Windows fica normal (ambiente-de-teste.md) · 2026-11-18 · confirmado
 - parallax de vários elementos pesa no fraco; parar no leve e matar se ligar no meio (causas.md) · 2026-11-18 · confirmado
 - CPU do PC a 100% estraga a comparação; provar pela contagem de mudanças (ambiente-de-teste.md) · 2026-11-18 · confirmado
+- programa de fundo segurando a CPU estraga a medição do PC (ambiente-de-teste.md) · 2026-11-18 · observação
