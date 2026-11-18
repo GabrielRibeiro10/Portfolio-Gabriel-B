@@ -484,3 +484,6 @@ Quatro causas no mesmo efeito (seção de etapas da WR):
   da foto caiu para 40 ms, mas a nota ficou em 77–81: o LCP (4,5–5,6 s) é a foto aparecendo DEPOIS da abertura da
   marca (opacidade 0 até a animação). Conta do celular do Lighthouse: 412px × DPR 1,75 = 721px (versão de 720 não
   serve; usar 800). Para nota 90+ a foto principal precisa estar visível já na primeira pintura.
+- Resultado medido (2026-11-18): foto visível desde a primeira pintura, por baixo da cortina opaca da abertura (o
+  LCP conta mesmo coberta; só opacidade 0 ou fora da tela não contam) e subidinha curta de 6% no lugar de vir de
+  baixo da tela → PageSpeed celular 77 → 92, LCP 5,6 s → 3,3 s, TBT 150 → 40 ms. A abertura ficou igual.
