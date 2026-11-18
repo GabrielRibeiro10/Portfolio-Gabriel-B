@@ -1,9 +1,11 @@
 // Segmentos: cartões em leque (efeito do "card fan carousel", refeito sem React, nos cartões que já existem: mesmas
-// fotos e textos). Sete cartões abertos em leque, o do meio na frente; passar o mouse num cartão levanta ele e afasta
-// os vizinhos; as setas, os pontinhos, o teclado (← →), arrastar de lado e tocar num cartão trocam o do centro (um sai
-// por uma ponta e outro entra pela outra). A chegada continua a mesma de antes: na primeira vez que a seção aparece
-// os cartões chegam deslizando da direita e sobem, do centro para as pontas. Movimento todo no GSAP (transform e
-// opacity). "Menos movimento" ou sem GSAP: fica a grade/carrossel de antes.
+// fotos e textos). No PC, sete cartões abertos em leque, o do meio na frente; passar o mouse num cartão levanta ele e
+// afasta os vizinhos. No celular/tablet (até 860 px), três: o da frente e um de cada lado aparecendo pela beirada,
+// inteiros dentro da tela e escondidos atrás do da frente na altura (nada cortado nem sobrando embaixo). As setas, os
+// pontinhos, o teclado (← →), arrastar de lado e tocar num cartão trocam o do centro (um sai por uma ponta e outro
+// entra pela outra). A chegada continua a mesma de antes: na primeira vez que a seção aparece os cartões chegam
+// deslizando da direita e sobem, do centro para as pontas. Movimento todo no GSAP (transform e opacity).
+// "Menos movimento" ou sem GSAP: fica a grade/carrossel de antes.
 (() => {
   const ni = document.querySelector('.nichos');
   const grid = ni && ni.querySelector('.nc-grid');
@@ -32,8 +34,7 @@
   const pips = cards.map(() => dotsRow.appendChild(document.createElement('i')));
   ctrl.querySelector('.nc-count').prepend(dotsRow);
 
-  // ----- posições do leque (mesmos números do componente: x e y em rem, rotação em graus) -----
-  const MAX = 7, HALF = 3;
+  // ----- posições do leque no PC (mesmos números do componente: x e y em rem, rotação em graus) -----
   const FAN = [
     { rot: -21, scale: 0.7756, x: -30, y: 7.3, z: 1 },
     { rot: -14, scale: 0.8498, x: -22, y: 4.0, z: 2 },
@@ -43,40 +44,65 @@
     { rot: 14, scale: 0.8498, x: 22, y: 4.0, z: 2 },
     { rot: 21, scale: 0.7756, x: 30, y: 7.3, z: 1 },
   ];
-  const paged = N > MAX;
-  const SLOTS = paged ? MAX : N;
-  const slotCfg = (slot) => {
-    if (paged) return FAN[slot];
-    const c = N >> 1, d = (slot - c) / c, a = Math.abs(d);
-    return { rot: d * 21, scale: 1 - 0.2244 * a * a, x: d * 30, y: a * a * 7.3, z: 10 - Math.abs(slot - c) };
-  };
+  const SIDE = { rot: 6, scale: 0.86 };   // celular: os dois de lado
+  const rad = (d) => (d * Math.PI) / 180;
+  const smallMQ = matchMedia('(max-width: 860px)');
+  const hoverMQ = matchMedia('(hover: hover) and (pointer: fine)');   // só mouse de verdade (toque não "passa por cima")
   const wrap = (v) => ((v % N) + N) % N;
 
-  // largura: o mesmo escalonamento por tela do componente, e nunca mais largo que a faixa
-  let kx = 1, ky = 1, cw = 300, ch = 500, vw = 1200;
+  let small = smallMQ.matches;
+  const maxSlots = () => Math.min(N, small ? 3 : 7);   // quantos aparecem
+  let SLOTS = maxSlots();
+
+  // medidas: no PC o mesmo escalonamento por tela do componente; nos dois casos o cartão da ponta, já girado,
+  // nunca passa da borda da tela
+  let kx = 16, ky = 16, sideX = 0, sideY = 0, cw = 300, ch = 500, vw = 1200;
   const measure = () => {
     vw = grid.clientWidth || innerWidth;
     cw = cards[0].offsetWidth || 300;
     ch = Math.max(...cards.map((c) => c.offsetHeight)) || 500;
-    const w = innerWidth;
-    const m = w < 480 ? 0.28 : w < 640 ? 0.38 : w < 768 ? 0.5 : w < 1024 ? 0.75 : 1;
-    const room = vw / 2 - (cw * 0.7756) / 2 - 12;   // até onde o centro do cartão da ponta pode ir
-    kx = 16 * Math.min(m, Math.max(0, room) / (30 * 16));
-    ky = 16 * Math.min(1, (innerHeight * 0.9) / (ch + 140));   // tela baixa: o leque desce menos
+    if (small) {
+      const s = SIDE.scale, a = rad(SIDE.rot);
+      const hw = ((cw * Math.cos(a) + ch * Math.sin(a)) * s) / 2;   // meia largura do cartão de lado, girado
+      const hh = ((ch * Math.cos(a) + cw * Math.sin(a)) * s) / 2;   // meia altura dele
+      sideX = Math.max(0, Math.min(cw * 0.42, vw / 2 - hw - 8));
+      sideY = Math.max(0, Math.min(14, ch / 2 - hh - 2));   // fica todo atrás do da frente na altura
+    } else {
+      const w = innerWidth;
+      const m = w < 1024 ? 0.75 : 1;
+      const e = FAN[0], a = rad(Math.abs(e.rot));
+      const hw = ((cw * Math.cos(a) + ch * Math.sin(a)) * e.scale) / 2;
+      const room = vw / 2 - hw - 12;   // até onde o centro do cartão da ponta pode ir
+      kx = 16 * Math.min(m, Math.max(0, room) / (30 * 16));
+      ky = 16 * Math.min(1, (innerHeight * 0.9) / (ch + 140));   // tela baixa: o leque desce menos
+    }
   };
 
-  let center = paged ? HALF : N >> 1;   // índice do cartão no meio
+  const slotCfg = (slot) => {
+    const c = SLOTS >> 1;
+    if (small) {
+      if (slot === c) return { rot: 0, scale: 1, x: 0, y: 0, z: 10 };
+      const side = slot < c ? -1 : 1;
+      return { rot: side * SIDE.rot, scale: SIDE.scale, x: side * sideX, y: sideY, z: 2 };
+    }
+    if (SLOTS === 7) { const f = FAN[slot]; return { rot: f.rot, scale: f.scale, x: f.x * kx, y: f.y * ky, z: f.z }; }
+    const d = (slot - c) / c, a = Math.abs(d);   // menos de 7 segmentos: as mesmas curvas do componente
+    return { rot: d * 21, scale: 1 - 0.2244 * a * a, x: d * 30 * kx, y: a * a * 7.3 * ky, z: 10 - Math.abs(slot - c) };
+  };
+
+  // índice do cartão no meio: no PC, como no componente (os sete primeiros em ordem); no celular, o 01
+  let center = small ? 0 : SLOTS >> 1;
   const visibleMap = (c) => {
-    const map = new Map();
-    if (!paged) { cards.forEach((_, i) => map.set(i, i)); return map; }
-    for (let s = 0; s < MAX; s++) map.set(wrap(c + s - HALF), s);
+    const map = new Map(), h = SLOTS >> 1;
+    for (let s = 0; s < SLOTS; s++) map.set(wrap(c + s - h), s);
     return map;
   };
   let map = visibleMap(center);
   const target = (slot, dx = 0, dy = 0, drot = 0, sc = 1) => {
     const f = slotCfg(slot);
-    return { x: f.x * kx + dx, y: f.y * ky + dy, rotation: f.rot + drot, scale: f.scale * sc, zIndex: f.z };
+    return { x: f.x + dx, y: f.y + dy, rotation: f.rot + drot, scale: f.scale * sc, zIndex: f.z };
   };
+  const edgeX = () => Math.abs(slotCfg(0).x);
 
   const label = () => {
     num.textContent = String(center + 1).padStart(2, '0');
@@ -85,10 +111,22 @@
     pips.forEach((p, k) => p.classList.toggle('on', k === center));
   };
 
-  let busy = true, started = false, hovered = null, leaveT = 0;
+  let busy = true, started = false, hovered = null, leaveT = 0, pending = false;
 
-  // ----- hover: o cartão sobe e cresce um pouco, os vizinhos abrem espaço -----
-  const layout = (hot, instant) => {
+  // tudo no lugar na hora (troca PC <-> celular, girar a tela): quem está à vista no slot, o resto escondido
+  const snap = () => {
+    pending = false; hovered = null; clearTimeout(leaveT);
+    gsap.killTweensOf(cards);
+    cards.forEach((card, k) => {
+      const slot = map.get(k);
+      if (slot === undefined) gsap.set(card, { x: 0, y: 0, rotation: 0, scale: 0.5, opacity: 0, zIndex: 0 });
+      else gsap.set(card, { ...target(slot), opacity: started ? 1 : 0 });
+    });
+  };
+  const idle = () => { busy = false; if (pending) snap(); };
+
+  // ----- hover (só com mouse, só no PC): o cartão sobe e cresce um pouco, os vizinhos abrem espaço -----
+  const layout = (hot) => {
     const cs = SLOTS >> 1;
     map.forEach((slot, k) => {
       let dx = 0, dy = 0, drot = 0, sc = 1, delay = Math.abs(slot - cs) * 0.02;
@@ -106,22 +144,23 @@
         }
       }
       const { zIndex, ...pos } = target(slot, dx, dy, drot, sc);
-      if (instant) gsap.set(cards[k], { ...pos, zIndex, opacity: 1 });
-      else { gsap.set(cards[k], { zIndex }); gsap.to(cards[k], { ...pos, duration: 0.5, delay, ease: 'elastic.out(1,.75)', overwrite: 'auto' }); }
+      gsap.set(cards[k], { zIndex });
+      gsap.to(cards[k], { ...pos, duration: 0.5, delay, ease: 'elastic.out(1,.75)', overwrite: 'auto' });
     });
   };
+  const canHover = (e) => e.pointerType === 'mouse' && hoverMQ.matches && !small;
 
   // ----- trocar o do centro: quem sai vai pela ponta, quem entra vem pela outra -----
   const goTo = (c) => {
     c = wrap(c);
     if (busy || c === center) return;
     const fwd = wrap(c - center) <= N / 2;   // caminho mais curto
-    busy = true; hovered = null;
+    busy = true; hovered = null; clearTimeout(leaveT);
     const before = map;
     center = c; map = visibleMap(center); label();
-    const far = 30 * kx + cw;   // fora da ponta do leque
+    const far = edgeX() + cw;   // fora da ponta do leque
     let left = map.size;
-    const done = () => { if (--left <= 0) busy = false; };
+    const done = () => { if (--left <= 0) idle(); };
     cards.forEach((card, k) => {
       const slot = map.get(k), was = before.has(k);
       if (slot !== undefined) {
@@ -139,14 +178,7 @@
   };
   const step = (d) => goTo(center + d);
 
-  // ----- posição inicial (escondidos) e a chegada de sempre -----
-  const place = () => {
-    cards.forEach((card, k) => {
-      const slot = map.get(k);
-      if (slot === undefined) gsap.set(card, { x: 0, y: 0, rotation: 0, scale: 0.5, opacity: 0, zIndex: 0 });
-      else gsap.set(card, { ...target(slot), opacity: started ? 1 : 0 });
-    });
-  };
+  // ----- a chegada de sempre -----
   const arrive = () => {
     started = true;
     const sp = cw * 1.12;   // a mesma distância de antes: chegam 1,6 cartão para a direita
@@ -157,7 +189,7 @@
       gsap.set(card, { ...t, x: t.x + sp * 1.6, y: t.y + ch * 0.18, opacity: 0 });
       gsap.to(card, { x: t.x, duration: 1.4, ease: 'power3.out' });   // desliza junto
       gsap.to(card, { y: t.y, opacity: 1, duration: 0.64, delay: order * 0.14, ease: 'power1.inOut',   // sobe e aparece em cascata
-        onComplete: () => { if (--left <= 0) setTimeout(() => { busy = false; }, 0); } });
+        onComplete: () => { if (--left <= 0) gsap.delayedCall(1.4 - 0.64 - order * 0.14 > 0 ? 1.4 - 0.64 - order * 0.14 : 0, idle); } });
     });
   };
 
@@ -174,9 +206,9 @@
     Promise.race([preload(), new Promise((r) => setTimeout(r, 2500))]).then(() => { measure(); arrive(); });
   }, { threshold: [0, 0.15, 0.3] }).observe(grid);
 
-  // ----- mouse por cima -----
+  // ----- mouse por cima (PC) -----
   grid.addEventListener('pointerover', (e) => {
-    if (e.pointerType !== 'mouse' || busy) return;
+    if (!canHover(e) || busy) return;
     const c = e.target.closest && e.target.closest('.nc-card');
     const slot = c ? map.get(cards.indexOf(c)) : undefined;
     if (slot === undefined) return;
@@ -184,9 +216,9 @@
     if (hovered !== slot) { hovered = slot; layout(slot); }
   });
   grid.addEventListener('pointerleave', (e) => {
-    if (e.pointerType !== 'mouse' || busy) return;
+    if (!canHover(e) || busy || hovered === null) return;
     clearTimeout(leaveT);
-    leaveT = setTimeout(() => { hovered = null; layout(null); }, 50);
+    leaveT = setTimeout(() => { if (busy) return; hovered = null; layout(null); }, 50);
   });
 
   // ----- arrastar de lado (dedo ou mouse) troca; tocar num cartão traz ele para o centro -----
@@ -208,14 +240,21 @@
   });
   [prev, next].forEach((b) => { b.disabled = false; b.addEventListener('click', () => step(Number(b.dataset.dir))); });
 
-  // ----- tamanho da tela -----
+  // ----- tamanho da tela: mede de novo e põe tudo no lugar (se estiver animando, logo depois) -----
   let w0 = 0;
-  const onResize = () => { const w = grid.clientWidth; if (w === w0) return; w0 = w; measure(); if (started && !busy) layout(hovered, true); else if (!started) place(); };
+  const refit = () => {
+    small = smallMQ.matches;
+    const s = maxSlots();
+    if (s !== SLOTS) { SLOTS = s; map = visibleMap(center); }
+    measure();
+    if (busy && started) pending = true; else snap();
+  };
+  const onResize = () => { const w = grid.clientWidth; if (w === w0) return; w0 = w; refit(); };
   if ('ResizeObserver' in window) new ResizeObserver(onResize).observe(grid);
   else addEventListener('resize', onResize);
 
   label();
   measure();
-  place();
-  addEventListener('load', () => { measure(); if (started && !busy) layout(hovered, true); }, { once: true });
+  snap();
+  addEventListener('load', refit, { once: true });
 })();

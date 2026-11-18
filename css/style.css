@@ -2188,7 +2188,7 @@ html.nc-gal-on .nichos .nc-ctrl { position: relative; z-index: 5; margin-top: ca
   html.nc-gal-on .nichos .nc-ctrl { margin-top: -50px; }
 }
 /* ---------- Segmentos em leque (js/segmentos.js): sete cartões abertos, pontinhos entre as setas ---------- */
-html.nc-gal-on .nichos.nc-fan .nc-grid { padding: clamp(44px, 4vw, 60px) 0 clamp(110px, 9vw, 140px); cursor: default; }
+html.nc-gal-on .nichos.nc-fan .nc-grid { padding: clamp(44px, 4vw, 60px) 0 clamp(110px, 9vw, 140px); cursor: default; overflow: clip visible; }   /* corta só nas laterais: a subida da chegada não aparece cortada embaixo */
 html.nc-gal-on .nichos.nc-fan .nc-card { transform-origin: 50% 50%; cursor: pointer; }
 html.nc-gal-on .nichos.nc-fan .nc-card.is-center { cursor: default; }
 html.nc-gal-on .nichos.nc-fan .nc-ctrl { margin-top: -40px; }
@@ -2199,8 +2199,9 @@ html.nc-gal-on .nichos.nc-fan .nc-count em { grid-row: 2; margin-top: 8px; font-
 .nc-pips i { width: 8px; height: 8px; border-radius: 50%; background: rgba(17, 17, 17, .15); transition: background .3s, transform .3s; }
 .nc-pips i.on { background: rgba(17, 17, 17, .7); transform: scale(1.3); }
 @media (max-width: 860px) {
-  html.nc-gal-on .nichos.nc-fan .nc-grid { --cw: min(62vw, 250px); padding: 40px 0 70px; }
-  html.nc-gal-on .nichos.nc-fan .nc-ctrl { margin-top: -20px; }
+  /* três cartões, os de lado escondidos atrás do da frente na altura: sem sobra embaixo */
+  html.nc-gal-on .nichos.nc-fan .nc-grid { --cw: min(62vw, 250px); padding: 20px 0 24px; }
+  html.nc-gal-on .nichos.nc-fan .nc-ctrl { margin-top: 0; }
   .nc-pips { gap: 6px; }
 }
 
