@@ -126,3 +126,13 @@ Achar a causa: `causas.js --secao=#id --aparelho=celular-fraco` e confirmar desl
 - **Números (portfólio):** marca aparecendo: PC médio 5,4 s → 2,5–3,4 s; PC fraco 7,1 s → 3,5–4,0 s.
 - **Junto:** efeito pesado fora da tela (crachá 3D/three.js) que liga por tempo fixo caiu no meio da entrada. Ligue-o
   por um aviso de "entrada terminou" (`gr:hero-fim`), não por relógio. PC bom: travadas da abertura 2,7 s → 1,8 s.
+
+## SVG decorativo enorme com recorte e máscaras trava ~1 s ao entrar na tela, mesmo parado — 2026-11-18 · confirmado (medido)
+- Onde: fundo desenhado em SVG (onda de 420×2400 com clip-path, <mask> com regiões gigantes e degradês), visto no
+  portfólio (FAQ). Sintoma: no celular fraco, um quadro de 0,9–1,4 s ao chegar na seção de cima; não aparece como
+  tarefa longa de JS (é desenho). Desligar o `will-change` e os brilhos com máscara NÃO resolveu.
+- Como confirmar: `desempenho.js --modo=leve --css=".fundo{display:none}"` — só esconder o desenho tirou o pico
+  (Tecnologias 43 → 27 ms, pior 934 → 150 ms). Testar também as outras suspeitas (degradês, contagem) para descartar.
+- Correção (modo leve, celular/tablet): foto pronta do desenho (Playwright, 430 px × DPR 2, `?leve=1`, só o fundo
+  visível, sem a máscara) em WebP (8,6 KB), como `background` com `100% auto`; o SVG fica `display: none` só no leve.
+  A máscara de degradê do contêiner continua por cima. Visual igual; aparelho bom segue com o SVG animado.

@@ -90,3 +90,5 @@ Atualize a cada entrada nova (arquivo · título · data · status).
 - Lenis ignora scrollTo/WheelEvent do console: testar com a roda de verdade (ambiente-de-teste.md) · 2026-11-18 · confirmado
 - abertura que esconde o LCP trava o PageSpeed em ~80; logo 2x (img + máscara); DPR 1,75 → versão 800px (efeitos.md) · 2026-11-18 · confirmado
 - API do PageSpeed esgota; WebKit no Windows não mede tempo; nota varia (ambiente-de-teste.md) · 2026-11-18 · confirmado
+- SVG decorativo com máscaras trava ~1 s ao entrar; no leve vira foto WebP de 8 KB (causas.md) · 2026-11-18 · confirmado
+- descobrir.js reconhece detecção embutida; modo auto no Windows fica normal (ambiente-de-teste.md) · 2026-11-18 · confirmado

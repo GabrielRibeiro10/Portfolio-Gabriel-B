@@ -118,7 +118,7 @@ if (animate) {
   // pesa e está fora da tela (crachá 3D) espera a entrada acabar para não travá-la
   const tl = gsap.timeline({ defaults: { ease: 'expo.out' },
     onComplete: () => { window.grHeroDone = true; document.dispatchEvent(new Event('gr:hero-fim')); } });
-  tl.timeScale(1.35);   // abertura e entrada da hero ~35% mais rápidas (a marca pousa em ~3,3 s em vez de ~4,4 s)
+  tl.timeScale(1.6);   // abertura e entrada da hero 60% mais rápidas (a marca pousa em ~2,8 s em vez de ~4,4 s)
 
   // ----- abertura da marca (~4 s) -----
   // Um fundo abstrato (.gr-open: vermelho, laranja e amarelo, formas curvas em camadas que se movem devagar) cobre a

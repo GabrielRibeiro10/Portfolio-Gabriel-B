@@ -110,6 +110,8 @@ const inventario = () => {
     // (404, páginas de texto) não tem efeito para desligar
     const temJs = /<script[^>]*\bsrc=/i.test(h);
     if (!tag && !temJs) st = 'sem detecção, mas a página não tem JavaScript (ok se não tiver efeito pesado em CSS)';
+    // cópia embutida no <head> (para não bloquear a 1ª pintura com mais um download): reconhece pelo código do modelo
+    else if (!tag && /<script>[^<]*(grPerfil|gr-perfil-v|leve:liga|grLeve)/.test(head)) st = 'ok (detecção embutida no <head>)';
     else if (!tag) { st = 'NÃO tem: instale modelos/modo-leve.js (passo 0b)'; faltam++; }
     else if (/\b(defer|async)\b/.test(tag)) { st = 'tem, mas com defer/async: tire (precisa rodar antes da 1ª pintura)'; faltam++; }
     else st = /desempenho/.test(tag) ? 'ok (js/desempenho.js, original do portfólio)' : 'ok (js/modo-leve.js)';

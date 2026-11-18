@@ -142,3 +142,11 @@ são do site; outras ele não consegue mostrar. Antes de corrigir ou descartar u
 - WebKit do Playwright no Windows (sem GPU) dá todos os quadros longos e FCP de 6 s até no localhost: serve para
   ver o que o Safari baixa (srcset, formato), não para medir travada ou tempo. Medir Safari de verdade num iPhone.
 - Nota do PageSpeed varia (81 → 77 sem piorar nada): comparar pelas partes do LCP, não só pela nota.
+
+## Detecção embutida no <head> e modo "auto" no Windows — 2026-11-18 · confirmado
+- `descobrir.js` só reconhecia `<script src=".../desempenho.js|modo-leve.js">`; com a detecção copiada para dentro
+  do HTML (para não bloquear a pintura) acusava "NÃO tem". Corrigido: reconhece `<script>` embutido com o código do
+  modelo (grPerfil/gr-perfil-v/leve:liga/grLeve).
+- No Windows o teste usa o Chrome real (placa de vídeo forte): no modo "auto", até o celular-fraco (CPU 6x) fica no
+  modo normal. Para medir o que o aparelho fraco recebe, use `--modo=leve`; a detecção se confere com `?leve=info`
+  num celular de verdade.

@@ -93,3 +93,4 @@ primeiro arquivo** de um site novo. Cada item aponta para a entrada da base que 
 - Vídeo curto dentro de etapa/painel: WebP animado com capa parada + troca de src só com o painel aberto e versão menor no celular (efeitos.md, 2026-11-18).
 - Abertura animada: a foto/título principal (o LCP) precisa aparecer na primeira pintura, por trás ou junto da abertura; escondê-la até a animação acabar trava a nota do PageSpeed perto de 80 (efeitos.md, 2026-11-18).
 - Logo/ícone: arquivo no tamanho exibido × 3 no máximo; se a mesma imagem é <img> e máscara CSS, pôr crossorigin="anonymous" na <img> para baixar uma vez (efeitos.md, 2026-11-18).
+- Fundo decorativo grande em SVG com máscara/recorte: no modo leve (celular), trocar por uma foto pronta dele em WebP; desenhar o SVG travava ~1 s ao entrar na tela (causas.md, 2026-11-18).
