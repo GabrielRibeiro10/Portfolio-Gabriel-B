@@ -381,7 +381,9 @@ a { color: inherit; text-decoration: none; }
 /* enquanto o GSAP não prepara a entrada, o conteúdo da hero fica escondido (sem piscar no
    lugar final). A classe é posta no <head> e tirada pelo js/main.js, inclusive se o GSAP não
    carregar. */
-.gsap-loading :is(.logo, .intro, .panel, .socials, .person) { opacity: 0; }
+/* a foto (.person) NÃO entra aqui: ela fica visível desde a primeira pintura, coberta pela cortina da abertura
+   (.gr-open); escondida, o PageSpeed só contava o LCP depois da abertura (nota ~80) */
+.gsap-loading :is(.logo, .intro, .panel, .socials) { opacity: 0; }
 
 /* máscaras da entrada do texto (js/main.js quebra o texto em letras/palavras): o texto sobe
    de baixo da máscara. O padding com margem negativa dá espaço às letras que descem (g, p, ç)

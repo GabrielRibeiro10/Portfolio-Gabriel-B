@@ -107,3 +107,38 @@ são do site; outras ele não consegue mostrar. Antes de corrigir ou descartar u
 - Quadro médio entre 22 e ~26 ms **com zero travadas** em aparelho bom/médio: o navegador mede em quadros de 16,7 ou
   33,3 ms, então alguns quadros de 33 ms puxam a média para cima sem a pessoa sentir. Anote no relatório, mas a
   prioridade é o aparelho fraco e as travadas. — observação
+- Mudou o CSS e o navegador de teste continua mostrando o visual velho (mesmo recarregando): o link usa marca de
+  versão fixa (`style.css?v=6`) e o navegador guarda o arquivo. Suba a marca (`?v=7`) a cada mudança de CSS/JS; isso
+  também é o que faz o celular do cliente pegar a versão nova. — confirmado (medido: fonte continuou 28px até subir a
+  marca) · 2026-11-16
+- Print com `chrome --headless --screenshot --virtual-time-budget` saiu com o **vídeo de fundo preto** depois que a
+  página passou a usar `requestVideoFrameCallback`/`IntersectionObserver` no vídeo; no navegador de verdade o vídeo
+  tocava (currentTime andando, readyState 4). Para conferir vídeo, use o navegador real (painel/Chrome), não o print
+  com tempo virtual. — confirmado (medido) · 2026-11-16
+
+## Escape de CSS (`content: "\2192"`) estraga quando passa pelo terminal — confirmado · 2026-11-16
+- Escrever `\2192` via `sed`, `python -c` ou heredoc no Git Bash virou um byte de controle + "92" (a seta aparecia
+  como "92" no botão). Para escapes com barra invertida, editar com a ferramenta de edição de arquivo ou com um
+  script `.py` salvo em arquivo; depois conferir com `od -c` ou no navegador.
+
+## PowerShell 5.1 `Set-Content -Encoding utf8` grava BOM no começo do arquivo — confirmado · 2026-11-17
+- Trocar a marca `?v=` no index.html com `Get-Content | .Replace() | Set-Content -Encoding utf8` deixou o arquivo com
+  BOM (`EF BB BF`) e git diff marcou a primeira linha. Fazer essas trocas com a ferramenta de edição ou `sed -i` no
+  bash; se já gravou, tirar com `sed -i '1s/^\xEF\xBB\xBF//' arquivo`.
+
+## Painel do navegador do app parado (requestAnimationFrame) — 2026-11-18 · confirmado
+- No navegador embutido do app, com a janela de fora visível, o rAF caiu para ~0 quadros: rolagem suave e GSAP não
+  andavam e parecia bug do site. Conferir com `gsap.ticker.frame` antes/depois; se não anda, testar animação/clique
+  no Playwright sem janela (NODE_PATH para o playwright do rascunho), que roda normal.
+
+
+## Rolagem suave (Lenis) ignora scrollTo/WheelEvent do console — 2026-11-18 · confirmado
+- Com Lenis, `window.scrollTo`, `scrollIntoView` e `WheelEvent` disparado por script não movem a seção presa de
+  forma confiável (o painel não troca e parece bug do site). Testar com a roda de verdade: ação `scroll` do navegador.
+
+## API do PageSpeed sem chave esgota; WebKit no Windows não mede desempenho — 2026-11-18 · confirmado
+- A API pública do PageSpeed (sem chave) dá "Quota exceeded" por dia: usar pagespeed.web.dev no navegador e ler o
+  relatório por textContent (as tabelas ficam fechadas; innerText vem vazio).
+- WebKit do Playwright no Windows (sem GPU) dá todos os quadros longos e FCP de 6 s até no localhost: serve para
+  ver o que o Safari baixa (srcset, formato), não para medir travada ou tempo. Medir Safari de verdade num iPhone.
+- Nota do PageSpeed varia (81 → 77 sem piorar nada): comparar pelas partes do LCP, não só pela nota.
