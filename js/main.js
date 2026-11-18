@@ -213,21 +213,15 @@ if (animate) {
   tl.call(() => nums.forEach(countUp), null, D + 1.05);
   outOf($$('.socials a'), D + 1.1, { scale: 0.3, autoAlpha: 0, ease: 'back.out(2)' }, 0.75, 0);
 
-  // Foto: entra subindo e sendo descoberta de baixo para cima, sempre OPACA, e só depois de
-  // baixada e decodificada inteira. Antes ela entrava esmaecendo (autoAlpha 0 → 1) no tempo
-  // fixo de 0,5 s: o painel claro aparecia através dela ("branco por cima da foto, depois
-  // atrás") e, com internet lenta, ela surgia pela metade. Se demorar, entra assim que chegar.
-  gsap.set(person, { autoAlpha: 0 });
+  // a foto já está no lugar desde a primeira pintura, por baixo da cortina da abertura (.gr-open): assim o
+  // PageSpeed conta o LCP cedo. Quando a cortina abre, ela só dá uma subidinha curta (sem sair da tela).
+  gsap.set(person, { yPercent: 6 });   // ainda coberta pela cortina: ninguém vê esse ajuste
   if (art.length) gsap.set(art, { autoAlpha: 0, scale: 0.94, transformOrigin: '50% 45%' });
   photoReady().then(() => requestAnimationFrame(() => requestAnimationFrame(() => {
-    // sobe de baixo da moldura, inteira e opaca (sem efeito de aparecer). Fica invisível até a hora (a abertura com a
-    // marca vem antes): o parallax da rolagem podia devolvê-la ao lugar antes, e ela aparecia durante a abertura
-    // em segundos reais: a linha do tempo roda acelerada (timeScale), esta animação não. Sobe junto com a abertura
-    // do fundo (D), sem esperar
+    // a subidinha acontece junto com a abertura do fundo (D); a linha do tempo roda acelerada (timeScale), esta não
     const wait = Math.max(0, (D + 0.4 - tl.time()) / tl.timeScale());
-    gsap.fromTo(person, { yPercent: 100 },
-      { yPercent: 0, duration: 1.2, ease: 'expo.out', delay: wait, immediateRender: false,
-        onStart: () => gsap.set(person, { autoAlpha: 1 }) });
+    gsap.fromTo(person, { yPercent: 6 },
+      { yPercent: 0, duration: 1.4, ease: 'expo.out', delay: wait, immediateRender: false });
     // o desenho amarelo aparece atrás quando a foto está chegando
     if (art.length) gsap.to(art, { autoAlpha: 1, scale: 1, duration: 1.3, ease: 'expo.out', delay: wait + 0.4 });
   })));
