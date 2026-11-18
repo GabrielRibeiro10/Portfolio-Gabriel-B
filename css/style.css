@@ -1200,13 +1200,21 @@ html, body { overflow-x: clip; }
   .faq-crest .cr-narrow { display: inline; }
 }
 html.leve .faq-wave { animation: none; }
-/* modo leve no celular/tablet: a onda vira uma foto pronta dela (img/faq-onda-leve.webp, 8 KB, tirada em 430 px).
-   O SVG tem 2.400 px de altura com recorte e máscaras: mesmo parado, desenhá-lo travava ~1 s ao chegar no FAQ no
-   celular fraco. A máscara do .faq-bg (o degradê para o creme) continua valendo por cima da foto. */
+/* celular/tablet: a onda vira uma foto pronta dela (img/faq-onda-leve.webp, 17 KB, tirada em 430 px × 3). No
+   celular só o topo da onda aparece (a máscara do .faq-bg some com ela no creme), mas o SVG tem 2.400 px de altura
+   com recorte e máscaras: desenhá-lo travava ~1 s ao chegar no FAQ (celular fraco e médio). A foto balança igual
+   ao SVG (mesma animação fw-sway); no modo leve fica parada. No PC continua o SVG (a onda acompanha a coluna e a
+   chamada final, medidas no js/main.js). */
 @media (max-width: 860px) {
-  html.leve .faq-wave { display: none; }
-  html.leve .faq-bg { background: url("../img/faq-onda-leve.webp") 0 3px / 100% auto no-repeat, linear-gradient(#b9480f 0 3px, #f9f7f5 3px); }
-}   /* em telas largas o laranja passa da moldura até a borda esquerda */
+  .faq-wave { display: none; }
+  .faq-bg::before {
+    content: ''; position: absolute; left: 0; top: 3px; width: 100%; aspect-ratio: 1290 / 2997;
+    background: url("../img/faq-onda-leve.webp") 0 0 / 100% auto no-repeat;
+    transform-origin: 0 50%; animation: fw-sway 7s ease-in-out infinite;
+  }
+  html.leve .faq-bg::before { animation: none; }
+}
+@media (max-width: 860px) and (prefers-reduced-motion: reduce) { .faq-bg::before { animation: none; } }   /* em telas largas o laranja passa da moldura até a borda esquerda */
 
 .faq .about-kicker { display: flex; align-items: center; gap: 0; font-size: max(13px, calc(14 * var(--u))); line-height: 1; }
 .faq .about-kicker .k-line, .faq .about-kicker .k-sub { display: none; }
