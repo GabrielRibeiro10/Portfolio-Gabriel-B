@@ -92,3 +92,5 @@ Atualize a cada entrada nova (arquivo · título · data · status).
 - API do PageSpeed esgota; WebKit no Windows não mede tempo; nota varia (ambiente-de-teste.md) · 2026-11-18 · confirmado
 - SVG decorativo com máscaras trava ~1 s ao entrar; no leve vira foto WebP de 8 KB (causas.md) · 2026-11-18 · confirmado
 - descobrir.js reconhece detecção embutida; modo auto no Windows fica normal (ambiente-de-teste.md) · 2026-11-18 · confirmado
+- parallax de vários elementos pesa no fraco; parar no leve e matar se ligar no meio (causas.md) · 2026-11-18 · confirmado
+- CPU do PC a 100% estraga a comparação; provar pela contagem de mudanças (ambiente-de-teste.md) · 2026-11-18 · confirmado

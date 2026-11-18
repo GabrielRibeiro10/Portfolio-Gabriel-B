@@ -136,3 +136,12 @@ Achar a causa: `causas.js --secao=#id --aparelho=celular-fraco` e confirmar desl
 - Correção (modo leve, celular/tablet): foto pronta do desenho (Playwright, 430 px × DPR 2, `?leve=1`, só o fundo
   visível, sem a máscara) em WebP (8,6 KB), como `background` com `100% auto`; o SVG fica `display: none` só no leve.
   A máscara de degradê do contêiner continua por cima. Visual igual; aparelho bom segue com o SVG animado.
+
+## Parallax "barato" de vários elementos ainda pesa no celular fraco — 2026-11-18 · confirmado (medido)
+- Onde: topo com parallax de rolagem (ScrollTrigger scrub) na foto, no desenho atrás dela e em 3 elementos com
+  `translate` por variável CSS (--hp). O comentário do código dizia "custo quase zero" no modo leve.
+- Medido (causas.js, celular fraco, leve): 408 mudanças de estilo na foto/desenho e ~200 em cada um dos 3 durante
+  ~35 quadros; `_rafBugFix` do ScrollTrigger 659 ms. Parado no modo leve: 0 mudanças; travadas longas da página
+  4,1 s → 1,9 s (maior 573 → 169 ms).
+- Correção: no modo leve não criar os parallax de rolagem (posição fixa) e, se o modo ligar no meio do uso, matar o
+  ScrollTrigger e limpar a propriedade animada (helper que escuta o evento do modo leve uma vez).

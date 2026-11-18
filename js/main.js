@@ -6,6 +6,11 @@ const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const leve = () => document.documentElement.classList.contains('leve');
 const hero = document.querySelector('.hero');
 const person = document.querySelector('.person');
+// parallax de rolagem: se o modo leve ligar no meio do uso, para e deixa os elementos no lugar
+const paraLeve = (tweens, els, prop) => document.addEventListener('gr:leve', () => {
+  tweens.forEach((t) => { if (t.scrollTrigger) t.scrollTrigger.kill(); t.kill(); });
+  gsap.set(els, { clearProps: prop });
+}, { once: true });
 // design da referência atrás da foto (svg.hero-art): anda junto com ela
 const art = [...document.querySelectorAll('.hero-art')];
 const withArt = art.length ? [person, ...art] : person;
@@ -269,14 +274,15 @@ if (animate) {
 
   // botão "Ver meus projetos", cartões de números e redes: na rolagem andam na mesma velocidade do card da citação
   // (mesma distância em px, mesmo trecho e mesmo scrub). Vai na propriedade CSS translate (--hp), separada do
-  // transform: a entrada e o hover deles continuam usando transform sem brigar com o parallax. Fica também no modo
-  // leve (celular mais simples): são só 3 elementos andando, custo quase zero.
-  if (ScrollTrigger) {
+  // transform: a entrada e o hover deles continuam usando transform sem brigar com o parallax. Modo leve: parados
+  // (medido no celular fraco: com a foto, o desenho e estes 3 andando a cada quadro, o topo passava da meta).
+  if (ScrollTrigger && !leve()) {
     const els = [$('.intro .btn-work'), $('.stats'), $('.socials')].filter(Boolean);
     const dist = () => card.offsetHeight * (isMobile ? 0.16 : 0.42);
     const sts = els.map((el) => gsap.fromTo(el, { '--hp': () => (isMobile ? dist() : 0) + 'px' }, { '--hp': () => -dist() + 'px', ease: 'none',
       scrollTrigger: { ...(isMobile ? { trigger: el, start: 'top 125%', end: 'bottom 15%' } : { trigger: hero, start: 'top top', end: 'bottom top' }),
         scrub: 0.8, invalidateOnRefresh: true } }));
+    paraLeve(sts, els, '--hp');
   }
 
   // conteúdo do painel: selo, apresentação palavra por palavra e card da citação
@@ -337,16 +343,18 @@ if (animate && person) {
   });
   mm.add('not ((hover: hover) and (pointer: fine))', () => {
     if (!ScrollTrigger) return;
-    gsap.to(withArt, { y: () => innerHeight * 0.18, ease: 'none',
-      scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.6, invalidateOnRefresh: true } });
+    if (leve()) return;   // modo leve: a foto fica parada na rolagem
+    paraLeve([gsap.to(withArt, { y: () => innerHeight * 0.18, ease: 'none',
+      scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.6, invalidateOnRefresh: true } })], withArt, 'y');
   });
   // PC: descendo a página, a foto desce junto (30% da altura dela até a hero sair da tela);
   // subindo, volta. Usa yPercent: o y fica com o parallax do mouse. (No celular já existe o
   // mesmo efeito acima, com y.)
   mm.add('(hover: hover) and (pointer: fine)', () => {
     if (!ScrollTrigger) return;
-    gsap.to(withArt, { yPercent: 30, ease: 'none',
-      scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.6, invalidateOnRefresh: true } });
+    if (leve()) return;
+    paraLeve([gsap.to(withArt, { yPercent: 30, ease: 'none',
+      scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.6, invalidateOnRefresh: true } })], withArt, 'yPercent');
   });
 }
 

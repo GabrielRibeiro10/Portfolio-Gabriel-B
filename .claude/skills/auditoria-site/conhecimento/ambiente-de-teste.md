@@ -150,3 +150,9 @@ são do site; outras ele não consegue mostrar. Antes de corrigir ou descartar u
 - No Windows o teste usa o Chrome real (placa de vídeo forte): no modo "auto", até o celular-fraco (CPU 6x) fica no
   modo normal. Para medir o que o aparelho fraco recebe, use `--modo=leve`; a detecção se confere com `?leve=info`
   num celular de verdade.
+
+## Processador do PC a 100% invalida a comparação de tempos — 2026-11-18 · confirmado
+- Duas medições seguidas deram quadros piores em TODAS as seções (até nas não mexidas: rodapé 22 → 55 ms); o
+  Windows estava com a CPU a 100% por outros programas. Antes de comparar números, conferir a carga
+  (`Get-CimInstance Win32_Processor | Measure LoadPercentage`). Sem PC livre, provar a correção pelo que não depende
+  de velocidade: contagem de mudanças de estilo do `causas.js` e posição dos elementos antes/depois de rolar.
