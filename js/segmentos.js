@@ -1,189 +1,221 @@
-// Segmentos: galeria em arco (efeito do CircularGallery do React Bits, refeito sem React e sem WebGL, nos cartões que já
-// existem: mesmas fotos e textos). Os cartões ficam num arco que desce nas pontas e acompanha a curva; arrastar (mouse
-// ou dedo), a roda/trackpad de lado, as setas e o teclado (← →) passam de um para outro com inércia e assentam no mais
-// próximo; as pontas somem num degradê; enquanto anda, os cartões ondulam de leve; na primeira vez que a seção aparece
-// eles chegam deslizando. Tudo com transform/opacity (só o compositor trabalha), o laço só roda enquanto algo se mexe
-// e com a seção à vista. "Menos movimento": fica a grade/carrossel de antes. Modo leve: sem a ondulação.
+// Segmentos: cartões em leque (efeito do "card fan carousel", refeito sem React, nos cartões que já existem: mesmas
+// fotos e textos). Sete cartões abertos em leque, o do meio na frente; passar o mouse num cartão levanta ele e afasta
+// os vizinhos; as setas, os pontinhos, o teclado (← →), arrastar de lado e tocar num cartão trocam o do centro (um sai
+// por uma ponta e outro entra pela outra). A chegada continua a mesma de antes: na primeira vez que a seção aparece
+// os cartões chegam deslizando da direita e sobem, do centro para as pontas. Movimento todo no GSAP (transform e
+// opacity). "Menos movimento" ou sem GSAP: fica a grade/carrossel de antes.
 (() => {
   const ni = document.querySelector('.nichos');
   const grid = ni && ni.querySelector('.nc-grid');
   const ctrl = ni && ni.querySelector('.nc-ctrl');
-  if (!grid || !ctrl || !document.documentElement.classList.contains('nc-gal-on')) return;   // classe posta no <head> (js/desempenho.js)
+  const { gsap } = window;
+  if (!grid || !ctrl || !gsap || !document.documentElement.classList.contains('nc-gal-on')) {
+    document.documentElement.classList.remove('nc-gal-on');   // sem GSAP: volta a grade (js/main.js cuida do carrossel)
+    return;
+  }
   const cards = [...grid.querySelectorAll(':scope > .nc-card')];
   const N = cards.length;
   if (N < 3) return;
   const [prev, next] = ctrl.querySelectorAll('.nc-arrow');
   const num = ctrl.querySelector('.nc-count b'), name = ctrl.querySelector('.nc-count em');
-  const leve = () => document.documentElement.classList.contains('leve');
 
-  ni.classList.add('nc-gal');
+  ni.classList.add('nc-gal', 'nc-fan');
   grid.setAttribute('tabindex', '0');
   grid.setAttribute('role', 'region');
   grid.setAttribute('aria-roledescription', 'carrossel');
-  grid.setAttribute('aria-label', 'Segmentos: arraste ou use as setas');
+  grid.setAttribute('aria-label', 'Segmentos: use as setas para trocar');
 
-  const BEND = 3, EASE = 0.075, INTRO = 1.4;
-  // celular: cartões mais juntos e pontas sumindo só bem na borda, para os vizinhos aparecerem dos dois lados
-  const small = () => matchMedia('(max-width: 860px)').matches;
-  let GAP = 0.12, FADE = 0.12;
-  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-  const wrap = (v, n) => ((v % n) + n) % n;
-  const ease = (x) => x * x * (3 - 2 * x);
-  const smoother = (x) => { x = clamp(x, 0, 1); return x * x * x * (x * (x * 6 - 15) + 10); };
+  // pontinhos entre as setas (um por segmento)
+  const dotsRow = document.createElement('span');
+  dotsRow.className = 'nc-pips';
+  dotsRow.setAttribute('aria-hidden', 'true');
+  const pips = cards.map(() => dotsRow.appendChild(document.createElement('i')));
+  ctrl.querySelector('.nc-count').prepend(dotsRow);
 
-  const st = { scroll: 0, target: 0, vel: 0, active: 0, intro: 0, started: false, drag: null, hover: -1, lift: new Float32Array(N) };
-  let vw = 1, cw = 300, ch = 400, sp = 330, R = 1e9, half = 1, raf = 0, last = 0, visible = false, snapT = 0;
+  // ----- posições do leque (mesmos números do componente: x e y em rem, rotação em graus) -----
+  const MAX = 7, HALF = 3;
+  const FAN = [
+    { rot: -21, scale: 0.7756, x: -30, y: 7.3, z: 1 },
+    { rot: -14, scale: 0.8498, x: -22, y: 4.0, z: 2 },
+    { rot: -7, scale: 0.9346, x: -11, y: 1.3, z: 3 },
+    { rot: 0, scale: 1, x: 0, y: 0, z: 10 },
+    { rot: 7, scale: 0.9346, x: 11, y: 1.3, z: 3 },
+    { rot: 14, scale: 0.8498, x: 22, y: 4.0, z: 2 },
+    { rot: 21, scale: 0.7756, x: 30, y: 7.3, z: 1 },
+  ];
+  const paged = N > MAX;
+  const SLOTS = paged ? MAX : N;
+  const slotCfg = (slot) => {
+    if (paged) return FAN[slot];
+    const c = N >> 1, d = (slot - c) / c, a = Math.abs(d);
+    return { rot: d * 21, scale: 1 - 0.2244 * a * a, x: d * 30, y: a * a * 7.3, z: 10 - Math.abs(slot - c) };
+  };
+  const wrap = (v) => ((v % N) + N) % N;
 
+  // largura: o mesmo escalonamento por tela do componente, e nunca mais largo que a faixa
+  let kx = 1, ky = 1, cw = 300, ch = 500, vw = 1200;
   const measure = () => {
     vw = grid.clientWidth || innerWidth;
-    cw = cards[0].offsetWidth;
-    ch = Math.max(...cards.map((c) => c.offsetHeight));
-    GAP = small() ? 0.06 : 0.12; FADE = small() ? 0.03 : 0.12;
-    sp = cw * (1 + GAP);
-    // arco: desce "depth" px na borda da tela (como bend=3 do original), raio que passa por esse ponto
-    half = Math.max(vw / 2, cw * 1.5);
-    const depth = ch * 0.06 * BEND;
-    R = (half * half + depth * depth) / (2 * depth);
-    const a = st.active;
-    st.scroll = st.target = a * sp;
-    wake();
+    cw = cards[0].offsetWidth || 300;
+    ch = Math.max(...cards.map((c) => c.offsetHeight)) || 500;
+    const w = innerWidth;
+    const m = w < 480 ? 0.28 : w < 640 ? 0.38 : w < 768 ? 0.5 : w < 1024 ? 0.75 : 1;
+    const room = vw / 2 - (cw * 0.7756) / 2 - 12;   // até onde o centro do cartão da ponta pode ir
+    kx = 16 * Math.min(m, Math.max(0, room) / (30 * 16));
+    ky = 16 * Math.min(1, (innerHeight * 0.9) / (ch + 140));   // tela baixa: o leque desce menos
   };
 
-  const setActive = (slot) => {
-    const i = wrap(slot, N);
-    if (slot === st.active && num.textContent) return;
-    st.active = slot;
-    num.textContent = String(i + 1).padStart(2, '0');
-    name.textContent = cards[i].querySelector('h3').textContent;
-    cards.forEach((c, k) => c.classList.toggle('is-center', k === i));
+  let center = paged ? HALF : N >> 1;   // índice do cartão no meio
+  const visibleMap = (c) => {
+    const map = new Map();
+    if (!paged) { cards.forEach((_, i) => map.set(i, i)); return map; }
+    for (let s = 0; s < MAX; s++) map.set(wrap(c + s - HALF), s);
+    return map;
   };
-  const goTo = (slot) => { st.target = slot * sp; setActive(slot); wake(); };
-  const nearest = () => Math.round(st.target / sp);
-
-  const frame = (now) => {
-    raf = 0;
-    if (!visible) { last = 0; return; }
-    const dt = last ? clamp((now - last) / 1000, 0.001, 0.05) : 1 / 60;
-    last = now;
-    const before = st.scroll;
-    st.scroll += (st.target - st.scroll) * (1 - Math.pow(1 - EASE, dt * 60));
-    if (Math.abs(st.target - st.scroll) < 0.1) st.scroll = st.target;
-    const v = (st.scroll - before) / dt;
-    st.vel += (v - st.vel) * (1 - Math.exp(-dt / 0.08));
-    if (Math.abs(st.vel) < 2) st.vel = 0;
-    if (st.started && st.intro < 1) st.intro = Math.min(1, st.intro + dt / INTRO);
-    let settling = false;
-    for (let k = 0; k < N; k++) {
-      const goal = k === st.hover && !st.drag ? 1 : 0;
-      const nv = st.lift[k] + (goal - st.lift[k]) * (1 - Math.exp(-dt / 0.12));
-      st.lift[k] = Math.abs(goal - nv) < 0.002 ? goal : nv;
-      if (st.lift[k] !== goal) settling = true;
-    }
-    if (!st.drag) { const s = Math.round(st.scroll / sp); if (s !== st.active && Math.abs(st.scroll - st.target) < sp * 0.5) setActive(nearest()); }
-
-    const ie = 1 - Math.pow(1 - st.intro, 3);
-    const scroll = st.scroll + (1 - ie) * sp * 1.6;   // entrada: chegam da direita
-    const total = sp * N;
-    const wav = leve() ? 0 : clamp(st.vel / (sp * 4), -1, 1);   // ondulação proporcional à velocidade
-    for (let k = 0; k < N; k++) {
-      const c = cards[k];
-      let x = wrap(k * sp - scroll + total / 2, total) - total / 2;
-      const reach = Math.min(Math.abs(x), half, R * 0.999);
-      const y = R - Math.sqrt(R * R - reach * reach);
-      const ang = Math.sign(x) * Math.asin(reach / R);
-      // degradê das pontas medido pela borda do cartão mais perto do centro: no celular o vizinho aparece pela beirada
-      const u = (vw / 2 + x - Math.sign(x) * Math.min(Math.abs(x), cw * 0.5)) / vw;
-      const edge = smoother(u / FADE) * smoother((1 - u) / FADE);
-      const order = Math.abs(k * sp - st.scroll) / sp;
-      const shown = st.started ? ease(clamp(st.intro * 2.2 - Math.min(order, N - order) * 0.22, 0, 1)) : 0;
-      const op = edge * shown;
-      if (op < 0.01) { if (c.style.visibility !== 'hidden') c.style.visibility = 'hidden'; continue; }
-      if (c.style.visibility) c.style.visibility = '';
-      const lift = st.lift[k];
-      const dy = y + (1 - shown) * ch * 0.18 - lift * 10;   // entrada: sobe um pouco; hover: levanta 10 px
-      const sk = wav * 6 * (0.6 + 0.4 * Math.cos(x / sp));
-      c.style.transform = `translate3d(${x.toFixed(1)}px, ${dy.toFixed(1)}px, 0) rotate(${ang.toFixed(4)}rad) skewX(${sk.toFixed(2)}deg) scale(${(1 + lift * 0.03).toFixed(4)})`;
-      c.style.opacity = op.toFixed(3);
-      c.style.zIndex = String(100 - Math.round(Math.abs(x) / 10));
-    }
-    const moving = st.scroll !== st.target || st.vel !== 0 || (st.started && st.intro < 1) || settling || st.drag;
-    if (moving) raf = requestAnimationFrame(frame); else last = 0;
+  let map = visibleMap(center);
+  const target = (slot, dx = 0, dy = 0, drot = 0, sc = 1) => {
+    const f = slotCfg(slot);
+    return { x: f.x * kx + dx, y: f.y * ky + dy, rotation: f.rot + drot, scale: f.scale * sc, zIndex: f.z };
   };
-  function wake() { if (!raf && visible) raf = requestAnimationFrame(frame); }
 
-  // ----- entrada: só quando a seção aparece e as fotos estão prontas (senão os cartões chegam brancos) -----
-  // as fotos começam a baixar quando a seção chega perto (antes eram "lazy" e só baixavam ao aparecer)
+  const label = () => {
+    num.textContent = String(center + 1).padStart(2, '0');
+    name.textContent = cards[center].querySelector('h3').textContent;
+    cards.forEach((c, k) => c.classList.toggle('is-center', k === center));
+    pips.forEach((p, k) => p.classList.toggle('on', k === center));
+  };
+
+  let busy = true, started = false, hovered = null, leaveT = 0;
+
+  // ----- hover: o cartão sobe e cresce um pouco, os vizinhos abrem espaço -----
+  const layout = (hot, instant) => {
+    const cs = SLOTS >> 1;
+    map.forEach((slot, k) => {
+      let dx = 0, dy = 0, drot = 0, sc = 1, delay = Math.abs(slot - cs) * 0.02;
+      if (hot !== null) {
+        const dist = Math.abs(slot - hot);
+        delay = dist * 0.02;
+        if (slot === hot) { dy = -2.5 * ky; sc = 1.08; }
+        else {
+          const norm = cs > 0 ? (slot - cs) / cs : 0;
+          const push = 8 * (1 - Math.abs(norm)) * (1 + 0.2 * Math.max(0, 3 - dist));
+          const side = slot < hot ? -1 : 1;
+          dx = side * push * kx; drot = (side * 3) / (dist + 1);
+          if (slot === SLOTS - 1 && hot < cs) dy -= ky;
+          if (slot === 0 && hot > cs) dy -= ky;
+        }
+      }
+      const { zIndex, ...pos } = target(slot, dx, dy, drot, sc);
+      if (instant) gsap.set(cards[k], { ...pos, zIndex, opacity: 1 });
+      else { gsap.set(cards[k], { zIndex }); gsap.to(cards[k], { ...pos, duration: 0.5, delay, ease: 'elastic.out(1,.75)', overwrite: 'auto' }); }
+    });
+  };
+
+  // ----- trocar o do centro: quem sai vai pela ponta, quem entra vem pela outra -----
+  const goTo = (c) => {
+    c = wrap(c);
+    if (busy || c === center) return;
+    const fwd = wrap(c - center) <= N / 2;   // caminho mais curto
+    busy = true; hovered = null;
+    const before = map;
+    center = c; map = visibleMap(center); label();
+    const far = 30 * kx + cw;   // fora da ponta do leque
+    let left = map.size;
+    const done = () => { if (--left <= 0) busy = false; };
+    cards.forEach((card, k) => {
+      const slot = map.get(k), was = before.has(k);
+      if (slot !== undefined) {
+        const t = target(slot);
+        if (!was) {
+          gsap.set(card, { x: fwd ? far : -far, y: t.y, rotation: fwd ? 30 : -30, scale: 0.5, opacity: 0, zIndex: t.zIndex });
+          gsap.to(card, { ...t, opacity: 1, duration: 0.6, ease: 'power2.out', overwrite: true, onComplete: done });
+        } else {
+          gsap.to(card, { ...t, opacity: 1, duration: 0.5, ease: 'power2.out', overwrite: true, onComplete: done });
+        }
+      } else if (was) {
+        gsap.to(card, { x: fwd ? -far : far, opacity: 0, scale: 0.5, rotation: fwd ? -30 : 30, zIndex: 0, duration: 0.4, ease: 'power2.in', overwrite: true });
+      }
+    });
+  };
+  const step = (d) => goTo(center + d);
+
+  // ----- posição inicial (escondidos) e a chegada de sempre -----
+  const place = () => {
+    cards.forEach((card, k) => {
+      const slot = map.get(k);
+      if (slot === undefined) gsap.set(card, { x: 0, y: 0, rotation: 0, scale: 0.5, opacity: 0, zIndex: 0 });
+      else gsap.set(card, { ...target(slot), opacity: started ? 1 : 0 });
+    });
+  };
+  const arrive = () => {
+    started = true;
+    const sp = cw * 1.12;   // a mesma distância de antes: chegam 1,6 cartão para a direita
+    let left = map.size;
+    map.forEach((slot, k) => {
+      const t = target(slot), order = Math.abs(slot - (SLOTS >> 1));
+      const card = cards[k];
+      gsap.set(card, { ...t, x: t.x + sp * 1.6, y: t.y + ch * 0.18, opacity: 0 });
+      gsap.to(card, { x: t.x, duration: 1.4, ease: 'power3.out' });   // desliza junto
+      gsap.to(card, { y: t.y, opacity: 1, duration: 0.64, delay: order * 0.14, ease: 'power1.inOut',   // sobe e aparece em cascata
+        onComplete: () => { if (--left <= 0) setTimeout(() => { busy = false; }, 0); } });
+    });
+  };
+
+  // as fotos começam a baixar quando a seção chega perto; a chegada espera elas (senão os cartões chegam brancos)
   const imgs = cards.map((c) => c.querySelector('.nc-hero img')).filter(Boolean);
   let photos = null;
   const preload = () => photos || (photos = Promise.all(imgs.map((im) => { im.loading = 'eager';
     return (im.complete && im.naturalWidth ? Promise.resolve() : new Promise((r) => { im.addEventListener('load', r, { once: true }); im.addEventListener('error', r, { once: true }); }))
       .then(() => (im.decode ? im.decode().catch(() => {}) : null)); })));
   new IntersectionObserver(([e], o) => { if (e.isIntersecting) { o.disconnect(); preload(); } }, { rootMargin: '900px 0px' }).observe(grid);
-
-  new IntersectionObserver(([e]) => {
-    visible = e.isIntersecting;
-    if (visible && !st.started && e.intersectionRatio > 0.15) {
-      Promise.race([preload(), new Promise((r) => setTimeout(r, 2500))]).then(() => { st.started = true; wake(); });
-    }
-    if (visible) wake();
+  new IntersectionObserver(([e], o) => {
+    if (!e.isIntersecting || e.intersectionRatio < 0.15) return;
+    o.disconnect();
+    Promise.race([preload(), new Promise((r) => setTimeout(r, 2500))]).then(() => { measure(); arrive(); });
   }, { threshold: [0, 0.15, 0.3] }).observe(grid);
 
-  // ----- arrastar (mouse e dedo); gesto vertical no celular continua rolando a página -----
-  const hitCard = (el) => el && el.closest && el.closest('.nc-card');
-  grid.addEventListener('pointerdown', (e) => {
-    if (e.button !== 0) return;
-    st.drag = { id: e.pointerId, x0: e.clientX, y0: e.clientY, start: st.target, moved: false, samples: [], card: hitCard(e.target) };
-    wake();
+  // ----- mouse por cima -----
+  grid.addEventListener('pointerover', (e) => {
+    if (e.pointerType !== 'mouse' || busy) return;
+    const c = e.target.closest && e.target.closest('.nc-card');
+    const slot = c ? map.get(cards.indexOf(c)) : undefined;
+    if (slot === undefined) return;
+    clearTimeout(leaveT);
+    if (hovered !== slot) { hovered = slot; layout(slot); }
   });
-  grid.addEventListener('pointermove', (e) => {
-    const d = st.drag;
-    if (!d || d.id !== e.pointerId) {
-      if (e.pointerType === 'mouse') { const c = hitCard(e.target); const k = c ? cards.indexOf(c) : -1; if (k !== st.hover) { st.hover = k; wake(); } }
-      return;
-    }
-    const dx = e.clientX - d.x0, dy = e.clientY - d.y0;
-    if (!d.moved && Math.hypot(dx, dy) > 6) {
-      if (Math.abs(dy) > Math.abs(dx) && e.pointerType !== 'mouse') { st.drag = null; return; }
-      d.moved = true; grid.setPointerCapture?.(e.pointerId); grid.setAttribute('data-dragging', ''); st.hover = -1;
-    }
-    if (d.moved) {
-      st.target = d.start - dx;
-      d.samples.push({ x: e.clientX, t: performance.now() }); if (d.samples.length > 6) d.samples.shift();
-      wake();
-    }
+  grid.addEventListener('pointerleave', (e) => {
+    if (e.pointerType !== 'mouse' || busy) return;
+    clearTimeout(leaveT);
+    leaveT = setTimeout(() => { hovered = null; layout(null); }, 50);
   });
-  const end = (e) => {
-    const d = st.drag;
-    if (!d || d.id !== e.pointerId) return;
-    st.drag = null; grid.removeAttribute('data-dragging');
-    if (grid.hasPointerCapture?.(e.pointerId)) grid.releasePointerCapture(e.pointerId);
-    if (d.moved) {
-      const s = d.samples;
-      if (s.length > 1) { const a = s[0], b = s[s.length - 1]; st.target -= ((b.x - a.x) / Math.max(b.t - a.t, 16)) * 1000 * 0.18; }
-      goTo(nearest());
-    } else if (d.card && e.type === 'pointerup') {   // toque/clique num cartão: ele vem para o centro
-      const k = cards.indexOf(d.card); const cur = st.active, base = cur - wrap(cur, N) + k;
-      goTo([base - N, base, base + N].reduce((p, q) => (Math.abs(q - cur) < Math.abs(p - cur) ? q : p)));
-    }
-  };
-  grid.addEventListener('pointerup', end);
-  grid.addEventListener('pointercancel', end);
-  grid.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse' && st.hover !== -1) { st.hover = -1; wake(); } });
-  // roda/trackpad: só o gesto de lado move a galeria (o vertical continua rolando a página)
-  grid.addEventListener('wheel', (e) => {
-    if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
-    e.preventDefault();
-    st.target += e.deltaX * (e.deltaMode === 1 ? 16 : 1);
-    clearTimeout(snapT); snapT = setTimeout(() => goTo(nearest()), 140);
-    wake();
-  }, { passive: false });
-  grid.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); goTo(nearest() + (e.key === 'ArrowRight' ? 1 : -1)); }
-  });
-  [prev, next].forEach((b) => { b.disabled = false; b.addEventListener('click', () => goTo(nearest() + Number(b.dataset.dir))); });
 
-  if ('ResizeObserver' in window) { let w0 = 0; new ResizeObserver(() => { const w = grid.clientWidth; if (w !== w0) { w0 = w; measure(); } }).observe(grid); }
-  setActive(0);
+  // ----- arrastar de lado (dedo ou mouse) troca; tocar num cartão traz ele para o centro -----
+  let drag = null;
+  grid.addEventListener('pointerdown', (e) => { if (e.button === 0) drag = { id: e.pointerId, x: e.clientX, y: e.clientY }; });
+  grid.addEventListener('pointerup', (e) => {
+    const d = drag; drag = null;
+    if (!d || d.id !== e.pointerId) return;
+    const dx = e.clientX - d.x, dy = e.clientY - d.y;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) { step(dx < 0 ? 1 : -1); return; }
+    if (Math.hypot(dx, dy) < 8) {
+      const c = e.target.closest && e.target.closest('.nc-card');
+      if (c && map.has(cards.indexOf(c))) goTo(cards.indexOf(c));
+    }
+  });
+  grid.addEventListener('pointercancel', () => { drag = null; });
+  grid.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); step(e.key === 'ArrowRight' ? 1 : -1); }
+  });
+  [prev, next].forEach((b) => { b.disabled = false; b.addEventListener('click', () => step(Number(b.dataset.dir))); });
+
+  // ----- tamanho da tela -----
+  let w0 = 0;
+  const onResize = () => { const w = grid.clientWidth; if (w === w0) return; w0 = w; measure(); if (started && !busy) layout(hovered, true); else if (!started) place(); };
+  if ('ResizeObserver' in window) new ResizeObserver(onResize).observe(grid);
+  else addEventListener('resize', onResize);
+
+  label();
   measure();
-  addEventListener('load', measure, { once: true });
+  place();
+  addEventListener('load', () => { measure(); if (started && !busy) layout(hovered, true); }, { once: true });
 })();

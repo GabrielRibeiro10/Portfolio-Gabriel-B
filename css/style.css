@@ -2187,6 +2187,23 @@ html.nc-gal-on .nichos .nc-ctrl { position: relative; z-index: 5; margin-top: ca
   html.nc-gal-on .nichos .nc-grid { --cw: min(60vw, 250px); padding-bottom: 84px; }
   html.nc-gal-on .nichos .nc-ctrl { margin-top: -50px; }
 }
+/* ---------- Segmentos em leque (js/segmentos.js): sete cartões abertos, pontinhos entre as setas ---------- */
+html.nc-gal-on .nichos.nc-fan .nc-grid { padding: clamp(44px, 4vw, 60px) 0 clamp(110px, 9vw, 140px); cursor: default; }
+html.nc-gal-on .nichos.nc-fan .nc-card { transform-origin: 50% 50%; cursor: pointer; }
+html.nc-gal-on .nichos.nc-fan .nc-card.is-center { cursor: default; }
+html.nc-gal-on .nichos.nc-fan .nc-ctrl { margin-top: -40px; }
+html.nc-gal-on .nichos.nc-fan .nc-count { display: flex; flex-direction: column; align-items: center; min-width: 0; }
+html.nc-gal-on .nichos.nc-fan .nc-count b, html.nc-gal-on .nichos.nc-fan .nc-count > span:not(.nc-pips) { display: none; }
+html.nc-gal-on .nichos.nc-fan .nc-count em { grid-row: 2; margin-top: 8px; font-size: 13px; color: #8a8580; }
+.nc-pips { grid-row: 1; grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; }
+.nc-pips i { width: 8px; height: 8px; border-radius: 50%; background: rgba(17, 17, 17, .15); transition: background .3s, transform .3s; }
+.nc-pips i.on { background: rgba(17, 17, 17, .7); transform: scale(1.3); }
+@media (max-width: 860px) {
+  html.nc-gal-on .nichos.nc-fan .nc-grid { --cw: min(62vw, 250px); padding: 40px 0 70px; }
+  html.nc-gal-on .nichos.nc-fan .nc-ctrl { margin-top: -20px; }
+  .nc-pips { gap: 6px; }
+}
+
 /* "Quero uma landing page": a mesma luz branca do botão da hero (halo branco fixo + reflexo que atravessa) */
 .nc-more-go { position: relative; overflow: hidden; isolation: isolate;
   box-shadow: 0 0 0 1px rgba(255, 255, 255, .55), 0 0 18px 2px rgba(255, 255, 255, .28), 0 0 42px 6px rgba(255, 236, 214, .18), 0 14px 30px -14px rgba(242, 107, 29, .8); }
