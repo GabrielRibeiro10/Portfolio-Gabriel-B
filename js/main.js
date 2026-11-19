@@ -170,6 +170,14 @@ if (animate) {
     .set(open, { display: 'none' }, 4.65)
     .to(logo, { x: 0, y: 0, scale: 1, duration: 1.6, ease: 'power2.inOut', force3D: false, clearProps: 'transform,filter,zIndex,transition,opacity,visibility' }, 2.9)
     .from($$('.logo-shine, .lg-cursor'), { autoAlpha: 0, duration: 0.4, ease: 'power1.out', clearProps: 'opacity,visibility' }, 4.3);
+  // durante a abertura a marca não reage a seta nem dedo (.logo-wait: pointer-events none no css); só depois de
+  // pousar no topo (fim do voo: 2,9 + 1,6). Segurança: se a linha do tempo não chegar lá (aba em segundo plano,
+  // erro), libera assim que a marca não estiver mais se mexendo
+  logo.classList.add('logo-wait');
+  const logoFree = () => logo.classList.remove('logo-wait');
+  tl.call(logoFree, null, 4.5);
+  const logoSafety = () => { if (!logo.classList.contains('logo-wait')) return; if (gsap.isTweening(logo)) setTimeout(logoSafety, 500); else logoFree(); };
+  setTimeout(logoSafety, 9000);
   // a página fica parada até a marca pousar no canto (roda, toque e teclado; o Lenis para junto, lá embaixo).
   // Sem mexer no overflow: a barra de rolagem não some, então nada pula de lugar ao soltar.
   {
@@ -399,12 +407,14 @@ if ('IntersectionObserver' in window) {
   }), { rootMargin: '120px 0px' });
   document.querySelectorAll('.hero, .about-title, .stack, .faq-bg, .site-footer, .doc-hero').forEach((el) => io.observe(el));
 }
-// marca: passar o mouse redesenha o GR uma vez até o fim; entrar e sair de novo no meio não recomeça
+// marca: passar o mouse (PC) ou tocar com o dedo (celular) redesenha o GR uma vez até o fim; de novo no meio não
+// recomeça. Na abertura nada disso: a marca só reage depois de pousar no topo (.logo-wait, na entrada da hero)
 {
   const logo = document.querySelector('.logo'), gr = logo && logo.querySelector('.lg-gr');
-  if (gr && matchMedia('(hover: hover)').matches) {
-    // na abertura a marca cresce e voa até o canto por baixo da seta: ignora até ela pousar
-    logo.addEventListener('mouseenter', () => { if (!(window.gsap && gsap.isTweening(logo))) logo.classList.add('is-drawing'); });
+  if (gr) {
+    const draw = () => { if (!logo.classList.contains('logo-wait') && !(window.gsap && gsap.isTweening(logo))) logo.classList.add('is-drawing'); };
+    logo.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') draw(); });
+    logo.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') draw(); });
     gr.addEventListener('animationend', () => logo.classList.remove('is-drawing'));
   }
 }

@@ -94,10 +94,10 @@ a { color: inherit; text-decoration: none; }
 @keyframes lg-shine { 0% { transform: translateX(-66.667%); } 100% { transform: translateX(0); } }   /* = background-position 100% → 0% */
 @keyframes lg-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
 @keyframes lg-redraw { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 55.1% 0 0); } }
-@media (hover: hover) {
-  /* .is-drawing: posta pelo js/main.js ao passar o mouse e tirada só quando o desenho termina (não recomeça no meio) */
-  .logo.is-drawing .lg-gr { animation: lg-redraw .8s cubic-bezier(.65, 0, .35, 1) both; }
-}
+/* .is-drawing: posta pelo js/main.js ao passar o mouse ou tocar e tirada só quando o desenho termina (não recomeça no meio) */
+.logo.is-drawing .lg-gr { animation: lg-redraw .8s cubic-bezier(.65, 0, .35, 1) both; }
+/* na abertura a marca não reage a seta nem dedo (nem o brilho do hover): só depois de pousar no topo */
+.gsap-loading .logo, .logo.logo-wait { pointer-events: none; }
 .logo:focus-visible { outline: 2px solid #fff; outline-offset: 6px; border-radius: 6px; }
 @media (prefers-reduced-motion: reduce) { .logo-shine i { animation: none; } .logo-shine { opacity: 0; } .lg-cursor, .logo.is-drawing .lg-gr { animation: none; } }
 .is-off :is(.logo-shine, .lg-cursor), html.leve .logo-shine { animation-play-state: paused; }
