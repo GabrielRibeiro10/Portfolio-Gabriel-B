@@ -29,26 +29,13 @@
   <svg class="doc-art" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><circle cx="50" cy="50" r="44"/><circle cx="50" cy="50" r="36.5"/><circle cx="50" cy="26" r="6"/><path d="M27 37.5c8 2.2 15.5 3.3 23 3.3s15-1.1 23-3.3M50 41v18M50 59l-10 19M50 59l10 19"/></svg>
   <div class="doc-in">
     <div class="doc-top">
-      <a class="doc-brand" href="index.html" aria-label="Gabriel Ribeiro, voltar ao site">
-        <svg class="logo-mark" viewBox="1 5 48 30" aria-hidden="true">
-          <!-- degradê que corre pelo traço: branco → pêssego → laranja → branco, em loop -->
-          <defs>
-            <linearGradient id="lg-grad" gradientUnits="userSpaceOnUse" x1="-40" y1="5" x2="8" y2="35" spreadMethod="repeat">
-              <stop offset="0" stop-color="#fff"/>
-              <stop offset=".3" stop-color="#ffd2a8"/>
-              <stop offset=".5" stop-color="#ff9536"/>
-              <stop offset=".7" stop-color="#ffd2a8"/>
-              <stop offset="1" stop-color="#fff"/>
-              <animateTransform class="lg-flow" attributeName="gradientTransform" type="translate" from="0 0" to="48 30" dur="4s" repeatCount="indefinite"/>
-            </linearGradient>
-          </defs>
-          <path class="lg-s" pathLength="1" d="M21.9 10.2A12 12 0 1 0 27 20"/>
-          <path class="lg-s" pathLength="1" d="M27 32V8h5.5a6 6 0 0 1 0 12H17"/>
-          <path class="lg-s" pathLength="1" d="M31 20l7 12"/>
-          <rect class="lg-cursor" x="42" y="27" width="6" height="5" rx="1"/>
-        </svg>
-        <span class="logo-sep" aria-hidden="true"></span>
-        <span class="logo-word" aria-hidden="true">Gabriel<i>Ribeiro</i></span>
+      <a class="doc-brand logo" href="index.html" aria-label="Gabriel Ribeiro, voltar ao site">
+        <!-- a mesma marca da hero: três recortes da imagem (o hover ou toque redesenha o GR), brilho que corre e cursor -->
+        <img class="logo-mark lg-gr" src="img/logo-gabriel-ribeiro-540.webp" alt="" width="900" height="299" decoding="async" fetchpriority="high">
+        <img class="logo-mark lg-bar" src="img/logo-gabriel-ribeiro-540.webp" alt="" width="900" height="299" decoding="async">
+        <img class="logo-mark lg-name" src="img/logo-gabriel-ribeiro-540.webp" alt="" width="900" height="299" decoding="async">
+        <span class="logo-shine" aria-hidden="true"><i></i></span>
+        <span class="lg-cursor" aria-hidden="true"></span>
       </a>
       <nav class="doc-tabs" aria-label="Documentos">
         <a href="termos.html">Termos</a>

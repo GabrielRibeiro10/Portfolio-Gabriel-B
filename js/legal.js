@@ -3,6 +3,15 @@
   const hero = document.querySelector('.doc-hero');
   if (hero && 'IntersectionObserver' in window) new IntersectionObserver(([e]) => hero.classList.toggle('is-off', !e.isIntersecting)).observe(hero);
 })();
+// Marca: passar o mouse (PC) ou tocar (celular) redesenha o GR uma vez até o fim, como na hero
+(() => {
+  const logo = document.querySelector('.doc-brand.logo'), gr = logo && logo.querySelector('.lg-gr');
+  if (!gr) return;
+  const draw = () => logo.classList.add('is-drawing');
+  logo.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') draw(); });
+  logo.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') draw(); });
+  gr.addEventListener('animationend', () => logo.classList.remove('is-drawing'));
+})();
 // O índice da esquerda acende a seção que está sendo lida (a última cujo topo já passou de 30% da tela).
 (() => {
   const links = [...document.querySelectorAll('.doc-toc a[href^="#"]')];
