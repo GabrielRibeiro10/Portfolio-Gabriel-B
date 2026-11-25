@@ -59,7 +59,10 @@ function goTitle() {
   const lines = [...title.querySelectorAll('.at-line')];
   // no celular o título vem de fora da tela (34% da largura de um celular era pouco: ele mal saía do lugar)
   const D = mob() ? 1600 : 1350, LAG = 110, X = (mob() ? -1.05 : -0.34) * innerWidth;
-  const soft = !document.documentElement.classList.contains('leve');
+  // desfoque de movimento: não no modo leve nem no iPhone/iPad (no Safari, refazer o desfoque de um texto grande a
+  // cada quadro junto com o crachá 3D engasgava a entrada; a inclinação continua)
+  const ios = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const soft = !document.documentElement.classList.contains('leve') && !ios;
   let t = 0, last = performance.now();
   const f = (now) => {
     t += Math.min(now - last, 34); last = now;
@@ -248,6 +251,9 @@ async function start() {
   await photo.decode();
   if (!photo.naturalWidth) throw new Error('foto do crachá não carregou');
 
+  // montar o 3D em pedaços, devolvendo a vez ao navegador entre eles: tudo de uma vez era uma travada de ~0,3 s
+  // e, se a pessoa rolava rápido, ela caía bem na chegada ao crachá (o Safari não tem requestIdleCallback)
+  const pausa = () => new Promise((r) => ('requestIdleCallback' in window ? requestIdleCallback(() => r(), { timeout: 250 }) : setTimeout(r, 32)));
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const W = matchMedia('(max-width: 860px)').matches ? 150 : 180;   // largura do cartão (o antigo tinha 260 e ficava grande)
   const H = Math.round(W * 1.54);
@@ -263,10 +269,11 @@ async function start() {
   canvas.setAttribute('aria-hidden', 'true');
   canvas.style.visibility = 'hidden';
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: devicePixelRatio < 1.5, alpha: true, powerPreference: 'high-performance' });   // tela de alta densidade não precisa de antisserrilhado (mais leve)
-  // desempenho e iPhone: até 1,5x no PC; no iPhone/iPad (Safari tem limite de memória de canvas e entrega o canvas em
-  // branco, sem erro, quando passa dele) até 1x
+  // nitidez: até 1,5x no PC e 2x no iPhone/iPad (com 1x a tela 3x do iPhone esticava o desenho e a fita saía
+  // pixelada). O Safari tem limite de memória de canvas: o layout() ainda baixa a densidade se o canvas passar de
+  // ~3 milhões de pixels
   const ios = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  renderer.setPixelRatio(Math.min(devicePixelRatio, ios ? 1 : 1.5));
+  const PR = Math.min(devicePixelRatio, ios ? 2 : 1.5);
   about.appendChild(canvas);
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(30, 1, 1, 10);
@@ -280,10 +287,13 @@ async function start() {
     const m = new THREE.Mesh(strip, new THREE.MeshBasicMaterial({ color: new THREE.Color(i, i, i), side: THREE.DoubleSide }));
     m.position.set(...p); m.rotation.set(...r); m.scale.set(sc[0], sc[1], 1); env.add(m);
   }
+  await pausa();
   scene.environment = new THREE.PMREMGenerator(renderer).fromScene(env, 0.04).texture;
+  await pausa();
   const gloss = (o) => new THREE.MeshPhysicalMaterial({ clearcoat: 1, clearcoatRoughness: 0.15, roughness: 0.9, metalness: 0.1, envMapIntensity: 0.35, ...o });
   const aniso = renderer.capabilities.getMaxAnisotropy();
-  const tex = (c) => { const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = aniso; return t; };
+  const texs = [];
+  const tex = (c) => { const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = aniso; texs.push(t); return t; };
 
   // cartão: corpo com espessura + frente (foto e nome) + verso; a origem fica no meio da borda de cima
   const shape = new THREE.Shape(), r = W * 0.07, x0 = -W / 2, y0 = -H / 2;
@@ -299,11 +309,12 @@ async function start() {
   };
   const card = new THREE.Group(), inner = new THREE.Group();
   inner.position.y = -H / 2;
+  const frontMat = gloss({ map: tex(drawFront()) });   // uma textura só para os dois lados (antes eram duas iguais: memória e envio dobrados)
   inner.add(
     new THREE.Mesh(new THREE.ExtrudeGeometry(shape, { depth: 2.4, bevelEnabled: false, curveSegments: 8 }).translate(0, 0, -1.2),
       gloss({ color: 0xeceae6 })),
-    new THREE.Mesh(face(1.4), gloss({ map: tex(drawFront()) })),
-    new THREE.Mesh(face(-1.4, true), gloss({ map: tex(drawFront()) })),   // verso igual à frente: foto dos dois lados
+    new THREE.Mesh(face(1.4), frontMat),
+    new THREE.Mesh(face(-1.4, true), frontMat),   // verso igual à frente: foto dos dois lados
   );
   // brilho do vídeo: faixa de luz na diagonal sobre a frente, que desliza quando o cartão gira/balança.
   // O reflexo do mapa de ambiente sozinho fica um véu borrado num cartão desse tamanho, então a faixa é desenhada.
@@ -394,6 +405,7 @@ async function start() {
     // e na altura começa pouco acima do gancho (folga para levantar o cartão arrastando): a seção tem os Projetos
     // em cima, e sem isso o canvas teria mais de mil pixels transparentes desenhados a cada quadro
     Y0 = Math.max(0, Math.round(P.y - L - 80)); rh = ch - Y0;
+    renderer.setPixelRatio(Math.max(1, Math.min(PR, Math.sqrt(3e6 / (vw * rh)))));
     renderer.setSize(vw, rh); canvas.style.left = X0 + 'px'; canvas.style.top = Y0 + 'px';
     camera.aspect = cw / ch;
     camera.setViewOffset(cw, ch, X0, Y0, vw, rh);
@@ -462,6 +474,24 @@ async function start() {
     return moved;
   }
 
+  // área de toque só em cima do cartão (touch-action: none): arrastar o cartão não rola a página. Antes era um
+  // touchstart que não deixava rolar (passive: false) na seção inteira: a cada toque no Sobre mim o iPhone esperava
+  // o JavaScript responder antes de começar a rolar, e a rolagem engasgava (Safari e Chrome do iPhone)
+  const hit = document.createElement('div');
+  hit.className = 'cracha-hit'; hit.setAttribute('aria-hidden', 'true');
+  about.appendChild(hit);
+  let hb = '';
+  function placeHit() {
+    const hx = (BR.x - BL.x) / 2, hy = (BR.y - BL.y) / 2;
+    const xs = [T.x - hx, T.x + hx, BL.x, BR.x], ys = [T.y - hy - 12, T.y + hy - 12, BL.y, BR.y];
+    const l = Math.min(...xs) - 6, t = Math.min(...ys) - 6, w = Math.max(...xs) + 6 - l, h = Math.max(...ys) + 6 - t;
+    const v = `${l.toFixed(0)},${t.toFixed(0)},${w.toFixed(0)},${h.toFixed(0)}`;
+    if (v === hb) return;
+    hb = v;
+    Object.assign(hit.style, { left: l.toFixed(0) + 'px', top: t.toFixed(0) + 'px', width: w.toFixed(0) + 'px', height: h.toFixed(0) + 'px',
+      translate: title.style.translate, display: shown && !dead ? '' : 'none' });
+  }
+
   // ----- desenho -----
   const toW = (p, v) => v.set(p.x - cw / 2, ch / 2 - p.y, p.z);
   const vT = new THREE.Vector3(), vL = new THREE.Vector3(), vR = new THREE.Vector3();
@@ -496,6 +526,7 @@ async function start() {
       bandPos[o] = p.x - side.x; bandPos[o + 1] = p.y - side.y; bandPos[o + 2] = p.z - side.z;
       bandPos[o + 3] = p.x + side.x; bandPos[o + 4] = p.y + side.y; bandPos[o + 5] = p.z + side.z;
     }
+    placeHit();
     hook.position.set(P.x - cw / 2, ch / 2 - P.y, 0); hook.rotation.z = hookAng;
     cap.position.copy(smp[0]); cap.rotation.z = hookAng;
     bandGeo.attributes.position.needsUpdate = true;
@@ -513,8 +544,10 @@ async function start() {
     const dt = Math.min(0.05, (t - last) / 1000 || 1 / 60); last = t; acc += dt;
     // o título pode estar animando: o "g" muda de lugar. O gancho não pula de uma vez para a posição nova: anda um
     // pedaço em cada passo da física (num quadro atrasado o salto era grande e o cartão disparava a girar)
+    // só mede o "g" de novo enquanto o título anda: com ele parado a posição não muda (o layout() refaz a conta
+    // quando algo muda de tamanho), e medir a cada quadro obrigava o navegador a recalcular a página
     const ox = P.x, oy = P.y;
-    pin();
+    if (!titleDone) pin();
     const nx = P.x, ny = P.y, n = Math.floor(acc / STEP);
     let moved = 0, i = 0;
     while (acc >= STEP) {
@@ -529,10 +562,17 @@ async function start() {
   }
   const kick = () => { still = 0; since = 0; if (!running && visible && shown) { running = true; last = performance.now(); acc = 0; requestAnimationFrame(frame); } };
 
+  // o primeiro desenho compilava os shaders e enviava as texturas para a placa no mesmo quadro: agora vai em partes
+  layout(); hang(0);
+  await pausa(); renderer.compile(scene, camera);
+  for (const t of texs) { await pausa(); renderer.initTexture(t); }
+  await pausa();
+  // o modo leve ligou enquanto montava (o aviso gr:leve só é ouvido mais abaixo): fica o crachá desenhado
+  if (document.documentElement.classList.contains('leve')) { dead = true; canvas.remove(); hit.remove(); renderer.dispose(); lanyard(); return; }
   layout(); hang(0); draw();
   about.classList.add('cracha-3d'); about.classList.remove('cracha-loading');
   markReady();
-  const show = () => { shown = true; canvas.style.visibility = ''; kick(); };
+  const show = () => { shown = true; canvas.style.visibility = ''; hb = ''; placeHit(); kick(); };
   if (reduce) show();
   else whenTitleIn(() => { pin(); hang(0.5); show(); });   // aparece junto com o título, que o arrasta para a direita
   new IntersectionObserver((e) => { visible = e[0].isIntersecting; kick(); }).observe(canvas);   // só o pedaço do crachá, não a seção inteira
@@ -546,7 +586,7 @@ async function start() {
   // modo leve ligado no meio do uso: some o 3D e volta o crachá estático
   document.addEventListener('gr:leve', () => {
     dead = true; visible = false; drag = null; about.style.cursor = '';
-    canvas.remove(); renderer.dispose(); about.classList.remove('cracha-3d'); lanyard();
+    canvas.remove(); hit.remove(); renderer.dispose(); about.classList.remove('cracha-3d'); lanyard();
   }, { once: true });
   function onCard(e) {
     if (!shown || dead) return false;
@@ -557,7 +597,6 @@ async function start() {
     return ray.intersectObject(card, true).length > 0;
   }
   let off = null;
-  about.addEventListener('touchstart', (e) => { if (onCard(e.touches[0])) e.preventDefault(); }, { passive: false });   // não rola a página
   about.addEventListener('pointerdown', (e) => {
     if (!onCard(e)) return;
     e.preventDefault();
@@ -642,7 +681,8 @@ async function start() {
     return c;
   }
   function drawBand() {   // uma repetição do texto; a textura se repete ao longo da fita
-    const text = 'GABRIEL RIBEIRO   •   FULL STACK   •   ', hpx = 64, font = `600 ${hpx * 0.42}px "Inter Tight", sans-serif`;
+    // 128 px de altura (antes 64): letra nítida mesmo em tela 3x
+    const text = 'GABRIEL RIBEIRO   •   FULL STACK   •   ', hpx = 128, font = `600 ${hpx * 0.42}px "Inter Tight", sans-serif`;
     const c = document.createElement('canvas'), x = c.getContext('2d');
     x.font = font; c.width = Math.ceil(x.measureText(text).width); c.height = hpx;
     x.fillStyle = '#111'; x.fillRect(0, 0, c.width, hpx);

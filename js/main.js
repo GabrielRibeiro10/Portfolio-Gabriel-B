@@ -933,12 +933,12 @@ if (window.gsap && window.ScrollTrigger && !reduceMotion) {
         const v = document.documentElement.classList.contains('leve') ? '' : `0 ${ty.v.toFixed(1)}px`;
         if (v === last) return;
         last = v; title.style.translate = v;
-        for (const c of about.querySelectorAll(':scope > .cracha-canvas, :scope > .lanyard, .cracha-leve .cracha')) c.style.translate = v;
+        for (const c of about.querySelectorAll(':scope > .cracha-canvas, :scope > .cracha-hit, :scope > .lanyard, .cracha-leve .cracha')) c.style.translate = v;
       } }, 0);
       // o gsap.matchMedia já desfaz a timeline ao trocar PC <-> celular; aí tl.scrollTrigger vem vazio e, sem o "?",
       // o erro parava aqui e o título e o crachá não voltavam ao lugar
       const off = () => { tl.scrollTrigger?.kill(); tl.kill(); title.style.translate = '';
-        for (const c of about.querySelectorAll(':scope > .cracha-canvas, :scope > .lanyard, .cracha-leve .cracha')) c.style.translate = '';
+        for (const c of about.querySelectorAll(':scope > .cracha-canvas, :scope > .cracha-hit, :scope > .lanyard, .cracha-leve .cracha')) c.style.translate = '';
         gsap.set(me.querySelectorAll(layers.map((l) => l[0]).join(',')), { '--ap': '0px' }); };
       return off;
     };
