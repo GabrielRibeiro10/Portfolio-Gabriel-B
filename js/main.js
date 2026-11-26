@@ -136,7 +136,9 @@ if (animate) {
   // transform: termina exatamente onde já fica). A imagem da logo não muda: só opacidade, escala, foco e luz.
   // Modo leve: sem desfoque e sem a máscara que abre (repintam a cada quadro); o fundo só se apaga crescendo.
   const logo = $('.logo'), open = $('.gr-open'), layers = $$('.gr-open__l');
-  const lite = leve();
+  // celular/tablet (toque) também abre na versão barata: sem desfoque animado na logo e sem a máscara que abre o
+  // fundo. Os dois repintam a tela inteira a cada quadro; no iPhone (tela 3x) a abertura "lagava" mesmo no 11 Pro Max
+  const lite = leve() || isMobile;
   const D = 2.85;   // quando o resto da hero começa: junto com a abertura do fundo (a marca pousa em ~4,4 s)
   const hr = hero.getBoundingClientRect(), lr = logo.getBoundingClientRect();
   const S = Math.min(isMobile ? 2.6 : 3.1, (hr.width * (isMobile ? 0.8 : 0.42)) / lr.width);
@@ -147,8 +149,9 @@ if (animate) {
   // o .gr-open já aparece com a página (css: .gsap-loading), sem as formas; aqui ele passa a ser do GSAP
   gsap.set(open, { display: 'block', '--r': -30, '--cy': cy + 'px' });
   gsap.set(layers, { autoAlpha: 0 });
-  // force3D: false = sem camada 3D: a logo fica nítida o caminho todo e não "estala" ao parar no canto
-  gsap.set(logo, { x: dx, y: dy, scale: S * 0.94, transformOrigin: '50% 50%', autoAlpha: 0, zIndex: 9, transition: 'none', force3D: false,
+  // force3D: false = sem camada 3D: a logo fica nítida o caminho todo e não "estala" ao parar no canto. No celular,
+  // com camada (isMobile): sem ela a logo (com sombra, máscara e brilho) era redesenhada a cada quadro do voo
+  gsap.set(logo, { x: dx, y: dy, scale: S * 0.94, transformOrigin: '50% 50%', autoAlpha: 0, zIndex: 9, transition: 'none', force3D: isMobile,
     filter: lite ? sharp : 'blur(5px) brightness(1.25) drop-shadow(0 0 10px rgba(255,170,100,.45))' });
   // fundo: as três formas chegam uma depois da outra e derivam em ritmos e sentidos diferentes (xPercent/yPercent)
   const drift = [[-6, 4, -7, 5, -3, 5], [7, -5, 6, -6, 4, -4], [-3, -4, 10, 4, 3, -8]];
@@ -171,7 +174,7 @@ if (animate) {
     duration: 1.7, ease: 'power2.inOut' }, 2.8)
     .to(layers, { autoAlpha: 0, duration: 1.1, ease: 'power1.in' }, 3.45)
     .set(open, { display: 'none' }, 4.65)
-    .to(logo, { x: 0, y: 0, scale: 1, duration: 1.6, ease: 'power2.inOut', force3D: false, clearProps: 'transform,filter,zIndex,transition,opacity,visibility' }, 2.9)
+    .to(logo, { x: 0, y: 0, scale: 1, duration: 1.6, ease: 'power2.inOut', force3D: isMobile, clearProps: 'transform,filter,zIndex,transition,opacity,visibility' }, 2.9)
     .from($$('.logo-shine, .lg-cursor'), { autoAlpha: 0, duration: 0.4, ease: 'power1.out', clearProps: 'opacity,visibility' }, 4.3);
   // durante a abertura a marca não reage a seta nem dedo (.logo-wait: pointer-events none no css); só depois de
   // pousar no topo (fim do voo: 2,9 + 1,6). Segurança: se a linha do tempo não chegar lá (aba em segundo plano,
