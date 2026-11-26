@@ -10,6 +10,7 @@ const person = document.querySelector('.person');
 const paraLeve = (tweens, els, prop) => document.addEventListener('gr:leve', () => {
   tweens.forEach((t) => { if (t.scrollTrigger) t.scrollTrigger.kill(); t.kill(); });
   gsap.set(els, { clearProps: prop });
+  if (prop === 'yPercent' && person) gsap.set(person, { yPercent: 6 });   // a foto fica na posição final da entrada
 }, { once: true });
 // design da referência atrás da foto (svg.hero-art): anda junto com ela
 const art = [...document.querySelectorAll('.hero-art')];
@@ -228,13 +229,15 @@ if (animate) {
 
   // a foto já está no lugar desde a primeira pintura, por baixo da cortina da abertura (.gr-open): assim o
   // PageSpeed conta o LCP cedo. Quando a cortina abre, ela só dá uma subidinha curta (sem sair da tela).
-  gsap.set(person, { yPercent: 6 });   // ainda coberta pela cortina: ninguém vê esse ajuste
+  // posição final da foto: 6% mais baixa (o dono preferiu assim; é também onde a rolagem a devolve ao subir).
+  // Antes ela parava em 0 e, depois de descer e subir a página, voltava para 6: parecia encolher do nada.
+  gsap.set(person, { yPercent: 12 });   // ainda coberta pela cortina: ninguém vê esse ajuste
   if (art.length) gsap.set(art, { autoAlpha: 0, scale: 0.94, transformOrigin: '50% 45%' });
   photoReady().then(() => requestAnimationFrame(() => requestAnimationFrame(() => {
     // a subidinha acontece junto com a abertura do fundo (D); a linha do tempo roda acelerada (timeScale), esta não
     const wait = Math.max(0, (D + 0.4 - tl.time()) / tl.timeScale());
-    gsap.fromTo(person, { yPercent: 6 },
-      { yPercent: 0, duration: 1.4, ease: 'expo.out', delay: wait, immediateRender: false });
+    gsap.fromTo(person, { yPercent: 12 },
+      { yPercent: 6, duration: 1.4, ease: 'expo.out', delay: wait, immediateRender: false });
     // o desenho amarelo aparece atrás quando a foto está chegando
     if (art.length) gsap.to(art, { autoAlpha: 1, scale: 1, duration: 1.3, ease: 'expo.out', delay: wait + 0.4 });
   })));
@@ -361,7 +364,9 @@ if (animate && person) {
   mm.add('(hover: hover) and (pointer: fine)', () => {
     if (!ScrollTrigger) return;
     if (leve()) return;
-    paraLeve([gsap.to(withArt, { yPercent: 30, ease: 'none',
+    // fromTo com o início fixo (6, a posição final da entrada): com .to() o início era lido na hora em que a
+    // página abria (ainda no meio da entrada) e a foto voltava para outro lugar ao subir a página
+    paraLeve([gsap.fromTo(withArt, { yPercent: (i, el) => (el === person ? 6 : 0) }, { yPercent: (i, el) => (el === person ? 36 : 30), ease: 'none', immediateRender: false,
       scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.6, invalidateOnRefresh: true } })], withArt, 'yPercent');
   });
 }
