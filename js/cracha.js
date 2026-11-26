@@ -72,6 +72,7 @@ function goTitle() {
       if (p < 1) busy = true;
       const e = slideEase(p), v = (slideEase(Math.min(1, p + 0.01)) - e) / 0.01;   // velocidade (0 a ~2,4)
       // linha que já chegou fica no lugar (none/1) até a outra chegar: o CSS do .ab-slide ainda vale
+      ln.__x = p < 1 ? X * (1 - e) : 0;   // deslocamento atual da linha: a fita do modo sem 3D anda junto sem medir nada
       ln.style.transform = p < 1 ? `translate3d(${(X * (1 - e)).toFixed(1)}px, 0, 0) skewX(${(-v * 1.6).toFixed(2)}deg)` : 'none';
       ln.style.opacity = p < 1 ? Math.min(1, p * 3.2).toFixed(3) : '1';
       if (soft) ln.style.filter = p < 1 && v > 0.15 ? `blur(${Math.min(4, v * 1.8).toFixed(2)}px)` : '';
@@ -201,16 +202,29 @@ async function lanyard() {
   let dx = 0;
   const px = (n) => n.toFixed(2) + 'px';
   const box = (n, l, t, w, h) => Object.assign(n.style, { left: px(l), top: px(t), width: px(w), height: px(h) });
+  let gLine = null;   // linha do título onde está a letra do gancho
+  // gancho, fita e cartão andam com a linha do "g" pela propriedade translate: x = deslocamento da linha na entrada
+  // (ln.__x, escrito pelo goTitle), y = parallax do título. Sem medir nada: dá para fazer a cada quadro
+  const shift = () => {
+    const lx = (gLine && gLine.__x) || 0, ty = parseFloat((title.style.translate || '').split(' ')[1]) || 0;
+    el.style.translate = fig.style.translate = lx || ty ? `${lx.toFixed(1)}px ${ty}px` : '';
+  };
   function place() {
-    const { r } = anchor(), ar = about.getBoundingClientRect();
+    const a = anchor(), { r } = a, ar = about.getBoundingClientRect();
+    gLine = a.el.closest('.at-line');
     // parallax do Sobre mim (js/main.js): título, gancho/fita e cartão andam juntos com o mesmo translate. As medidas
     // abaixo já vêm com esse translate (o título e o cartão estão deslocados), e o .lanyard também é deslocado: sem
     // descontar, o gancho caía longe do "g" e a fita encurtava conforme a rolagem
     // no modo leve o título não tem parallax (js/main.js): se o modo leve ligou no meio do uso, tira já o que sobrou
     if (document.documentElement.classList.contains('leve')) title.style.translate = '';
     const tr = title.style.translate, ty = parseFloat(tr.split(' ')[1]) || 0;
-    el.style.translate = fig.style.translate = tr;
-    const x = r.left + r.width * tail.x - ar.left, y = r.top + r.height * tail.y - ar.top - ty;   // centro do traço do "g"
+    // todas as medidas ANTES de escrever estilo: antes o cartão era medido depois de mexer na fita e no gancho, e o
+    // navegador refazia o layout da página a cada quadro enquanto o título deslizava (no celular fraco, ~60 ms/quadro)
+    const fr = fig.getBoundingClientRect(), ft = (fig.style.translate || '').split(' ');
+    const ftx = parseFloat(ft[0]) || 0, fty = parseFloat(ft[1]) || 0, lx = (gLine && gLine.__x) || 0;
+    shift();
+    // x sem o deslocamento da linha (ele vai no translate do shift)
+    const x = r.left - lx + r.width * tail.x - ar.left, y = r.top + r.height * tail.y - ar.top - ty;   // centro do traço do "g"
     const W = mob() ? 150 : 180, BAND = Math.round(W * 0.12);
     // mesmas contas do buildHook() do 3D
     const t = tail.th * r.height, rw = Math.max(1.4, t * 0.18), R = t / 2 + rw + 0.6;
@@ -219,10 +233,9 @@ async function lanyard() {
     box(ring, x - wb / 2 - rw, y + sh - rw, wb + rw * 2, hb + rw * 2);
     Object.assign(ring.style, { borderWidth: px(rw * 2), borderRadius: px(rr + rw) });
     // cartão centrado embaixo do gancho; a fita vai da argola até o clipe do cartão
-    const fr = fig.getBoundingClientRect();
-    dx = x - (fr.left - dx + fr.width / 2 - ar.left);
+    dx = x - (fr.left - ftx - dx + fr.width / 2 - ar.left);
     fig.style.transform = `translateX(${px(dx)})`;
-    const A = y + sh + hb, top = A - rw * 3.2, bottom = fr.top - ar.top - 3 - ty;   // termina dentro do clipe
+    const A = y + sh + hb, top = A - rw * 3.2, bottom = fr.top - fty - ar.top - 3;   // termina dentro do clipe
     box(band, x - BAND / 2, top, BAND, Math.max(0, bottom - top));
     Object.assign(band.style, {
       borderRadius: `${px(BAND / 2)} ${px(BAND / 2)} 0 0 / ${px(rw * 2.2)} ${px(rw * 2.2)} 0 0`,
@@ -235,7 +248,9 @@ async function lanyard() {
   // acompanha o "g" só enquanto o título desliza (antes ficava 3 s refazendo a posição a cada quadro logo ao montar,
   // com a pessoa ainda na hero: travava a hero em aparelho fraco). Vai até o título terminar de verdade, e não por um
   // tempo fixo: num aparelho lento a entrada passava dos 2,2 s e o cartão ficava preso fora da tela, à esquerda
-  const follow = () => { place(); if (!titleDone) requestAnimationFrame(follow); };
+  // só o shift() (sem medir) a cada quadro: medir a letra a cada quadro, logo depois de o título mudar, obrigava o
+  // navegador a refazer o layout (no celular fraco ~170 ms em 35 quadros). O place() completo fica para o fim
+  const follow = () => { shift(); if (!titleDone) requestAnimationFrame(follow); };
   whenTitleIn(() => requestAnimationFrame(follow));
   whenTitleDone(() => requestAnimationFrame(place));
   onShift(relayout);
