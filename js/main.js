@@ -257,7 +257,11 @@ if (animate) {
   shine.setAttribute('aria-hidden', 'true'); glow.setAttribute('aria-hidden', 'true');
   card.prepend(glow); card.append(shine);
   gsap.set(shine, { xPercent: -70 });
-  function cardAlive() {
+  // A rolagem (parallax + luz) liga JÁ NO CARREGAMENTO, não no fim da entrada: ligada depois, o card ficava parado
+  // com a luz na borda e, ~2 s depois, pulava para a posição da rolagem e só então a luz começava a andar. Não briga
+  // com a entrada porque usam propriedades separadas (entrada: y/rotationX/scale; rolagem: yPercent) e a entrada não
+  // apaga mais o transform no fim (clearProps só de opacidade/visibilidade).
+  function cardScroll() {
     if (leve()) return;
     if (ScrollTrigger) {
       // PC: o card está na hero desde o começo; vale do topo até a hero sair da tela.
@@ -274,6 +278,11 @@ if (animate) {
       // modo leve ligado no meio do uso: para tudo e deixa o card no lugar, com a luz parada
       document.addEventListener('gr:leve', () => { st.scrollTrigger.kill(); st.progress(0).kill(); gsap.set(card, { clearProps: 'transform' }); }, { once: true });
     }
+  }
+  cardScroll();
+  // inclinação com o mouse: só depois da entrada (ela também mexe em y e rotationX)
+  function cardAlive() {
+    if (leve()) return;
     if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
     gsap.set(card, { transformPerspective: 900 });
     const rx = gsap.quickTo(card, 'rotationX', { duration: 0.7, ease: 'power3.out' });
@@ -311,11 +320,11 @@ if (animate) {
     // card da citação: levanta em 3D (dobrado para trás, de baixo), a foto salta, nome e cargo deslizam, as
     // palavras sobem; depois a rolagem move o card e a luz dele, e no PC ele inclina seguindo o mouse
     t.fromTo(card, { y: 70, rotationX: -24, scale: 0.94, autoAlpha: 0, transformPerspective: 900, transformOrigin: '50% 100%' },
-      { y: 0, rotationX: 0, scale: 1, autoAlpha: 1, duration: 1.4, ease: 'expo.out', clearProps: 'transform,opacity,visibility' }, at + 0.3)
+      { y: 0, rotationX: 0, scale: 1, autoAlpha: 1, duration: 1.4, ease: 'expo.out', clearProps: 'opacity,visibility' }, at + 0.3)
     .from($('.quote-head img'), { scale: 0.3, rotation: -14, autoAlpha: 0, duration: 0.9, ease: 'back.out(2.2)', clearProps: 'transform,opacity,visibility' }, at + 0.55)
     .from($$('.quote-head strong, .quote-head span'), { x: -18, autoAlpha: 0, duration: 0.8, stagger: 0.08, clearProps: 'transform,opacity,visibility' }, at + 0.62);
     textIn(t, quoteWords, $('.quote-card blockquote'), 0.9, 0.03, at + 0.7);
-    t.call(cardAlive, null, at + 1.75);   // depois do fim da entrada (o clearProps dela apagaria o parallax)
+    t.call(cardAlive, null, at + 1.75);   // inclinação com o mouse depois do fim da entrada
     return t;
   };
   if (!isMobile) {
