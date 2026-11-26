@@ -2270,7 +2270,14 @@ html.leve .nc-more-go::after { animation: none; }
 .hero-art g[mask] > circle:first-child { display: none; }
 /* fundo novo (paisagem escura com arcos): sem o sol amarelo atrás da pessoa e com a luz de contorno bem mais suave */
 .person-rim { opacity: .08; }
-html.leve .person-rim { display: none; }   /* modo leve: a 8% quase não aparece e a mistura (screen) numa área grande que se mexe pesa na placa de vídeo */
+html.leve .person-rim { display: none; }
+/* celular/tablet (toque): sem a mistura "screen" na foto que anda com a rolagem (a 8% quase não se vê) e sem o fio de
+   luz girando dentro do recorte da borda do botão: o recorte (mask) por cima de algo que gira é refeito a cada quadro,
+   sem parar, e no iPhone (tela 3x) isso somava com a rolagem da hero */
+@media (hover: none), (pointer: coarse) {
+  .person-rim { display: none; }
+  .intro .bw-ring { display: none; }
+}   /* modo leve: a 8% quase não aparece e a mistura (screen) numa área grande que se mexe pesa na placa de vídeo */
 .hero-art g[mask] > circle:nth-child(2) { display: none; }   /* sem o disco amarelo (lua) atrás do ombro */
 .hero-art { display: none; }   /* sem a luz amarela atrás da pessoa */
 

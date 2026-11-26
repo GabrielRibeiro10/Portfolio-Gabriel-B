@@ -111,7 +111,9 @@ if (animate) {
   // tempo deixavam a abertura em ~39 ms por quadro (meta 35); quem tem aparelho bom vê igual a antes
   const L = leve();
   const titleIn = L ? $$('.intro h1 .line') : chars;
-  const textIn = (t, words, el, dur, stag, at) => (L
+  // celular: os textos do painel também entram inteiros. Lá a entrada deles começa NA ROLAGEM (ao chegar no
+  // painel) e ~1.900 mudanças de estilo palavra por palavra junto com a rolagem deixavam tudo lento no iPhone
+  const textIn = (t, words, el, dur, stag, at) => (L || isMobile
     ? t.from(el, { y: 18, autoAlpha: 0, duration: dur, ease: 'power3.out', clearProps: 'transform,opacity,visibility' }, at)
     : t.from(words, { yPercent: 110, duration: dur, stagger: stag }, at));
   const nums = $$('[data-count]');
@@ -262,8 +264,9 @@ if (animate) {
         : { trigger: hero, start: 'top top', end: 'bottom top' };
       const st = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { ...range, scrub: 0.8, invalidateOnRefresh: true } });
       st.fromTo(card, { yPercent: isMobile ? 16 : 0 }, { yPercent: isMobile ? -16 : -42 }, 0)
-        .fromTo(shine, { xPercent: -70 }, { xPercent: 135 }, 0)   // a luz já aparece na borda esquerda no começo
-        .fromTo(glow, { '--gx': '12%', '--gy': '10%', '--gc': 'rgba(255, 130, 50, .34)' },
+        .fromTo(shine, { xPercent: -70 }, { xPercent: 135 }, 0);  // a luz já aparece na borda esquerda no começo
+      // brilho quente: muda o degradê (repinta o card inteiro a cada quadro). Só no PC; no celular fica parado
+      if (!isMobile) st.fromTo(glow, { '--gx': '12%', '--gy': '10%', '--gc': 'rgba(255, 130, 50, .34)' },
           { '--gx': '100%', '--gy': '100%', '--gc': 'rgba(255, 196, 80, .38)' }, 0);
       // modo leve ligado no meio do uso: para tudo e deixa o card no lugar, com a luz parada
       document.addEventListener('gr:leve', () => { st.scrollTrigger.kill(); st.progress(0).kill(); gsap.set(card, { clearProps: 'transform' }); }, { once: true });
@@ -287,7 +290,8 @@ if (animate) {
   // (mesma distância em px, mesmo trecho e mesmo scrub). Vai na propriedade CSS translate (--hp), separada do
   // transform: a entrada e o hover deles continuam usando transform sem brigar com o parallax. Modo leve: parados
   // (medido no celular fraco: com a foto, o desenho e estes 3 andando a cada quadro, o topo passava da meta).
-  if (ScrollTrigger && !leve()) {
+  // celular: parados (são mais 3 camadas mudando a cada quadro da rolagem, junto com foto, desenho e card)
+  if (ScrollTrigger && !leve() && !isMobile) {
     const els = [$('.intro .btn-work'), $('.stats'), $('.socials')].filter(Boolean);
     const dist = () => card.offsetHeight * (isMobile ? 0.16 : 0.42);
     const sts = els.map((el) => gsap.fromTo(el, { '--hp': () => (isMobile ? dist() : 0) + 'px' }, { '--hp': () => -dist() + 'px', ease: 'none',
