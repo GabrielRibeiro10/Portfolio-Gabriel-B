@@ -7,6 +7,9 @@
 /* o site tem tema próprio: o modo escuro automático (Samsung Internet, Chrome do Android) não pode trocar as cores
    (sem isto o painel claro da hero ficava escuro). Junto com a <meta name="color-scheme"> das páginas */
 :root { color-scheme: only light; }
+/* texto só para leitor de tela e Google (não aparece na tela) */
+.sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 @font-face { font-family: "Inter Tight"; font-style: normal; font-weight: 100 900; font-display: swap;
   src: url(../fonts/inter-tight-latin.woff2) format("woff2"); }
 @font-face { font-family: "Instrument Serif"; font-style: normal; font-weight: 400; font-display: swap;

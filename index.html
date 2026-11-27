@@ -5,12 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- site só com tema próprio: o modo escuro automático do Samsung Internet e do Chrome do Android não troca as cores -->
   <meta name="color-scheme" content="only light">
+  <!-- endereço oficial desta página (o Google junta aqui as outras formas do link) -->
+  <link rel="canonical" href="https://gabrielribeiroweb.com.br/">
   <title>Gabriel Ribeiro • Desenvolvedor Web Full Stack</title>
   <meta name="description" content="Sites, landing pages e lojas virtuais para advogados, imobiliárias, dentistas e todo tipo de negócio. Rápidos, bonitos e feitos para vender. Peça seu orçamento.">
   <!-- prévia do link no WhatsApp, Instagram, LinkedIn, Facebook e X (imagem 1200×630) -->
   <meta property="og:type" content="website">
   <meta property="og:locale" content="pt_BR">
   <meta property="og:site_name" content="Gabriel Ribeiro">
+  <meta property="og:url" content="https://gabrielribeiroweb.com.br/">
   <meta property="og:title" content="Gabriel Ribeiro • Desenvolvedor Web Full Stack">
   <meta property="og:description" content="Seu site pode estar perdendo clientes. Crio sites, lojas virtuais e sistemas rápidos, bonitos e feitos para vender. Peça seu orçamento.">
   <meta property="og:image" content="https://gabrielribeiroweb.com.br/img/og-gabriel-ribeiro-v2.jpg">
@@ -201,6 +204,23 @@
   <script src="js/segmentos.js" defer></script>
   <script src="js/main.js" defer></script>
   <script type="module" src="js/cracha.js"></script>
+  <!-- ficha para o Google (não aparece na tela): o nome do site no resultado da busca (WebSite) e quem é o Gabriel
+       (Person). Mesmos dados do rodapé. JSON-LD não roda como script, então a CSP não bloqueia -->
+  <script type="application/ld+json">
+  [
+    { "@context": "https://schema.org", "@type": "WebSite", "name": "Gabriel Ribeiro",
+      "alternateName": ["Gabriel Ribeiro Web", "gabrielribeiroweb"], "url": "https://gabrielribeiroweb.com.br/", "inLanguage": "pt-BR" },
+    { "@context": "https://schema.org", "@type": "Person", "name": "Gabriel Ribeiro",
+      "jobTitle": "Desenvolvedor Web Full Stack",
+      "description": "Sites, landing pages e lojas virtuais rápidos, bonitos e feitos para vender.",
+      "url": "https://gabrielribeiroweb.com.br/",
+      "image": "https://gabrielribeiroweb.com.br/img/og-gabriel-ribeiro-v2.jpg",
+      "telephone": "+55-12-99197-0096",
+      "address": { "@type": "PostalAddress", "addressLocality": "Ilhabela", "addressRegion": "SP", "addressCountry": "BR" },
+      "knowsAbout": ["Criação de sites", "Landing pages", "Lojas virtuais", "Desenvolvimento web"],
+      "sameAs": ["https://github.com/GabrielRibeiro10"] }
+  ]
+  </script>
 </head>
 <body>
 
@@ -323,6 +343,9 @@
 <section class="about" aria-labelledby="about-title">
   <div class="about-in">
     <div class="projects" id="projetos">
+      <!-- título da seção para leitor de tela e Google (o selo abaixo é o título visível): os <h3> dos projetos ficam
+           debaixo de um <h2>, sem pular nível -->
+      <h2 class="sr-only">Projetos</h2>
       <p class="about-kicker pj-kicker" data-ab><span class="k-num">(01)</span><span class="k-name">Projetos</span><span class="k-line" aria-hidden="true"></span><span class="k-sub">Sites que já estão no ar</span></p>
       <div class="pj" role="region" aria-roledescription="carrossel" aria-label="Projetos publicados">
         <!-- fundo grafite: grade de pontos e holofote laranja que segue o mouse (css + js/main.js) -->

@@ -23,9 +23,12 @@
 
   ni.classList.add('nc-gal', 'nc-fan');
   grid.setAttribute('tabindex', '0');
-  grid.setAttribute('role', 'region');
-  grid.setAttribute('aria-roledescription', 'carrossel');
   grid.setAttribute('aria-label', 'Segmentos: use as setas para trocar');
+  // "carrossel" vai no contêiner, não na <ul>: com role na própria lista, o leitor de tela deixava de anunciar
+  // "lista, 8 itens" e os <li> ficavam soltos (axe: listitem)
+  ni.setAttribute('role', 'region');
+  ni.setAttribute('aria-roledescription', 'carrossel');
+  ni.setAttribute('aria-label', 'Segmentos');
 
   // pontinhos entre as setas (um por segmento)
   const dotsRow = document.createElement('span');
