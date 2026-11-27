@@ -585,8 +585,10 @@ document.querySelectorAll('.about-areas ol').forEach((list) => {
     slides.forEach((s, k) => { s.inert = k > 0; });
 
     if ('IntersectionObserver' in window && !reduceMotion) {
-      new IntersectionObserver(([e], o) => { if (e.isIntersecting) { o.disconnect(); if (cur < 0) show(0); } }, { threshold: 0.15 })
-        .observe(slides[0].querySelector('.laptop'));
+      // entra quando o COMEÇO do projeto passa de 85% da tela (antes: quando 15% do notebook aparecia; no celular o
+      // texto fica em cima do notebook e quem rolava devagar via um bloco vazio até o notebook chegar)
+      new IntersectionObserver(([e], o) => { if (e.isIntersecting) { o.disconnect(); if (cur < 0) show(0); } }, { rootMargin: '0px 0px -15% 0px' })
+        .observe(slides[0]);
       new IntersectionObserver(([e]) => {
         inView = e.isIntersecting;
         pj.classList.toggle('is-paused', !inView);
