@@ -4,6 +4,9 @@
 /* Fontes servidas pelo próprio site (antes vinham do Google Fonts: a página esperava o servidor do Google, DNS +
    conexão + 2 arquivos, antes de aparecer e de rodar a abertura da hero; e o IP do visitante ia para o Google).
    Só o conjunto latino (português inteiro). Inter Tight é variável: um arquivo serve os pesos 400 a 700. */
+/* o site tem tema próprio: o modo escuro automático (Samsung Internet, Chrome do Android) não pode trocar as cores
+   (sem isto o painel claro da hero ficava escuro). Junto com a <meta name="color-scheme"> das páginas */
+:root { color-scheme: only light; }
 @font-face { font-family: "Inter Tight"; font-style: normal; font-weight: 100 900; font-display: swap;
   src: url(../fonts/inter-tight-latin.woff2) format("woff2"); }
 @font-face { font-family: "Instrument Serif"; font-style: normal; font-weight: 400; font-display: swap;
@@ -2283,6 +2286,8 @@ html.leve .person-rim { display: none; }
   .person-rim { display: none; }
   .intro .bw-ring { display: none; }
 }   /* modo leve: a 8% quase não aparece e a mistura (screen) numa área grande que se mexe pesa na placa de vídeo */
+/* PC "mais ou menos" (degrau do meio, html.medio: notebook com placa integrada): os mesmos dois cortes do toque */
+html.medio .person-rim, html.medio .intro .bw-ring { display: none; }
 .hero-art g[mask] > circle:nth-child(2) { display: none; }   /* sem o disco amarelo (lua) atrás do ombro */
 .hero-art { display: none; }   /* sem a luz amarela atrás da pessoa */
 

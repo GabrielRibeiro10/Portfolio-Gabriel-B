@@ -100,7 +100,12 @@ function photoReady() {
 if (animate) {
   if (ScrollTrigger) { gsap.registerPlugin(ScrollTrigger); if (window.grReload) ScrollTrigger.clearScrollMemory('manual'); }
   const $ = (s) => hero.querySelector(s), $$ = (s) => hero.querySelectorAll(s);
-  const isMobile = matchMedia(MOBILE).matches;
+  const isMobile = matchMedia(MOBILE).matches;   // LAYOUT de celular (tamanho da tela)
+  // DESEMPENHO, degrau do meio: qualquer tela de toque (celular, tablet em pé OU deitado) e o PC "mais ou menos"
+  // (classe "medio", js/desempenho.js: notebook com placa integrada etc.). Ali sai o que repinta muito a cada quadro
+  // (texto palavra por palavra, desfoque/máscara da abertura, degradê no scrub, camadas extras de parallax);
+  // o resto fica igual. Antes era só isMobile: tablet deitado e notebook médio recebiam tudo do PC bom
+  const cheap = () => isMobile || matchMedia('(hover: none), (pointer: coarse)').matches || document.documentElement.classList.contains('medio');
 
   const chars = splitChars($('.intro h1'));
   const pitchWords = splitWords($('.pitch-text'));
@@ -113,7 +118,7 @@ if (animate) {
   const titleIn = L ? $$('.intro h1 .line') : chars;
   // celular: os textos do painel também entram inteiros. Lá a entrada deles começa NA ROLAGEM (ao chegar no
   // painel) e ~1.900 mudanças de estilo palavra por palavra junto com a rolagem deixavam tudo lento no iPhone
-  const textIn = (t, words, el, dur, stag, at) => (L || isMobile
+  const textIn = (t, words, el, dur, stag, at) => (L || cheap()
     ? t.from(el, { y: 18, autoAlpha: 0, duration: dur, ease: 'power3.out', clearProps: 'transform,opacity,visibility' }, at)
     : t.from(words, { yPercent: 110, duration: dur, stagger: stag }, at));
   const nums = $$('[data-count]');
@@ -138,7 +143,7 @@ if (animate) {
   const logo = $('.logo'), open = $('.gr-open'), layers = $$('.gr-open__l');
   // celular/tablet (toque) também abre na versão barata: sem desfoque animado na logo e sem a máscara que abre o
   // fundo. Os dois repintam a tela inteira a cada quadro; no iPhone (tela 3x) a abertura "lagava" mesmo no 11 Pro Max
-  const lite = leve() || isMobile;
+  const lite = leve() || cheap();
   const D = 2.85;   // quando o resto da hero começa: junto com a abertura do fundo (a marca pousa em ~4,4 s)
   const hr = hero.getBoundingClientRect(), lr = logo.getBoundingClientRect();
   const S = Math.min(isMobile ? 2.6 : 3.1, (hr.width * (isMobile ? 0.8 : 0.42)) / lr.width);
@@ -272,9 +277,14 @@ if (animate) {
       const st = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { ...range, scrub: 0.8, invalidateOnRefresh: true } });
       st.fromTo(card, { yPercent: isMobile ? 16 : 0 }, { yPercent: isMobile ? -16 : -42 }, 0)
         .fromTo(shine, { xPercent: -70 }, { xPercent: 135 }, 0);  // a luz já aparece na borda esquerda no começo
-      // brilho quente: muda o degradê (repinta o card inteiro a cada quadro). Só no PC; no celular fica parado
-      if (!isMobile) st.fromTo(glow, { '--gx': '12%', '--gy': '10%', '--gc': 'rgba(255, 130, 50, .34)' },
-          { '--gx': '100%', '--gy': '100%', '--gc': 'rgba(255, 196, 80, .38)' }, 0);
+      // brilho quente: muda o degradê (repinta o card inteiro a cada quadro). Só no PC bom; no toque e no PC médio
+      // fica parado (e para se o degrau do meio ligar no meio do uso)
+      if (!cheap()) {
+        const gt = gsap.fromTo(glow, { '--gx': '12%', '--gy': '10%', '--gc': 'rgba(255, 130, 50, .34)' },
+          { '--gx': '100%', '--gy': '100%', '--gc': 'rgba(255, 196, 80, .38)', ease: 'none', paused: true });
+        st.add(gt.play(), 0);
+        document.addEventListener('gr:medio', () => { st.remove(gt); gt.progress(0).kill(); }, { once: true });
+      }
       // modo leve ligado no meio do uso: para tudo e deixa o card no lugar, com a luz parada
       document.addEventListener('gr:leve', () => { st.scrollTrigger.kill(); st.progress(0).kill(); gsap.set(card, { clearProps: 'transform' }); }, { once: true });
     }
@@ -303,13 +313,18 @@ if (animate) {
   // transform: a entrada e o hover deles continuam usando transform sem brigar com o parallax. Modo leve: parados
   // (medido no celular fraco: com a foto, o desenho e estes 3 andando a cada quadro, o topo passava da meta).
   // celular: parados (são mais 3 camadas mudando a cada quadro da rolagem, junto com foto, desenho e card)
-  if (ScrollTrigger && !leve() && !isMobile) {
+  if (ScrollTrigger && !leve() && !cheap()) {
     const els = [$('.intro .btn-work'), $('.stats'), $('.socials')].filter(Boolean);
     const dist = () => card.offsetHeight * (isMobile ? 0.16 : 0.42);
     const sts = els.map((el) => gsap.fromTo(el, { '--hp': () => (isMobile ? dist() : 0) + 'px' }, { '--hp': () => -dist() + 'px', ease: 'none',
       scrollTrigger: { ...(isMobile ? { trigger: el, start: 'top 125%', end: 'bottom 15%' } : { trigger: hero, start: 'top top', end: 'bottom top' }),
         scrub: 0.8, invalidateOnRefresh: true } }));
     paraLeve(sts, els, '--hp');
+    // degrau do meio ligado no meio do uso (quadros lentos): estes 3 param também
+    document.addEventListener('gr:medio', () => {
+      sts.forEach((t) => { if (t.scrollTrigger) t.scrollTrigger.kill(); t.kill(); });
+      gsap.set(els, { clearProps: '--hp' });
+    }, { once: true });
   }
 
   // conteúdo do painel: selo, apresentação palavra por palavra e card da citação

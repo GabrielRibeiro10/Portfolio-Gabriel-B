@@ -3,6 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- site só com tema próprio: o modo escuro automático do Samsung Internet e do Chrome do Android não troca as cores -->
+  <meta name="color-scheme" content="only light">
   <title>Gabriel Ribeiro • Desenvolvedor Web Full Stack</title>
   <meta name="description" content="Sites, landing pages e lojas virtuais para advogados, imobiliárias, dentistas e todo tipo de negócio. Rápidos, bonitos e feitos para vender. Peça seu orçamento.">
   <!-- prévia do link no WhatsApp, Instagram, LinkedIn, Facebook e X (imagem 1200×630) -->
@@ -79,7 +81,7 @@
 
   // Perfil do aparelho: placa de vídeo + processador + memória. É do aparelho, não da visita, então fica
   // guardado (localStorage, 30 dias) e as próximas visitas nem medem de novo.
-  const KEY = 'gr-perfil-v2';
+  const KEY = 'gr-perfil-v3';
   const profile = () => {
     try { const p = JSON.parse(localStorage.getItem(KEY)); if (p && Date.now() - p.t < 2592e6) return p; } catch (e) { /* sem storage */ }
     const p = { t: Date.now(), gpu: '', cpu: 0, why: '' };
@@ -120,9 +122,29 @@
     const cores = navigator.hardwareConcurrency || 8, mem = navigator.deviceMemory || 8;
     if (!p.why && p.cpu < 350) p.why = 'cpu';
     if (!p.why && !apple && (cores <= 2 || mem <= 2)) p.why = 'aparelho';
+    // degrau do meio (PC "mais ou menos"): placa de vídeo da própria CPU (Intel/AMD integrada, a de quase todo
+    // notebook comum), processador abaixo do comum ou até 4 núcleos / 4 GB. Ali ficam o mouse e as entradas, mas
+    // sai o que repinta muito a cada quadro da rolagem (ver js/main.js, "cheap")
+    if (!p.why) {
+      if (/intel(?!.*\barc\b)|radeon\(tm\)( r\d)? graphics|radeon vega|vega \d|\bmali|adreno|powervr/i.test(p.gpu)) p.medio = 'gpu';
+      else if (p.cpu < 900) p.medio = 'cpu';
+      else if (!apple && (cores <= 4 || mem <= 4)) p.medio = 'aparelho';
+    }
     try { localStorage.setItem(KEY, JSON.stringify(p)); } catch (e) { /* sem storage */ }
     return p;
   };
+
+  // degrau do meio: classe "medio" no <html> (só computador; tela de toque já é barata em js/main.js).
+  // ?medio=1 força. Também liga no meio do uso pela rede de segurança abaixo (aviso 'gr:medio')
+  const mid = (why) => {
+    if (html.classList.contains('medio') || html.classList.contains('leve')) return;
+    html.classList.add('medio');
+    html.dataset.medio = why;
+    ss('gr-medio', '1');
+    document.dispatchEvent(new CustomEvent('gr:medio', { detail: why }));
+  };
+  let medioForce = null;
+  try { medioForce = new URLSearchParams(location.search).get('medio'); } catch (e) { /* sem URLSearchParams */ }
 
   const c = navigator.connection || {};
   if (force === '1') on('forçado');
@@ -132,6 +154,7 @@
     const p = profile();
     window.grPerfil = p;   // para conferir no console
     if (p.why) on(p.why);
+    else if (medioForce !== '0' && (medioForce === '1' || p.medio || ss('gr-medio') === '1')) mid(medioForce === '1' ? 'forçado' : p.medio || 'sessão');
   }
   if (html.classList.contains('leve') || ss('gr-leve') === '0') return;
 
@@ -140,7 +163,7 @@
   // 2 s (com a aba à vista, nos primeiros segundos depois da entrada e enquanto a pessoa rola) e só liga
   // se duas janelas seguidas tiverem a mediana abaixo de ~25 quadros por segundo. 30 fps fixos (modo
   // economia de bateria do iPhone) não contam como lento.
-  let frames = [], spent = 0, bad = 0, last = 0, raf = 0, until = 0;
+  let frames = [], spent = 0, bad = 0, so = 0, last = 0, raf = 0, until = 0;
   const tick = (t) => {
     raf = 0;
     const dt = last ? t - last : 0;
@@ -148,7 +171,11 @@
     if (dt > 0 && dt < 250 && document.visibilityState === 'visible') { frames.push(dt); spent += dt; }
     if (spent >= 2000) {
       frames.sort((a, b) => a - b);
-      bad = frames[frames.length >> 1] > 40 ? bad + 1 : 0;
+      const med = frames[frames.length >> 1];
+      bad = med > 40 ? bad + 1 : 0;
+      // abaixo de ~45 quadros por segundo (mas não tão lento): passa para o degrau do meio
+      so = med > 22 ? so + 1 : 0;
+      if (so >= 2 && medioForce !== '0') mid('fps');
       frames = []; spent = 0;
       if (bad >= 2) { on('fps'); removeEventListener('scroll', onScroll); return; }
     }
