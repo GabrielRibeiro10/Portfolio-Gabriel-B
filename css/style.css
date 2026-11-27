@@ -15,6 +15,11 @@
   src: local("Arial"), local("Helvetica"), local("Liberation Sans"), local("Roboto");
   size-adjust: 95.7%; ascent-override: 101.2%; descent-override: 25.3%; line-gap-override: 0%;
 }
+/* toque: botões, links e campos respondem na hora e dois toques rápidos NÃO dão zoom (no iPhone, tocar rápido nas
+   setas dos Segmentos dava zoom na página). "manipulation" só tira o zoom de toque duplo: o zoom de pinça continua.
+   Classes com touch-action próprio (.cracha-hit, .pj-track...) vencem esta regra. */
+a, button, [role="button"], input, select, textarea, label, summary { touch-action: manipulation; }
+
 /* Hero B do portfólio do Gabriel: cópia do layout da referência
    (Downloads/02dc17bfa7e203ea4202aab6907b6a12.jpg). Medidas tiradas da referência
    como fração da largura/altura do hero, para o desenho se manter em qualquer tela. */

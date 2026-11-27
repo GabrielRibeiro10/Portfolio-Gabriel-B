@@ -104,3 +104,6 @@ a { color: inherit; text-decoration: none; }
   .nf-btn { width: 100%; }
   .nf-big { right: -6vw; top: 14vh; bottom: auto; }
 }
+
+/* dois toques rápidos nos botões não dão zoom (o zoom de pinça continua) */
+a, button { touch-action: manipulation; }
